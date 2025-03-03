@@ -1,3 +1,6 @@
+// Idea is that you create a label where you have the exact location and the statement.
+// This is the same for all types of statemetns.
+
 package hu.bme.mit.theta.xcfa.cli.witnesses
 import hu.bme.mit.theta.xcfa.model
 import hu.bme.mit.theta.core.decl.VarDecl
@@ -128,6 +131,92 @@ class YamlWitnessToXcfa(witness: YamlWitness, logger: Logger) {
             currentLoc = targetLoc
           }
         }
+        // The file:line:col is included in the label or metatdata of the edge
+        //
+        // main.c:
+        // 1. int main() {
+        // 2.   int x=0;
+        // 3.   while(x<5){
+        // 4.     x++;
+        // 5.   }
+        // 6.   if(x==5) error()
+        // 7.   return 0;
+        // 8. }
+
+        // XcfaProgram:       ----------------
+        //                    ↓              |
+        // [1] ---int x=0--> [2] ---x<5---> [3]
+        //                    |
+        //                   x>=5
+        //                    ↓
+        //                   [4]----x==5----->[error]
+        //                    |
+        //                   x<5
+        //                    ↓
+        //                  [exit]
+
+        // entry_type: violation_sequence
+        // metadata: <... >
+        // content:
+        //  - segment:
+        //    - waypoint:
+        //      action: follow
+        //      type: assumtion
+        //      location:
+        //        file_name: "main.c"
+        //        line: 3
+        //        constraint:
+        //          value: "int x=0"
+        //  - segment:
+        //    - waypoint:
+        //      action: avoid
+        //      type: branching
+        //      location:
+        //        file_name: "main.c"
+        //        line: 3
+        //        constraint:
+        //          value: x>5
+        //    - waypoint:
+        //      action: follow
+        //      type: branching
+        //      location:
+        //        file_name: "main.c"
+        //        line: 3
+        //        constraint:
+        //          value: true
+        //  - segment:
+        //    - waypoint:
+        //      action: follow
+        //      type: branching
+        //      location:
+        //        file_name: "main.c"
+        //        line: 3
+        //        constraint:
+        //          value: true 
+        //  - segment:
+        //    - waypoint:
+        //      action: follow
+        //      type: branching
+        //      location:
+        //        file_name: "main.c"
+        //        line: 3
+        //        constraint:
+        //          value: false
+        //  - segment:
+        //    - waypoint:
+        //      action: follow
+        //      type: target
+        //      location:
+        //        file_name: "main.c"
+        //        line: 6
+        
+        // XcfaViolationWitness:
+        //
+        // [1] ---int x=0--> [2] ---x>5---> [error]
+        //                    |
+        //                   x<=5
+        //                    ↓
+        //                   [3] ---true---> [4] ---true---> [5] ---false---> [target]
 
         WaypointType.BRANCHING -> {
           if (action == Action.FOLLOW) {
