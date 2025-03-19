@@ -1,6 +1,3 @@
-// Idea is that you create a label where you have the exact location and the statement.
-// This is the same for all types of statemetns.
-
 package hu.bme.mit.theta.xcfa.cli.witnesses
 import hu.bme.mit.theta.xcfa.model
 import hu.bme.mit.theta.core.decl.VarDecl
@@ -13,11 +10,12 @@ import hu.bme.mit.theta.c2xcfa
 import hu.bme.mit.theta.frontend.ParseContext
 import hu.bme.mit.theta.core.stmt.AssumeStmt
 
+// TODO: Are edges to itself o/w added?
 class YamlWitnessToXcfa(witness: YamlWitness, program: XCFA, source: String, logger: Logger) {
   
   val xcfaBuilder: XcfaBuilder; 
   val mainProcBuilder: XcfaProcedureBuilder;
-  val locationMap: MutableMap<Location, XcfaLocation> = mutableMapOf()
+  val locationMap: MutableMap<Location, XcfaLocation>;
   var currentLoc: XcfaLocation;
   var trapLoc: XcfaLocation;
 
@@ -156,55 +154,20 @@ class YamlWitnessToXcfa(witness: YamlWitness, program: XCFA, source: String, log
   }
 
 
+// Idea is that you create a label where you have the exact location and the statement.
+// This is the same for all types of statemetns.
 fun CorrectnessWitnessesToXcfa(witness: YamlWitness): XCFA {
-
-        // Track locations for each invariant
-        val invariantLocations = mutableMapOf<Triple<String, Int, Int?>, XcfaLocation>()
-
-
-        // Process each invariant
-        witness.content.forEach { contentItem ->
-            contentItem.invariant?.let { invariant ->
-                // Create a location key based on the invariant location
-                val locKey = Triple(invariant.location.fileName, invariant.location.line, invariant.location.column)
-
-                // Get or create a location for this invariant
-                val invLoc = invariantLocations.getOrPut(locKey) {
-                    val funcName = invariant.location.function ?: "unknown"
-                    XcfaLocation("${funcName}_L${invariant.location.line}_${invariant.location.column ?: 0}")
-                }
-                
-                // Add the invariant as a self-loop with a comment
-                val actions = listOf(CommentAction("Invariant: ${invariant.value}"))
-                
-                when (invariant.type) {
-                    InvariantType.LOOP_INVARIANT -> {
-                        // For loop invariants, add a self loop
-                        mainBuilder.addEdge(XcfaEdge(invLoc, invLoc, actions))
-                    }
-                    InvariantType.LOCATION_INVARIANT -> {
-                        // For location invariants, add a self loop
-                        mainBuilder.addEdge(XcfaEdge(invLoc, invLoc, actions))
-                    }
-                }
-                
-                // Ensure there's a path from init to this location and from this location to final
-                mainBuilder.addEdge(XcfaEdge(mainBuilder.initLoc, invLoc, listOf()))
-                mainBuilder.addEdge(XcfaEdge(invLoc, mainBuilder.finalLoc.get(), listOf(ReturnAction(Int(0)))))
-            }
-        }
-        
-        // If no invariants were processed, add a direct path from init to final
-        if (invariantLocations.isEmpty()) {
-            mainBuilder.addEdge(XcfaEdge(mainBuilder.initLoc, mainBuilder.finalLoc.get(), listOf(ReturnAction(Int(0)))))
-        }
-        
-        // Add the main procedure to the XCFA
-        xcfaBuilder.addProcedure(mainBuilder)
-        xcfaBuilder.addEntryPoint(mainBuilder, emptyList())
+    witness.content.forEach { contentItem ->
+      contentItem.segment?.let { invariant ->
+        // segment.forEach { waypoint ->
+          val (type, constraint, location, action) = waypoints.waypoint
+          if(forma2)
+        // }
+      }
     }
-    
-    return xcfaBuilder.build()
+
+    xcfaBuilder.addProcedure(mainProcBuilder)
+    xcfaBuilder.addEntryPoint(mainBuilder, emptyList())
 }
 
 
