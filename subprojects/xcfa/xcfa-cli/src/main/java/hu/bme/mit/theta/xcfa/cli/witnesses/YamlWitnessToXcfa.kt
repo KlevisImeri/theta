@@ -10,33 +10,23 @@ import hu.bme.mit.theta.core.type.inttype.IntExprs.Int
 import hu.bme.mit.theta.xcfa.model.*
 import hu.bme.mit.theta.xcfa.cli.witnesses.*
 import hu.bme.mit.theta.c2xcfa
+import hu.bme.mit.theta.frontend.ParseContext
+import hu.bme.mit.theta.core.stmt.AssumeStmt
 
-class YamlWitnessToXcfa(witness: YamlWitness, logger: Logger) {
+class YamlWitnessToXcfa(witness: YamlWitness, program: XCFA, source: String, logger: Logger) {
   
   val xcfaBuilder: XcfaBuilder; 
   val mainProcBuilder: XcfaProcedureBuilder;
-
   val locationMap: MutableMap<Location, XcfaLocation> = mutableMapOf()
-  private fun addLocation(location: Location, error: Boolean = false): XcfaLocation {
-    return locationMap.getOrPut(location) {
-      val funcName = location.function ?: "unknown"
-      val errorTag = if (error) "[Error]" else ""
-      XcfaLocation(
-        name = "$errorTag${location.fileName}:${funcName}:L${location.line}:${location.column ?: 0}",
-        error = error,
-        metadata = EmptyMetaData
-      )
-    }
-  }
-
   var currentLoc: XcfaLocation;
+  var trapLoc: XcfaLocation;
 
   fun toXcfa(): XCFA {
     xcfaBuilder = XcfaBuilder("WitnessModel_${witness.metadata.uuid.take(5)}")
     locationMap = mutableMapOf<Location, XcfaLocation>()
-    mainProcBuilder  = XcfaProcedureBuilder("main", ProcedurePassManager()) 
+    mainProcBuilder = XcfaProcedureBuilder("main", ProcedurePassManager()) 
     mainProcBuilder.createInitLoc()
-    mainProcBuilder.createFinalLoc()
+    // mainProcBuilder.createFinalLoc() TODO: Do we really need a final locaition for procedure?
     currentLoc = mainProcBuilder.initLoc
     return when (witness.entryType) {
       EntryType.VIOLATION -> violationWitnessToXcfa()
@@ -44,7 +34,9 @@ class YamlWitnessToXcfa(witness: YamlWitness, logger: Logger) {
     }
   }
 
-  private fun ViolationWitnessToXcfa(): XCFA {    
+  private fun ViolationWitnessToXcfa(): XCFA 
+    trapNode = newLocation(location);
+
     witness.content.forEach { contentItem ->
       contentItem.segment?.let { segment ->
         segment.forEach { waypoint ->
@@ -53,20 +45,13 @@ class YamlWitnessToXcfa(witness: YamlWitness, logger: Logger) {
       }
     }
 
-    // Ensure there's a path to the final location
-    if (currentLoc != mainBuilder.finalLoc.get()) {
-      mainBuilder.addEdge(XcfaEdge(currentLoc, mainBuilder.finalLoc.get(), listOf(ReturnAction(Int(0)))))
-    }
-
-    // Add the main procedure to the XCFA
-    xcfaBuilder.addProcedure(mainBuilder)
+    xcfaBuilder.addProcedure(mainProcBuilder)
     xcfaBuilder.addEntryPoint(mainBuilder, emptyList())
   }
  
   private fun waypointToXcfa(waypoint: Waypoint) {
     val (type, constraint, location, action) = waypoints.waypoint
-
-    val targetLoc = addLocation(location);
+    val targetLoc = newLocation(location);
 
     when (type) {
 
@@ -78,184 +63,111 @@ class YamlWitnessToXcfa(witness: YamlWitness, logger: Logger) {
         if(format != C_EXPRESSION or != null) {
           throw IllegalArgumentException("Only  C_EXPRESSION is supported currently")
         }
-        Expr<*> exp = parseCExpression(
-          value,
-          vars: Map<VarDecl<*>, CComplexType>,
-          scope: List<String>,
-          logger,
-        );
 
+        val stmt = CExpToAssumeStmt(value);
+        val targetLoc = newLocation(location);
 
-        if(action == Action.AVOID)) {
-
-        } else if (action == Action.FOLLOW) {
-            val actions = mutableListOf<XcfaAction>()
-            actions.add(CommentAction("Assumption: ${constraint.value}"))
-            builder.addEdge(XcfaEdge(currentLoc, targetLoc, actions))
+        when (action) {
+          Action.FOLLOW -> {
+            mainProcBuilder.addEdge(XcfaEdge(
+              currentLoc,
+              targetLoc,
+              exp,
+              EmptyMetaData
+            ))
             currentLoc = targetLoc
-        } else {
-          throw IllegalArgumentException("Unknown action type: ${action}")
+          }
+          Action.AVOID -> {
+            toTrapNode(currentLoc, StmtLabel(stmt))
+          }
+          else -> {
+              throw IllegalArgumentException("Unknown action type: $action")
+          }
         }
       }
 
       WaypointType.TARGET -> {
         if (action == Action.FOLLOW) {
           val errorLoc =  addLocation(location, true);
-          builder.addEdge(XcfaEdge(
+         mainProcBuilder.addEdge(XcfaEdge(
             currentLoc,
             errorLoc,
+            NopLabel,
             EmptyMetaData
           ))
-          builder.addEdge(XcfaEdge(
-            errorLoc, 
-            mainBuilder.finalLoc.get(), 
-            ReturnLabel(XcfaLabel(EmptyMetaData), //TODO:return 1
-            EmptyMetaData
-          )
-
           currentLoc = errorLoc
         } else {
            throw IllegalArgumentException("For waypoint of type TARGET only action FOLLOW is allowed. Current action: ${action}")         
         }
       }
 
-        WaypointType.FUNCTION_ENTER -> {
-          if (action == Action.FOLLOW) {
-            currentLoc = targetLoc
+      WaypointType.FUNCTION_ENTER -> {} //ignore TODO: What about avoid fucntion enter?
+
+      WaypointType.FUNCTION_RETURN -> {
+        val targetLoc = newLocation(location);
+        when (action) {
+          Action.FOLLOW -> {
+            val functionName = getNameOfFunctionAtLocation(location)
+            if (functionName.contains("__VERIFIER_nondet")) {
+              mainProcBuilder.addEdge(XcfaEdge(
+                currentLoc 
+                targetLoc,
+                HavocStmt.of(getVarDeclAtLocation(Location)); // TODO: is this the right way to creat havoc
+                EmptyMetaData,
+              ))
+              currentLoc = targetLoc
+            }
+          }
+          Action.AVOID -> {
+            // toTrapNode(currentLoc, ?)  TODO: what type of label
+          }
+          else -> {
+              throw IllegalArgumentException("Unknown action type: $action")
           }
         }
+      }
 
-        WaypointType.FUNCTION_RETURN -> {
-          if (action == Action.FOLLOW) {
-            // Function return waypoint
-            currentLoc = targetLoc
-          }
-        }
-        // The file:line:col is included in the label or metatdata of the edge
-        //
-        // main.c:
-        // 1. int main() {
-        // 2.   int x=0;
-        // 3.   while(x<5){
-        // 4.     x++;
-        // 5.   }
-        // 6.   if(x==5) error()
-        // 7.   return 0;
-        // 8. }
-
-        // XcfaProgram:       ----------------
-        //                    ↓              |
-        // [1] ---int x=0--> [2] ---x<5---> [3]
-        //                    |
-        //                   x>=5
-        //                    ↓
-        //                   [4]----x==5----->[error]
-        //                    |
-        //                   x<5
-        //                    ↓
-        //                  [exit]
-
-        // entry_type: violation_sequence
-        // metadata: <... >
-        // content:
-        //  - segment:
-        //    - waypoint:
-        //      action: follow
-        //      type: assumtion
-        //      location:
-        //        file_name: "main.c"
-        //        line: 3
-        //        constraint:
-        //          value: "int x=0"
-        //  - segment:
-        //    - waypoint:
-        //      action: avoid
-        //      type: branching
-        //      location:
-        //        file_name: "main.c"
-        //        line: 3
-        //        constraint:
-        //          value: x>5
-        //    - waypoint:
-        //      action: follow
-        //      type: branching
-        //      location:
-        //        file_name: "main.c"
-        //        line: 3
-        //        constraint:
-        //          value: true
-        //  - segment:
-        //    - waypoint:
-        //      action: follow
-        //      type: branching
-        //      location:
-        //        file_name: "main.c"
-        //        line: 3
-        //        constraint:
-        //          value: true 
-        //  - segment:
-        //    - waypoint:
-        //      action: follow
-        //      type: branching
-        //      location:
-        //        file_name: "main.c"
-        //        line: 3
-        //        constraint:
-        //          value: false
-        //  - segment:
-        //    - waypoint:
-        //      action: follow
-        //      type: target
-        //      location:
-        //        file_name: "main.c"
-        //        line: 6
-        
-        // XcfaViolationWitness:
-        //
-        // [1] ---int x=0--> [2] ---x>5---> [error]
-        //                    |
-        //                   x<=5
-        //                    ↓
-        //                   [3] ---true---> [4] ---true---> [5] ---false---> [target]
-
-        WaypointType.BRANCHING -> {
-          if (action == Action.FOLLOW) {
-            val targetLoc = addLocation(location);
-            builder.addEdge(XcfaEdge(
+      WaypointType.BRANCHING -> {
+        val targetLoc = newLocation(location);
+        val label = StmtLabel(
+          SkipStmt(),
+          if (constraint.value) ChoiceType.MAIN_PATH else ChoiceType.ALTERNATIVE_PATH
+        )
+        when (action) {
+          Action.FOLLOW -> {
+           mainProcBuilder.addEdge(XcfaEdge(
               currentLoc 
               targetLoc,
-              StmtLabel(
-                NoStmt(), // TODO: empty Stmt
-                if (constraint.value) ChoiceType.MAIN_PATH else ChoiceType.ALTERNATIVE_PATH
-              ),
+              label,
               EmptyMetaData,
             ))
             currentLoc = targetLoc
           }
+          Action.AVOID -> {
+            toTrapNode(currentLoc, label)
+          }
+          else -> {
+              throw IllegalArgumentException("Unknown action type: $action")
+          }
         }
-
       }
+
     }
   }
 
 
-
-
 fun CorrectnessWitnessesToXcfa(witness: YamlWitness): XCFA {
-    // For invariant witnesses, process the invariants
-    val mainBuilder = XcfaProcedureBuilder("main", ProcedurePassManager())
-    mainBuilder.createInitLoc()
-    mainBuilder.createFinalLoc()
-        
+
         // Track locations for each invariant
         val invariantLocations = mutableMapOf<Triple<String, Int, Int?>, XcfaLocation>()
-        
+
+
         // Process each invariant
         witness.content.forEach { contentItem ->
             contentItem.invariant?.let { invariant ->
                 // Create a location key based on the invariant location
                 val locKey = Triple(invariant.location.fileName, invariant.location.line, invariant.location.column)
-                
+
                 // Get or create a location for this invariant
                 val invLoc = invariantLocations.getOrPut(locKey) {
                     val funcName = invariant.location.function ?: "unknown"
@@ -295,4 +207,91 @@ fun CorrectnessWitnessesToXcfa(witness: YamlWitness): XCFA {
     return xcfaBuilder.build()
 }
 
+
+  private fun newLocation(location: Location, error: Boolean = false): XcfaLocation {
+    return locationMap.getOrPut(location) {
+      val funcName = location.function ?: "unknown"
+      val errorTag = if (error) "[Error]" else ""
+      XcfaLocation(
+        name = "$errorTag${location.fileName}:${funcName}:L${location.line}:${location.column ?: 0}",
+        error = error,
+        metadata = EmptyMetaData
+      )
+    }
+  }
+
+  private fun toTrapNode(from: XcfaLocation, label: XcfaLabel) { 
+    mainProcBuilder.addEdge(XcfaEdge(
+      currentLoc,
+      trapLoc,
+      label,
+      EmptyMetaData
+    )
+  }
+  
+  // TODO: Understand thsi fucntion exacly
+  private fun CExpToAssumeStmt(value: String): AssumeStmt {
+    val parseContext = ParseContext() //TODO: Understand what does this do and how is it used below?
+    val proc = program.initProcedures.first().first
+    val ifBeforeReachErrorCall = proc.edges.filter {
+      it.getCMetaData()?.let { 
+          it.lineNumberStart == location.line && it.colNumberStart == location.column 
+      } ?: false 
+    }.first()
+
+    val exp = parseCExpression(
+        value,
+        vars = this.program.collectVars().associateWith { CComplexType.getType(it.ref, parseContext) },
+        scope = ifBeforeReachErrorCall.getCMetaData()!!.scope.reversed(),
+        warningLogger = logger
+    )
+
+    return AssumeStmt.of(exp as Expr<BoolType>) //TODO: can you do it like this?
+  }
+  
+  private getVarDeclAtLocation(location: Location) {
+    // TODO: Use the XCFA.initProcedureBuildrs.first().vars ?
+    // Do something similar to parseCExpression exmaple
+  }
+
+  // TODO: Problamatic if not in the same line
+  private fun getNameOfFunctionAtLocation(location: Location): String {
+    val lines = try {
+      File(source).takeIf { it.exists() }?.readLines() 
+          ?: source.split("\n")
+    } catch (e: Exception) {
+      logger.error("Error reading source: ${e.message}")
+      throw IllegalArgumentException("Yaml witness location is not appropiate for the input file!")
+    }
+
+    var (line, column, function) = location;
+    line--
+    column-- 
+
+    if (lineNumber !in lines.indices) throw IllegalArgumentException("Yaml witness location is not appropiate for the input file!")
+    if (columnNumber !in line.indices) throw IllegalArgumentException("Yaml witness location is not appropiate for the input file!")
+    if (lines[line][column] != ')') throw IllegalArgumentException("Yaml witness location is not appropiate for the input file!")
+
+    var parenCount = 0;
+    var pos = column; 
+      while (pos >= 0 && parenCount > 0) {
+        when (line[pos]) {
+          ')' -> parenCount++
+          '(' -> parenCount--
+        }
+        pos--
+      }
+
+    if (parenCount != 0) throw IllegalArgumentException("Yaml witness location is not appropiate for the input file!")
+
+    var nameStart = pos
+    while (nameStart >= 0 && line[nameStart].isWhitespace()) {
+      nameStart--
+    }
+
+    val functionName = line.substring(nameStart + 1, pos).trim()
+    return functionName.ifEmpty { "unknown" }
+  }
+
+}
 
