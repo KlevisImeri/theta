@@ -62,6 +62,8 @@ import hu.bme.mit.theta.xcfa2chc.toSMT2CHC
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
+import hu.bme.mit.theta.xcfa.cli.witnesses.*
+import com.charleskorn.kaml.Yaml
 
 fun runConfig(
   config: XcfaConfig<*, *>,
@@ -75,8 +77,9 @@ fun runConfig(
 
   validateInputOptions(config, logger, uniqueLogger)
 
-  val (xcfa, mcm, parseContext) = frontend(config, logger, uniqueLogger)
+  val (xcfa, mcm, parseContext, witnessXcfa) = frontend(config, logger, uniqueLogger)
 
+  // TODO: validate(xcfa, witnessXcfva)
   preVerificationLogging(xcfa, mcm, parseContext, config, logger, uniqueLogger)
 
   val result = backend(xcfa, mcm, parseContext, config, logger, uniqueLogger, throwDontExit)
@@ -143,11 +146,17 @@ private fun validateInputOptions(config: XcfaConfig<*, *>, logger: Logger, uniqu
   }
 }
 
+data class FrontendResult(
+    val xcfa: XCFA,
+    val mcm: MCM,
+    val parseContext: ParseContext,
+    val witnessXcfa: XCFA? = null
+)
 fun frontend(
   config: XcfaConfig<*, *>,
   logger: Logger,
   uniqueLogger: Logger,
-): Triple<XCFA, MCM, ParseContext> {
+): FrontendResult {
   if (config.inputConfig.xcfaWCtx != null) {
     val xcfa = config.inputConfig.xcfaWCtx!!.first
     ConeOfInfluence =
@@ -156,7 +165,12 @@ fun frontend(
       } else {
         XcfaCoiSingleThread(xcfa)
       }
-    return config.inputConfig.xcfaWCtx!!
+    return FrontendResult(
+      xcfa = config.inputConfig.xcfaWCtx!!.first,
+      mcm = config.inputConfig.xcfaWCtx!!.second,
+      parseContext = config.inputConfig.xcfaWCtx!!.third,
+      witnessXcfa = null
+    )
   }
 
   val stopwatch = Stopwatch.createStarted()
@@ -177,6 +191,14 @@ fun frontend(
   }
 
   val xcfa = getXcfa(config, parseContext, logger, uniqueLogger)
+
+  val (enabled, witness) = config.validateConfig;
+  var witnessXcfa: XCFA? = null;
+  if (enabled) {
+    witness ?: throw IllegalStateException("No witness file provided")
+    val yamlWitness = Yaml.default.decodeFromString(YamlWitness.serializer(), witness.readText());
+    witnessXcfa = YamlWitnessToXcfa(yamlWitness, xcfa, parseContext, logger).run();
+  }
 
   val mcm =
     if (config.inputConfig.catFile != null) {
@@ -212,7 +234,7 @@ fun frontend(
     "Alias graph size: ${xcfa.pointsToGraph.size} -> ${xcfa.pointsToGraph.values.map { it.size }.toList()}\n",
   )
 
-  return Triple(xcfa, mcm, parseContext)
+  return FrontendResult(xcfa, mcm, parseContext, witnessXcfa)
 }
 
 private fun backend(

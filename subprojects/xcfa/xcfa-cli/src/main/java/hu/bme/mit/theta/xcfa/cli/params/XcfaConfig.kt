@@ -58,6 +58,7 @@ data class XcfaConfig<F : SpecFrontendConfig, B : SpecBackendConfig>(
   val backendConfig: BackendConfig<B> = BackendConfig(),
   val outputConfig: OutputConfig = OutputConfig(),
   val debugConfig: DebugConfig = DebugConfig(),
+  val validateConfig: ValidateConfig = ValidateConfig(),
 ) : Config {
 
   override fun getObjects(): Set<Config> {
@@ -65,7 +66,8 @@ data class XcfaConfig<F : SpecFrontendConfig, B : SpecBackendConfig>(
       frontendConfig.getObjects() union
       backendConfig.getObjects() union
       outputConfig.getObjects() union
-      debugConfig.getObjects()
+      debugConfig.getObjects() union
+      validateConfig.getObjects()
   }
 
   override fun update(): Boolean =
@@ -73,6 +75,15 @@ data class XcfaConfig<F : SpecFrontendConfig, B : SpecBackendConfig>(
       .map { it.update() }
       .any { it == true }
 }
+
+// TODO: move to appropiate place
+data class ValidateConfig(
+  @Parameter(names = ["--validate"], description = "Enable witness validation mode")
+  var enabled: Boolean = false,
+  
+  @Parameter(names = ["--witness"], description = "Path to the witness file for validation")
+  var witness: File? = null,
+) : Config
 
 data class InputConfig(
   @Parameter(names = ["--input"], description = "Path of the input model") var input: File? = null,

@@ -1,14 +1,16 @@
 package hu.bme.mit.theta.xcfa.cli.witnesses
-import hu.bme.mit.theta.xcfa.model
-import hu.bme.mit.theta.core.decl.VarDecl
 import hu.bme.mit.theta.core.type.inttype.IntType
 import hu.bme.mit.theta.core.type.Expr
 import hu.bme.mit.theta.core.type.inttype.IntExprs.Int
 import hu.bme.mit.theta.xcfa.model.*
 import hu.bme.mit.theta.xcfa.cli.witnesses.*
-import hu.bme.mit.theta.c2xcfa
 import hu.bme.mit.theta.frontend.ParseContext
 import hu.bme.mit.theta.core.stmt.AssumeStmt
+import hu.bme.mit.theta.xcfa.passes.HavocPromotionAndRange
+import hu.bme.mit.theta.common.logging.Logger
+import hu.bme.mit.theta.common.logging.Logger.Level.*
+import hu.bme.mit.theta.xcfa.passes.ProcedurePassManager
+
 
 // Work from main
 
@@ -17,24 +19,23 @@ import hu.bme.mit.theta.core.stmt.AssumeStmt
 // [] -- int x = havoc() --> []
 // [] --  x == 2 --> [] you dont have to put an havoc statement but you need a AsumeSmt
 // HavocPromotionAndRange :42
-// Execute config :172
 
 // TODO: remove source
-// TODO: Are edges to itself o/w added? Yes
 class YamlWitnessToXcfa(
-  witness: YamlWitness, 
-  program: XCFA, 
-  parseContext: ParseContext, 
-  logger: Logger
+  val witness: YamlWitness, 
+  val program: XCFA, 
+  val parseContext: ParseContext, 
+  val logger: Logger
 ) {
-  
-  val xcfaBuilder: XcfaBuilder; 
-  val mainProcBuilder: XcfaProcedureBuilder;
-  val locationMap: MutableMap<Location, XcfaLocation>;
-  var currentLoc: XcfaLocation;
-  var trapLoc: XcfaLocation;
 
-  fun toXcfa(): XCFA {
+  lateinit var xcfaBuilder: XcfaBuilder; 
+  lateinit var mainProcBuilder: XcfaProcedureBuilder;
+  lateinit var locationMap: MutableMap<Location, XcfaLocation>;
+  lateinit var currentLoc: XcfaLocation;
+  lateinit var trapLoc: XcfaLocation;
+
+  fun run(): XCFA {
+    System.out.println(program.toString());
     xcfaBuilder = XcfaBuilder("WitnessModel_${witness.metadata.uuid.take(5)}")
     locationMap = mutableMapOf<Location, XcfaLocation>()
     mainProcBuilder = XcfaProcedureBuilder("main", ProcedurePassManager()) 
@@ -47,8 +48,8 @@ class YamlWitnessToXcfa(
     }
   }
 
-  private fun ViolationWitnessToXcfa(): XCFA 
-    trapNode = newLocation(location);
+  private fun violationWitnessToXcfa(): XCFA {
+    trapLoc = newLocation(Location("Trap", -1));
 
     witness.content.forEach { contentItem ->
       contentItem.segment?.let { segment ->
@@ -59,11 +60,12 @@ class YamlWitnessToXcfa(
     }
 
     xcfaBuilder.addProcedure(mainProcBuilder)
-    xcfaBuilder.addEntryPoint(mainBuilder, emptyList())
+    xcfaBuilder.addEntryPoint(mainProcBuilder, emptyList())
+    return xcfaBuilder.build();
   }
  
   private fun waypointToXcfa(waypoint: Waypoint) {
-    val (type, constraint, location, action) = waypoints.waypoint
+    val (type, constraint, location, action) = waypoint.waypoint
     val targetLoc = newLocation(location);
 
     when (type) {
@@ -73,11 +75,11 @@ class YamlWitnessToXcfa(
           throw IllegalArgumentException("For waypoint of type ASSUMPTION the constraint shoudl not be null")
         }
         val (value, format) = constraint;
-        if(format != C_EXPRESSION or != null) {
+        if(format != Format.C_EXPRESSION && format!= null) {
           throw IllegalArgumentException("Only  C_EXPRESSION is supported currently")
         }
 
-        val stmt = CExpToAssumeStmt(value);
+        val stmtLabel = StmtLabel(CExpToAssumeStmt(value));
         val targetLoc = newLocation(location);
 
         when (action) {
@@ -85,13 +87,13 @@ class YamlWitnessToXcfa(
             mainProcBuilder.addEdge(XcfaEdge(
               currentLoc,
               targetLoc,
-              AssumeStmt(stmt),
+              stmtLabel,
               EmptyMetaData
             ))
             currentLoc = targetLoc
           }
           Action.AVOID -> {
-            toTrapNode(currentLoc, StmtLabel(stmt))
+            toTrapNode(currentLoc, stmtLabel)
           }
           else -> {
               throw IllegalArgumentException("Unknown action type: $action")
@@ -101,8 +103,8 @@ class YamlWitnessToXcfa(
         
       WaypointType.TARGET -> {
         if (action == Action.FOLLOW) {
-          val errorLoc =  addLocation(location, true);
-         mainProcBuilder.addEdge(XcfaEdge(
+          val errorLoc = newLocation(location, true);
+          mainProcBuilder.addEdge(XcfaEdge(
             currentLoc,
             errorLoc,
             NopLabel,
@@ -110,36 +112,36 @@ class YamlWitnessToXcfa(
           ))
           currentLoc = errorLoc
         } else {
-           throw IllegalArgumentException("For waypoint of type TARGET only action FOLLOW is allowed. Current action: ${action}")         
+           throw IllegalArgumentException("For waypoint of type TARGET only action FOLLOW is allowed. Current action: ${action}")
         }
       }
 
       WaypointType.FUNCTION_ENTER -> {} //ignore
       
-      // Thete when parses it can inline funcions so not all funcions are supported
-      // We have to through a warning in this case. But we have havocs. 
-      // At the begging you have more informatoin 
       WaypointType.FUNCTION_RETURN -> {
         val targetLoc = newLocation(location);
-        when (action) {
-          Action.FOLLOW -> {
-            val functionName = getNameOfFunctionAtLocation(location)
-            if (functionName.contains("__VERIFIER_nondet")) {
+        val (assumeStmt, successful) = getAssumeStmtAtLocation(location)
+        if(successful) {
+          when (action) {
+            Action.FOLLOW -> {
               mainProcBuilder.addEdge(XcfaEdge(
-                currentLoc 
+                currentLoc,
                 targetLoc,
-                AssumeStmt(Exp<BoolExpr>) // TODO: I have to get it from value and variables in XCFA
+                assumeStmt,
                 EmptyMetaData,
               ))
               currentLoc = targetLoc
             }
-          }
-          Action.AVOID -> {
-            // toTrapNode(currentLoc, ?)  TODO: what type of label ...
-          }
-          else -> {
+            Action.AVOID -> {
+               throw IllegalArgumentException("We don't know what to do when you avoid a function return!!!")
+              // toTrapNode(currentLoc, ?)  TODO: what type of label ...
+            }
+            else -> {
               throw IllegalArgumentException("Unknown action type: $action")
-          }
+            }
+          } 
+        } else {
+          throw IllegalArgumentException("We only support some function for their return!")
         }
       }
 
@@ -152,7 +154,7 @@ class YamlWitnessToXcfa(
         when (action) {
           Action.FOLLOW -> {
            mainProcBuilder.addEdge(XcfaEdge(
-              currentLoc 
+              currentLoc,
               targetLoc,
               label,
               EmptyMetaData,
@@ -173,7 +175,7 @@ class YamlWitnessToXcfa(
 
   // Idea is that you create a label where you have the exact location and the statement.
   // This is the same for all types of statemetns.
-  fun CorrectnessWitnessesToXcfa(witness: YamlWitness): XCFA {
+  private fun correctnessWitnessesToXcfa(): XCFA {
     witness.content.forEach { contentItem ->
       val (type, location, value, format) = contentItem.
       if(format != C_EXPRESSION) {
@@ -181,7 +183,6 @@ class YamlWitnessToXcfa(
       }
       val targetLoc = newLocation(location);
       val assumeStmt = CExpToAssumeStmt(value);
-      
 
     }
 
@@ -194,11 +195,19 @@ class YamlWitnessToXcfa(
     return locationMap.getOrPut(location) {
       val funcName = location.function ?: "unknown"
       val errorTag = if (error) "[Error]" else ""
-      XcfaLocation(
-        name = "$errorTag${location.fileName}:${funcName}:L${location.line}:${location.column ?: 0}",
+      val newXcfaLocation = XcfaLocation(
+        // name = "$errorTag${location.fileName}:${funcName}:L${location.line}:${location.column ?: 0}",
+        name = "",
         error = error,
         metadata = EmptyMetaData
       )
+      mainProcBuilder.addEdge(XcfaEdge(
+        newXcfaLocation,
+        newXcfaLocation,
+        label,
+        EmptyMetaData
+      ))
+      return newXcfaLocation;
     }
   }
 
@@ -208,30 +217,39 @@ class YamlWitnessToXcfa(
       trapLoc,
       label,
       EmptyMetaData
-    )
+    ))
   }
   
-  //TODO: We dont even need this now
-  private fun CExpToAssumeStmt(value: String): AssumeStmt {
-    val parseContext = ParseContext()
-    val proc = program.initProcedures.first().first
-    val ifBeforeReachErrorCall = proc.edges.filter {
-      it.getCMetaData()?.let { // TODO: This si worng int between colum does not matter  
-          it.lineNumberStart <= location.line && location.line <= it.lineNumberStop &&
-          it.colNumberStart <= location.column  && location.column <= it.colNumerStop
-      } ?: false 
-    }.first()
-    
-    // THe scope definintions are ...
-    val exp = parseCExpression(
-        value,
-        vars = this.program.collectVars().associateWith { CComplexType.getType(it.ref, parseContext) },
-        scope = ifBeforeReachErrorCall.getCMetaData()!!.scope.reversed(), // TODO: check with DB
-        warningLogger = logger
-    )
-
-    return AssumeStmt.of(exp as Expr<BoolType>)
+  private fun getAssumeStmtAtLocation(loc: Location): Pair<AssumeStmt, Boolean> {
+      return Pair(AssumeStmt.of(BoolExprs.True()), true)
   }
+
+  private fun CExpToAssumeStmt(value: String): AssumeStmt {
+    return AssumeStmt.of(BoolExprs.True());
+  }
+
+
+  // //TODO: We dont even need this now
+  // private fun CExpToAssumeStmt(value: String): AssumeStmt {
+  //   val parseContext = ParseContext()
+  //   val proc = program.initProcedures.first().first
+  //   val ifBeforeReachErrorCall = proc.edges.filter {
+  //     it.getCMetaData()?.let { // TODO: This si worng int between colum does not matter  
+  //         it.lineNumberStart <= location.line && location.line <= it.lineNumberStop &&
+  //         it.colNumberStart <= location.column  && location.column <= it.colNumerStop
+  //     } ?: false 
+  //   }.first()
+  //   
+  //   // THe scope definintions are ...
+  //   val exp = parseCExpression(
+  //       value,
+  //       vars = this.program.collectVars().associateWith { CComplexType.getType(it.ref, parseContext) },
+  //       scope = ifBeforeReachErrorCall.getCMetaData()!!.scope.reversed(), // TODO: check with DB
+  //       warningLogger = logger
+  //   )
+  //
+  //   return AssumeStmt.of(exp as Expr<BoolType>)
+  // }
 
 }
 
