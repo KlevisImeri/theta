@@ -45,7 +45,6 @@ import hu.bme.mit.theta.common.table.TableWriter;
 import hu.bme.mit.theta.core.model.Valuation;
 import hu.bme.mit.theta.core.type.booltype.BoolExprs;
 import hu.bme.mit.theta.core.utils.ExprUtils;
-import hu.bme.mit.theta.core.utils.indexings.VarIndexingFactory;
 import hu.bme.mit.theta.solver.SolverFactory;
 import hu.bme.mit.theta.solver.SolverManager;
 import hu.bme.mit.theta.solver.SolverPool;
@@ -409,10 +408,7 @@ public class StsCli {
             throws Exception {
         try (var solverPool = new SolverPool(solverFactory)) {
             return MddChecker.create(
-                    monolithicExpr.getInitExpr(),
-                    VarIndexingFactory.indexing(0),
-                    MonolithicExprKt.action(monolithicExpr),
-                    monolithicExpr.getPropExpr(),
+                    monolithicExpr,
                     List.copyOf(monolithicExpr.getVars()),
                     solverPool,
                     logger,
@@ -471,6 +467,8 @@ public class StsCli {
             writer.cell(sts.getVars().size());
             writer.cell(ExprUtils.nodeCountSize(BoolExprs.And(sts.getInit(), sts.getTrans())));
             writer.newRow();
+        } else {
+            logger.write(Level.RESULT, status.toString());
         }
     }
 
