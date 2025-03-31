@@ -16,10 +16,18 @@
 package hu.bme.mit.theta.xcfa.cli
 
 import com.charleskorn.kaml.Yaml
-import hu.bme.mit.theta.xcfa.cli.witnesses.*
+import hu.bme.mit.theta.xcfa.witnesses.*
 import java.util.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
+import hu.bme.mit.theta.common.logging.*
+import hu.bme.mit.theta.xcfa.cli.params.*
+import java.io.File
+import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig;
 
 class YamlWitnessToXcfaTest {
     companion object {
@@ -46,27 +54,45 @@ class YamlWitnessToXcfaTest {
         }
     }
 
+
     @ParameterizedTest
     @MethodSource("witnessExamples")
     fun testWitnessConversion(cFile: String, witnessFile: String) {
-        val logger = NullLogger.getInstance()
-        
+        val logger = ConsoleLabelledLogger()
+
         val (xcfa, mcm, parseContext, witnessXcfa) = frontend(
             XcfaConfig(
                 inputConfig = InputConfig(
                     input = File(javaClass.getResource(cFile)!!.path)
                 ),
                 validateConfig = ValidateConfig(
-                    enabled = true,
-                    witness = File(javaClass.getResource(witnessFile)!!.path)
-                )
+                  enabled = true,
+                  witness = File(javaClass.getResource(witnessFile)!!.path)
+                ),
+                debugConfig = DebugConfig(
+                  debug = true,
+                  stacktrace = true,
+                  logLevel = Logger.Level.VERBOSE,
+                ),
+                //--- fill up uninmportant ---//
+                frontendConfig = FrontendConfig(
+                  specConfig = CFrontendConfig(arithmetic = ArchitectureConfig.ArithmeticType.efficient),
+                ),
+                backendConfig = BackendConfig(
+                  backend = Backend.BOUNDED,
+                ),
+                outputConfig = OutputConfig(),
+                //--- fill up uninmportant ---//
             ),
             logger,
             logger
         )
 
-        // TODO: add more assertoins
+        println("The witness XCFA is: $witnessXcfa")
+
         Assertions.assertNotNull(witnessXcfa, "Witness XCFA should be generated")
         Assertions.assertTrue(xcfa.procedures.isNotEmpty(), "Main XCFA should have procedures")
+
     }
+
 }

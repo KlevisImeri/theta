@@ -63,8 +63,10 @@ import hu.bme.mit.theta.xcfa2chc.toSMT2CHC
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
-import hu.bme.mit.theta.xcfa.cli.witnesses.*
 import com.charleskorn.kaml.Yaml
+import hu.bme.mit.theta.xcfa.witnesses.*
+import hu.bme.mit.theta.xcfa.cli.witnesstransformation.*
+import kotlinx.serialization.builtins.ListSerializer
 
 fun runConfig(
   config: XcfaConfig<*, *>,
@@ -192,18 +194,15 @@ fun frontend(
   }
 
   val xcfa = getXcfa(config, parseContext, logger, uniqueLogger)
-<<<<<<< HEAD
 
   val (enabled, witness) = config.validateConfig;
   var witnessXcfa: XCFA? = null;
   if (enabled) {
     witness ?: throw IllegalStateException("No witness file provided")
-    val yamlWitness = Yaml.default.decodeFromString(YamlWitness.serializer(), witness.readText());
-    witnessXcfa = YamlWitnessToXcfa(yamlWitness, xcfa, parseContext, logger).run();
+    val yamlWitness = Yaml.default.decodeFromString(ListSerializer(YamlWitness.serializer()), witness.readText());
+    witnessXcfa = YamlWitnessToXcfa(yamlWitness[0], xcfa, parseContext, logger, uniqueLogger).run();
   }
 
-=======
->>>>>>> master
   val mcm =
     if (config.inputConfig.catFile != null) {
       CatDslManager.createMCM(config.inputConfig.catFile!!)

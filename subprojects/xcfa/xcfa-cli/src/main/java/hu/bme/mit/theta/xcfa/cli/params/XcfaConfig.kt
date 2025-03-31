@@ -141,8 +141,8 @@ data class FrontendConfig<T : SpecFrontendConfig>(
   var enableFew: Boolean = false,
   @Parameter(names = ["--input-type"], description = "Format of the input")
   var inputType: InputType = InputType.C,
-  override var specConfig: T? = null,
-) : SpecializableConfig<T> {
+    override var specConfig: T? = null,
+  ) : SpecializableConfig<T> {
 
   override fun createSpecConfig() {
     specConfig =
