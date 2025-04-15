@@ -91,15 +91,21 @@ private fun xcfaProcedureToDotMetadata(
       ""
     } else {
       loc.metadata.toString()
+        .replace("\n", "\\n")
+        .replace(Regex("\\s+"), " ")
     }
-    builder.appendLine("${loc.name},$metadataStr [];");
+    builder.appendLine("${loc.name} [label=\"${loc.name} ${metadataStr}\"];");
   }
   edges.forEach { edge ->
     val edgeLabelCustom = edgeLabelCustomizer?.invoke(edge) ?: ""
-    // Get metadata as string
-    val metadata = edge.metadata.toString()
+    val metadataStr = edge.metadata.toString()
+    val formattedMetadata = if (metadataStr.contains("EmptyMetaData")) {
+      ""
+    } else {
+      " ${metadataStr.replace("\n", "\\n").replace(Regex("\\s+"), " ")}"
+    }
     builder.appendLine(
-      "${edge.source.name} -> ${edge.target.name} [label=\"${edge.label} $edgeLabelCustom ${metadata}\"];"
+      "${edge.source.name} -> ${edge.target.name} [label=\"${edge.label} ${edgeLabelCustom} ${formattedMetadata}\"];"
     )
   }
   return builder.toString()

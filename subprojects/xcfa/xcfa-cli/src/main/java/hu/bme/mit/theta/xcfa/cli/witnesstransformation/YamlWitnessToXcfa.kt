@@ -231,7 +231,8 @@ class YamlWitnessToXcfa(
     return locationMap.getOrPut(location) {
       val funcName = location.function ?: ""
       val newXcfaLocation = XcfaLocation(
-        name = "\"${location.fileName}:${funcName}:L${location.line}:${location.column ?: 0}\"",
+        // name = "\"${location.fileName}:${funcName}:L${location.line}:${location.column ?: 0}\"",
+        name = "q$numberOfnodes",
         metadata = EmptyMetaData
       )
       numberOfnodes++;
