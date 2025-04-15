@@ -21,14 +21,14 @@ fun XCFA.toDot(edgeLabelCustomizer: LabelCustomizer? = null): String =
   xcfaToDot(name, procedures.map { DottableProcedure(it) }, edgeLabelCustomizer)
 
 fun XcfaProcedure.toDot(edgeLabelCustomizer: LabelCustomizer? = null): String =
-  xcfaProcedureToDot(name, locs, edges, edgeLabelCustomizer)
+  xcfaProcedureToDotMetadata(name, locs, edges, edgeLabelCustomizer)
 
 @Suppress("unused")
 fun XcfaBuilder.toDot(edgeLabelCustomizer: LabelCustomizer? = null): String =
   xcfaToDot(name, getProcedures().map { DottableProcedure(it) }, edgeLabelCustomizer)
 
 fun XcfaProcedureBuilder.toDot(edgeLabelCustomizer: LabelCustomizer? = null): String =
-  xcfaProcedureToDot(name, getLocs(), getEdges(), edgeLabelCustomizer)
+  xcfaProcedureToDotMetadata(name, getLocs(), getEdges(), edgeLabelCustomizer)
 
 private class DottableProcedure(
   private val procedure: XcfaProcedure?,
@@ -76,4 +76,66 @@ private fun xcfaProcedureToDot(
     )
   }
   return builder.toString()
+}
+
+private fun xcfaProcedureToDotMetadata(
+  name: String,
+  locs: Set<XcfaLocation>,
+  edges: Set<XcfaEdge>,
+  edgeLabelCustomizer: LabelCustomizer? = null,
+): String {
+  val builder = StringBuilder()
+  builder.appendLine("label=\"$name\";")
+  locs.forEach { loc ->
+    val metadataStr = if (loc.metadata.toString().contains("EmptyMetaData")) {
+      ""
+    } else {
+      loc.metadata.toString()
+    }
+    builder.appendLine("${loc.name},$metadataStr [];");
+  }
+  edges.forEach { edge ->
+    val edgeLabelCustom = edgeLabelCustomizer?.invoke(edge) ?: ""
+    // Get metadata as string
+    val metadata = edge.metadata.toString()
+    builder.appendLine(
+      "${edge.source.name} -> ${edge.target.name} [label=\"${edge.label} $edgeLabelCustom ${metadata}\"];"
+    )
+  }
+  return builder.toString()
+}
+
+//For those who:
+//- don't want to use a debuger 
+//- for fast output
+//- for testing
+//The debugger is probably better
+fun XCFA.toStringFormatted(): String = buildString {
+    appendLine("XCFA: $name")
+    appendLine("  Global Vars:")
+    globalVars.forEach {
+        appendLine("    - ${it.wrappedVar.name} = ${it.initValue} (threadLocal=${it.threadLocal}, atomic=${it.atomic})")
+    }
+    appendLine("  Procedures:")
+    procedures.forEach { proc ->
+        appendLine("    ${proc.name}(${proc.params.joinToString { "${it.first.name}:${it.second}" }})")
+        appendLine("      Vars: ${proc.vars.joinToString { it.name }}")
+        appendLine("      Locs:")
+        proc.locs.forEach { loc ->
+            appendLine("        - ${loc.name} ${if (loc.initial) "{init}" else ""}${if (loc.final) "{final}" else ""}${if (loc.error) "{error}" else ""}")
+            appendLine("        - ${loc.metadata.toString().replace(",", ",\n                ")}")
+        }
+        appendLine("      Edges:")
+        proc.edges.forEach { edge ->
+            appendLine("        ${edge.source.name} --${edge.label}--> ${edge.target.name}")
+            appendLine("        - ${edge.metadata.toString().replace(",", ",\n                ")}")
+        }
+        proc.finalLoc.ifPresent { appendLine("      Final: ${it.name}") }
+        proc.errorLoc.ifPresent { appendLine("      Error: ${it.name}") }
+    }
+    appendLine("  Init Procedures:")
+    initProcedures.forEach { (proc, args) ->
+        appendLine("    ${proc.name}(${args.joinToString()})")
+    }
+    appendLine("  Unsafe Unroll Used: $unsafeUnrollUsed")
 }

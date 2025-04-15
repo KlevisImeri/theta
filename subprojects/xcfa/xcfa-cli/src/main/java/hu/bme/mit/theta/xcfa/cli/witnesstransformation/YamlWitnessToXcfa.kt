@@ -14,6 +14,7 @@ import hu.bme.mit.theta.c2xcfa.getExpressionFromC
 import hu.bme.mit.theta.core.stmt.SkipStmt;
 import hu.bme.mit.theta.xcfa.collectVars;
 import hu.bme.mit.theta.core.type.booltype.BoolExprs;
+import hu.bme.mit.theta.c2xcfa.CMetaData;
 
 // HavocPromotionAndRange :42
 
@@ -21,7 +22,9 @@ import hu.bme.mit.theta.core.type.booltype.BoolExprs;
 // TODO  implement priv funcs
 // TODO: implement correctin witness
 
-// TODO: remove source
+// TODO: remove sourc
+
+// TODO: CMetaData instald of EmptyMetadata
 class YamlWitnessToXcfa(
   val witness: YamlWitness, 
   val program: XCFA, 
@@ -38,7 +41,6 @@ class YamlWitnessToXcfa(
   lateinit var errorLoc: XcfaLocation;
 
   fun run(): XCFA {
-    System.out.println(program.toString());
     xcfaBuilder = XcfaBuilder("WitnessModel_${witness.metadata.uuid.take(5)}")
     locationMap = mutableMapOf<Location, XcfaLocation>()
     mainProcBuilder = XcfaProcedureBuilder("main", ProcedurePassManager());
@@ -76,11 +78,11 @@ class YamlWitnessToXcfa(
 
       WaypointType.ASSUMPTION -> {
         if(constraint==null) {
-          throw IllegalArgumentException("For waypoint of type ASSUMPTION the constraint shoudl not be null")
+          throw IllegalArgumentException("For waypoint of type ASSUMPTION the constraint should not be null")
         }
         val (value, format) = constraint;
         if(format != Format.C_EXPRESSION && format!= null) {
-          throw IllegalArgumentException("Only  C_EXPRESSION is supported currently")
+          throw IllegalArgumentException("Only C_EXPRESSION is supported currently")
         }
 
         val stmtLabel = StmtLabel(CExpToAssumeStmt(value));
@@ -106,6 +108,13 @@ class YamlWitnessToXcfa(
 
       WaypointType.TARGET -> {
         if (action == Action.FOLLOW) {
+          mainProcBuilder.addEdge(XcfaEdge(
+            currentLoc,
+            targetLoc,
+            NopLabel,
+            EmptyMetaData
+          ))
+          currentLoc = targetLoc
           mainProcBuilder.addEdge(XcfaEdge(
             currentLoc,
             errorLoc,
@@ -174,28 +183,6 @@ class YamlWitnessToXcfa(
 
         } else { //switch statement
           throw TODO("How do you even label a switch?")
-
-          // val label = StmtLabel(
-          //   SkipStmt(),
-          //   if (constraint.value=="true") ChoiceType.MAIN_PATH else ChoiceType.ALTERNATIVE_PATH
-          // )
-          // when (action) {
-          //   Action.FOLLOW -> {
-          //    mainProcBuilder.addEdge(XcfaEdge(
-          //       currentLoc,
-          //       targetLoc,
-          //       label,
-          //       EmptyMetaData,
-          //     ))
-          //     currentLoc = targetLoc
-          //   }
-          //   Action.AVOID -> {
-          //     toTrapNode(label)
-          //   }
-          //   else -> {
-          //       throw IllegalArgumentException("Unknown action type: $action")
-          //   }
-
         }
       }
 
@@ -239,17 +226,19 @@ class YamlWitnessToXcfa(
   //   return binarySearchPrevLocation(OrderdArrayOfLcoations)
   // }
 
+  var numberOfnodes=0;
   private fun newLocation(location: Location): XcfaLocation {
     return locationMap.getOrPut(location) {
-      val funcName = location.function ?: "unknown"
+      val funcName = location.function ?: ""
       val newXcfaLocation = XcfaLocation(
-        name = "${location.fileName}:${funcName}:L${location.line}:${location.column ?: 0}",
+        name = "\"${location.fileName}:${funcName}:L${location.line}:${location.column ?: 0}\"",
         metadata = EmptyMetaData
       )
+      numberOfnodes++;
       mainProcBuilder.addEdge(XcfaEdge(
         newXcfaLocation,
         newXcfaLocation,
-        StmtLabel(SkipStmt.getInstance()),
+        NopLabel,
         EmptyMetaData
       ))
       return newXcfaLocation;
@@ -264,12 +253,12 @@ class YamlWitnessToXcfa(
       EmptyMetaData
     ))
   }
-  
+
   private fun getStmtLabelAtLocation(loc: Location): StmtLabel {
-      return StmtLabel(AssumeStmt.of(BoolExprs.True()));
+      return StmtLabel(AssumeStmt.of(BoolExprs.True())); // TODO:
       //throw IllegalArgumentException("We only support some function for their return!")
   }
-  
+
   private fun CExpToAssumeStmt(value: String): AssumeStmt {
     return AssumeStmt.of(getExpressionFromC(
         value,

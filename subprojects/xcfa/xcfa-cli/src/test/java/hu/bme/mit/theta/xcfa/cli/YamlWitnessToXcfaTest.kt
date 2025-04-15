@@ -28,6 +28,7 @@ import hu.bme.mit.theta.common.logging.*
 import hu.bme.mit.theta.xcfa.cli.params.*
 import java.io.File
 import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig;
+import hu.bme.mit.theta.xcfa.model.*
 
 class YamlWitnessToXcfaTest {
     companion object {
@@ -57,7 +58,7 @@ class YamlWitnessToXcfaTest {
 
     @ParameterizedTest
     @MethodSource("witnessExamples")
-    fun testWitnessConversion(cFile: String, witnessFile: String) {
+    fun testWitnessConversion(cFile: String, witnessFile: String) { //TODO : finish erro chekcing also the outptu of XCFA is not good
         val logger = ConsoleLabelledLogger()
 
         val (xcfa, mcm, parseContext, witnessXcfa) = frontend(
@@ -88,7 +89,16 @@ class YamlWitnessToXcfaTest {
             logger
         )
 
-        println("The witness XCFA is: $witnessXcfa")
+        println("------------------------------------")
+        println("The Program XCFA is:")
+        println("------------------------------------")
+        println(xcfa.toDot())
+        println(xcfa.toStringFormatted())
+        println("\n------------------------------------")
+        println("The Witness XCFA is:")
+        println("------------------------------------")
+        println(witnessXcfa!!.toDot())
+        println("------------------------------------")
 
         Assertions.assertNotNull(witnessXcfa, "Witness XCFA should be generated")
         Assertions.assertTrue(xcfa.procedures.isNotEmpty(), "Main XCFA should have procedures")
