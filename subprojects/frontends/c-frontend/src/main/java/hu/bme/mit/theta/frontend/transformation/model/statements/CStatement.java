@@ -158,4 +158,16 @@ public abstract class CStatement {
     public void setCtx(ParserRuleContext ctx) {
         this.ctx = ctx;
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+            "%s[id='%s', lines=(%d:%d–%d:%d), text='%s']",
+            getClass().getSimpleName(),
+            id,
+            lineNumberStart, colNumberStart,
+            lineNumberStop,  colNumberStop,
+            sourceText
+        );
+    }
 }

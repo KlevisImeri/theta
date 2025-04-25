@@ -94,6 +94,20 @@ data class CMetaData(
     }
     return true
   }
+
+
+  override fun toString(): String {
+    return if (isSubstantial()) {
+      val cleanText = sourceText
+        ?.replace("\n", "\\n")
+        ?.replace(Regex("\\s+"), " ")
+        ?.trim()
+        ?: ""
+      "${lineNumberStart}:${colNumberStart} - ${lineNumberStop}:${colNumberStop} $cleanText"
+    } else {
+      "CMetaData(invalid/insufficient data)"
+    }
+  }
 }
 
 fun XcfaLabel.getCMetaData(): CMetaData? {

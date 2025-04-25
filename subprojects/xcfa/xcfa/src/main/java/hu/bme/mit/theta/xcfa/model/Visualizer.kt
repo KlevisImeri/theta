@@ -94,18 +94,21 @@ private fun xcfaProcedureToDotMetadata(
         .replace("\n", "\\n")
         .replace(Regex("\\s+"), " ")
     }
-    builder.appendLine("${loc.name} [label=\"${loc.name} ${metadataStr}\"];");
+    // builder.appendLine("${loc.name} [label=\"${loc.name} ${metadataStr}\"];");
+    builder.appendLine("${loc.name} [label=\"${loc.name}\"];");
   }
   edges.forEach { edge ->
-    val edgeLabelCustom = edgeLabelCustomizer?.invoke(edge) ?: ""
-    val metadataStr = edge.metadata.toString()
-    val formattedMetadata = if (metadataStr.contains("EmptyMetaData")) {
-      ""
-    } else {
-      " ${metadataStr.replace("\n", "\\n").replace(Regex("\\s+"), " ")}"
+    val edgeLabelCustom = edgeLabelCustomizer?.invoke(edge) ?: ""  
+    val labelType = edge.label::class.simpleName ?: "Unknown"
+    val formattedMetadata = when {
+      edge.metadata == null -> ""
+      edge.metadata.toString().contains("EmptyMetaData") -> ""
+      else -> edge.metadata.toString()
     }
     builder.appendLine(
-      "${edge.source.name} -> ${edge.target.name} [label=\"${edge.label} ${edgeLabelCustom} ${formattedMetadata}\"];"
+        "${edge.source.name} -> ${edge.target.name} " +
+        // "[label=\"${labelType} ${edge.label}$edgeLabelCustom$formattedMetadata\"];"
+        "[label=\"${labelType} ${edge.label} ${formattedMetadata}\"];"
     )
   }
   return builder.toString()
@@ -120,12 +123,12 @@ fun XCFA.toStringFormatted(): String = buildString {
     appendLine("XCFA: $name")
     appendLine("  Global Vars:")
     globalVars.forEach {
-        appendLine("    - ${it.wrappedVar.name} = ${it.initValue} (threadLocal=${it.threadLocal}, atomic=${it.atomic})")
+        appendLine("    - ${it.wrappedVar.name}: ${it.wrappedVar.type} = ${it.initValue} (threadLocal=${it.threadLocal}, atomic=${it.atomic})")
     }
     appendLine("  Procedures:")
     procedures.forEach { proc ->
         appendLine("    ${proc.name}(${proc.params.joinToString { "${it.first.name}:${it.second}" }})")
-        appendLine("      Vars: ${proc.vars.joinToString { it.name }}")
+        appendLine("    Vars: ${proc.vars.joinToString { "${it.name}:${it.type}" }}")
         appendLine("      Locs:")
         proc.locs.forEach { loc ->
             appendLine("        - ${loc.name} ${if (loc.initial) "{init}" else ""}${if (loc.final) "{final}" else ""}${if (loc.error) "{error}" else ""}")

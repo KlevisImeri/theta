@@ -193,14 +193,23 @@ fun frontend(
     parseContext.architecture = cConfig.architecture
   }
 
-  val xcfa = getXcfa(config, parseContext, logger, uniqueLogger)
+  var xcfa = getXcfa(config, parseContext, logger, uniqueLogger)
 
   val (enabled, witness) = config.validateConfig;
   var witnessXcfa: XCFA? = null;
   if (enabled) {
     witness ?: throw IllegalStateException("No witness file provided")
     val yamlWitness = Yaml.default.decodeFromString(ListSerializer(YamlWitness.serializer()), witness.readText());
-    witnessXcfa = YamlWitnessToXcfa(yamlWitness[0], xcfa, parseContext, logger, uniqueLogger).run();
+    // witnessXcfa = YamlWitnessToXcfa(yamlWitness[0], xcfa, parseContext, logger, uniqueLogger).run();
+    val (programXcfaWithWaypoints, _witnessXcfa) = YamlWitnessToXcfa(
+      yamlWitness[0], 
+      xcfa, 
+      parseContext, 
+      logger, 
+      uniqueLogger
+    ).run();
+    xcfa = programXcfaWithWaypoints;
+    witnessXcfa = _witnessXcfa;
   }
 
   val mcm =
@@ -248,7 +257,29 @@ private fun backend(
   logger: Logger,
   uniqueLogger: Logger,
   throwDontExit: Boolean,
+  witness: XCFA? = null,
 ): SafetyResult<*, *> =
+
+  // if (config.validateConfig.enabled == true) {
+  //   val stopwatch = Stopwatch.createStarted()
+  //   
+  //   val cechker = XcfaYamlWintnessValidator(
+  //     program: xcfa,
+  //     witness: witness,
+  //   ).build();
+  //
+  //   logger.write(
+  //     Logger.Level.INFO,
+  //     "Backend finished (in ${
+  //         stopwatch.elapsed(TimeUnit.MILLISECONDS)
+  //     } ms)\n",
+  //   )
+  //
+  //   logger.write(RESULT, result.toString() + "\n")
+  //   result
+  // }
+
+
   if (config.backendConfig.backend == Backend.NONE) {
     SafetyResult.unknown<EmptyProof, EmptyCex>()
   } else {
@@ -270,7 +301,19 @@ private fun backend(
         "Starting verification of ${if (xcfa.name == "") "UnnamedXcfa" else xcfa.name} using ${config.backendConfig.backend}\n",
       )
 
-      val checker = getChecker(xcfa, mcm, config, parseContext, logger, uniqueLogger)
+      val checker = if (config.validateConfig.enabled == true) {
+          // if (witness == null) {
+          //     throw IllegalArgumentException("Witness cannot be null when validation is enabled.")
+          // }
+          // XcfaYamlWintnessValidator( // WARN: be careful this modifies the program and witness xcfa
+          //     program = xcfa,
+          //     witness = witness
+          // ).build()
+          getChecker(xcfa, mcm, config, parseContext, logger, uniqueLogger)
+      } else {
+          getChecker(xcfa, mcm, config, parseContext, logger, uniqueLogger)
+      }
+
       val result =
         exitOnError(config.debugConfig.stacktrace, config.debugConfig.debug || throwDontExit) {
             checker.check()

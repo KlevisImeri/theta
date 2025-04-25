@@ -45,11 +45,20 @@
 //
 //
 //     init {
+//         addControlWayPoints();
 //         programSide = createXcfaAnalysisSide(program)
 //         witnessSide = createXcfaAnalysisSide(witness)
 //         productAnalysis = createProductAnalysis()
 //     }
 //
+//     private fun addControlWayPoints() {
+//         program.procedures.forEach { procedure -> 
+//     }
+//
+//     public fun build() {
+//       return StmtMultiConfigBuilder<>.build()
+//     }
+//     
 //     private fun createPredXcfaAnalysisSide(
 //         xcfa: XCFA,
 //     ): MultiAnalysisSide<
@@ -96,7 +105,7 @@
 //         )
 //     }
 //
-//
+//     private fun createProductAnalysis() {
 //         val builder = StmtMultiBuilder(programSide, XcfaLts(program))
 //             .addRightSide(witnessSide, XcfaLts(witness))
 //
@@ -114,32 +123,4 @@
 //             }
 //         )
 //     }
-//
-//     public fun validate() {
-//         val initialStates = productAnalysis.analysis.initFunc.getInitStates(multiUnitPrec)
-//         val reached = mutableSetOf<ExprMultiState<*, *, *>>()
-//         val queue = ArrayDeque(initialStates)
-//
-//         while (queue.isNotEmpty()) {
-//             val state = queue.removeFirst()
-//             if (!reached.add(state)) continue
-//
-//             // Check refinement relationship
-//             if (!productAnalysis.analysis.partialOrd.isLeq(state.leftState, state.rightState)) {
-//                 throw ValidationException("Witness does not abstract program state: $state")
-//             }
-//
-//             productAnalysis.lts.getEnabledActionsFor(state)
-//                 .flatMap { action ->
-//                     productAnalysis.analysis.transFunc.getSuccStates(state, action, multiUnitPrec)
-//                 }
-//                 .forEach { succ ->
-//                     if (!isValidTransition(state, succ)) {
-//                         throw ValidationException("Invalid transition: $state -> $succ")
-//                     }
-//                     queue.add(succ)
-//                 }
-//         }
-//     }
-//
 // }

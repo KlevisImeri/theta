@@ -1,0 +1,122 @@
+---
+  version: 1.0
+  image: 
+    name: com.charleskorn.kaml.Yaml
+    permissions: 644
+    format: PS
+    formatDescription: PostScript
+    mimeType: application/postscript
+    class: DirectClass
+    geometry: 
+      width: 275
+      height: 278
+      x: 0
+      y: 0
+    
+    units: Undefined
+    type: Palette
+    baseType: Undefined
+    endianness: Undefined
+    colorspace: sRGB
+    depth: 8
+    baseDepth: 16
+    channelDepth: 
+      red: 8
+      green: 8
+      blue: 1
+    
+    pixels: 76450
+    imageStatistics: 
+      overall: 
+        min: 3341
+        max: 62451
+        mean: 11831.7
+        median: 4540.33
+        standardDeviation: 16151.8
+        kurtosis: 2.95242
+        skewness: 2.11009
+        entropy: 0.291403
+      
+    
+    channelStatistics: 
+      red: 
+        min: 3341
+        max: 59110
+        mean: 10565.2
+        median: 3341
+        standardDeviation: 16002.5
+        kurtosis: 2.95272
+        skewness: 2.11009
+        entropy: 0.291232
+       
+      green: 
+        min: 4369
+        max: 60909
+        mean: 11694.2
+        median: 4369
+        standardDeviation: 16226.5
+        kurtosis: 2.95207
+        skewness: 2.11003
+        entropy: 0.291586
+       
+      blue: 
+        min: 5911
+        max: 62451
+        mean: 13235.8
+        median: 5911
+        standardDeviation: 16226.3
+        kurtosis: 2.95247
+        skewness: 2.11014
+        entropy: 0.29139
+      
+    
+    renderingIntent: Perceptual
+    gamma: 0.454545
+    chromaticity: 
+      redPrimary: 
+        x: 0.64
+        y: 0.33
+      
+      greenPrimary: 
+        x: 0.3
+        y: 0.6
+      
+      bluePrimary: 
+        x: 0.15
+        y: 0.06
+      
+      whitePrimary: 
+        x: 0.3127
+        y: 0.329
+      
+    
+    matteColor: '#BDBDBDBDBDBD'
+    backgroundColor: '#FFFFFFFFFFFF'
+    borderColor: '#DFDFDFDFDFDF'
+    transparentColor: '#000000000000'
+    interlace: None
+    intensity: Undefined
+    compose: Over
+    pageGeometry: 
+      width: 2560
+      height: 1440
+      x: 1616
+      y: 1017
+    
+    originGeometry: +1616+1017
+    dispose: Undefined
+    iterations: 0
+    compression: Undefined
+    quality: 85
+    orientation: Undefined
+    properties: 
+      signature: 7f5115a3e71bd3c1a6126581bb400eb4b33fdf58b96dabc6d899967777bdb2c4
+    
+    tainted: true
+    filesize: 0B
+    numberPixels: 76450
+    pixelsPerSecond: 484968B
+    userTime: 0.000u
+    elapsedTime: 0:01.157
+    version: "ImageMagick 7.1.1-45 Q16-HDRI x86_64 22722 https://imagemagick.org"
+...
