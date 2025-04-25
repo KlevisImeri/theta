@@ -26,47 +26,31 @@ data class WaypointKey(
   val type: KClass<out CStatement>
 )
 
+
 class AssumeStmtRegistry {
+  data class PositionKey(
+    val lineStart: Int,
+    val endInSameLine: Boolean
+  )
   private val map = mutableMapOf<
-    WaypointKey,
+    PositionKey,
     MutableList<Pair<KClass<out CStatement>, AssumeStmt>>
   >()
 
   fun put(key: WaypointKey, stmt: AssumeStmt) {
-    map.getOrPut(key) { mutableListOf() }
+    val pos = PositionKey(key.lineStart, key.endInSameLine)
+    map.getOrPut(pos) { mutableListOf() }
        .add(key.type to stmt)
   }
 
   fun get(query: WaypointKey): AssumeStmt? {
-    return map[query]
+    val pos = PositionKey(query.lineStart, query.endInSameLine)
+    return map[pos]
       ?.firstOrNull { (storedType, _) ->
         storedType.java.isAssignableFrom(query.type.java)
       }
       ?.second
   }
-  // fun get(query: WaypointKey): AssumeStmt? {
-  //   println("===== get() called =====")
-  //   println("Query key: $query")
-  //   println("Query type: ${query.type.java.name}")
-  //   
-  //   val candidates = map[query]
-  //   println("Candidates found in map: ${candidates?.size ?: 0}")
-  //   
-  //   candidates?.forEachIndexed { index, (storedType, stmt) ->
-  //       val isAssignable = storedType.java.isAssignableFrom(query.type.java)
-  //       println("  Candidate #$index:")
-  //       println("    Stored type: ${storedType.java.name}")
-  //       println("    Stored stmt: $stmt")
-  //       println("    isAssignable: $isAssignable")
-  //   }
-  //   
-  //   return candidates?.firstOrNull { (storedType, _) ->
-  //       storedType.java.isAssignableFrom(query.type.java)
-  //   }?.second.also { result ->
-  //       println("Selected result: $result")
-  //       println("===== get() end =====")
-  //   }
-  // }
 }
 
 class WitnessWaypointsPass(

@@ -98,14 +98,20 @@ data class CMetaData(
 
   override fun toString(): String {
     return if (isSubstantial()) {
-      val cleanText = sourceText
-        ?.replace("\n", "\\n")
-        ?.replace(Regex("\\s+"), " ")
-        ?.trim()
-        ?: ""
-      "${lineNumberStart}:${colNumberStart} - ${lineNumberStop}:${colNumberStop} $cleanText"
+     val cleanText = sourceText
+       ?.replace("\n", "\\n")
+       ?.replace(Regex("\\s+"), " ")
+       ?.trim()
+       ?: ""
+     
+     val astTypes = astNodes
+       .map { it::class.simpleName?.replace("CStatement", "") ?: "Unknown" }
+       .distinct()
+       .joinToString("|") { it }
+     
+     "${lineNumberStart}:${colNumberStart}-${lineNumberStop}:${colNumberStop} [$astTypes] $cleanText"
     } else {
-      "CMetaData(invalid/insufficient data)"
+     "CMetaData(invalid/insufficient data)"
     }
   }
 }

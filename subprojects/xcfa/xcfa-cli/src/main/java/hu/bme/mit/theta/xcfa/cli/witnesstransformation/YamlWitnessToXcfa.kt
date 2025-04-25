@@ -19,9 +19,10 @@ import hu.bme.mit.theta.c2xcfa.CMetaData;
 import hu.bme.mit.theta.frontend.transformation.model.types.complex.integer.*;
 import hu.bme.mit.theta.core.decl.VarDecl;
 import hu.bme.mit.theta.core.decl.Decls.Var
-import hu.bme.mit.theta.frontend.transformation.model.statements.CStatement
-import hu.bme.mit.theta.frontend.transformation.model.statements.CIf
-import hu.bme.mit.theta.frontend.transformation.model.statements.CCall
+import hu.bme.mit.theta.frontend.transformation.model.statements.*;
+// import hu.bme.mit.theta.frontend.transformation.model.statements.CStatement
+// import hu.bme.mit.theta.frontend.transformation.model.statements.CIf
+// import hu.bme.mit.theta.frontend.transformation.model.statements.CCall
 // import package hu.bme.mit.theta.core.type.anytype.RefExpr;
 
 
@@ -286,6 +287,26 @@ class YamlWitnessToXcfa(
           location.line,
           false,
           CIf::class
+        ), assumeWaypointStmt);
+        edgesMap.put(WaypointKey(
+          location.line,
+          false,
+          CWhile::class
+        ), assumeWaypointStmt);
+        edgesMap.put(WaypointKey(
+          location.line,
+          false,
+          CFor::class
+        ), assumeWaypointStmt);
+        edgesMap.put(WaypointKey(
+          location.line,
+          false,
+          CSwitch::class
+        ), assumeWaypointStmt);
+        edgesMap.put(WaypointKey(
+          location.line,
+          false,
+          CDoWhile::class
         ), assumeWaypointStmt);
       }
 
