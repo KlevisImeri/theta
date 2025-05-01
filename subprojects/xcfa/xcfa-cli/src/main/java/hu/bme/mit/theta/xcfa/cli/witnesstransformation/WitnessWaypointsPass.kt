@@ -6,10 +6,12 @@ import hu.bme.mit.theta.xcfa.model.XcfaEdge
 import hu.bme.mit.theta.xcfa.model.XcfaGlobalVar
 import hu.bme.mit.theta.xcfa.model.SequenceLabel
 import hu.bme.mit.theta.xcfa.model.StmtLabel
+import hu.bme.mit.theta.xcfa.model.ChoiceType;
 import hu.bme.mit.theta.xcfa.passes.ProcedurePass
 import kotlin.reflect.KClass
 import hu.bme.mit.theta.frontend.transformation.model.statements.CStatement
 import hu.bme.mit.theta.frontend.transformation.model.statements.CCompound
+import hu.bme.mit.theta.core.stmt.Stmt
 import hu.bme.mit.theta.core.stmt.AssumeStmt
 import hu.bme.mit.theta.core.stmt.AssignStmt
 import hu.bme.mit.theta.c2xcfa.getCMetaData
@@ -22,29 +24,30 @@ import hu.bme.mit.theta.core.type.Expr;
 
 data class WaypointKey(
   val lineStart: Int,
-  val endInSameLine: Boolean,
-  val type: KClass<out CStatement>
+  val endInSameLine: Boolean = false,
+  val path: ChoiceType = ChoiceType.NONE,
+  val type: KClass<out CStatement> = CStatement::class
 )
 
-
-class AssumeStmtRegistry {
+class StmtRegistry {
   data class PositionKey(
     val lineStart: Int,
-    val endInSameLine: Boolean
+    val endInSameLine: Boolean,
+    val path: ChoiceType
   )
   private val map = mutableMapOf<
     PositionKey,
-    MutableList<Pair<KClass<out CStatement>, AssumeStmt>>
+    MutableList<Pair<KClass<out CStatement>, Stmt>>
   >()
 
-  fun put(key: WaypointKey, stmt: AssumeStmt) {
-    val pos = PositionKey(key.lineStart, key.endInSameLine)
+  fun put(key: WaypointKey, stmt: Stmt) {
+    val pos = PositionKey(key.lineStart, key.endInSameLine, key.path)
     map.getOrPut(pos) { mutableListOf() }
        .add(key.type to stmt)
   }
 
-  fun get(query: WaypointKey): AssumeStmt? {
-    val pos = PositionKey(query.lineStart, query.endInSameLine)
+  fun get(query: WaypointKey): Stmt? {
+    val pos = PositionKey(query.lineStart, query.endInSameLine, query.path)
     return map[pos]
       ?.firstOrNull { (storedType, _) ->
         storedType.java.isAssignableFrom(query.type.java)
@@ -54,8 +57,7 @@ class AssumeStmtRegistry {
 }
 
 class WitnessWaypointsPass(
-  private val edgesMap: AssumeStmtRegistry,
-  private val globalWaypointVar: XcfaGlobalVar,
+  private val edgesMap: StmtRegistry,
 ) : ProcedurePass {
 
 //  data class XcfaEdge(
@@ -64,15 +66,27 @@ class WitnessWaypointsPass(
 //   val label: XcfaLabel = NopLabel, // edge label
 //   val metadata: MetaData,
 // ) { 
-  fun XcfaEdge.edgeToWaypointKeyStmt(): AssumeStmt? {
+  fun XcfaEdge.edgeToWaypointKeyStmt(): Stmt? {
     if (getCMetaData() == null) return null
+
+    var path = ChoiceType.NONE;
+    val sequenceLabel = label
+    if (sequenceLabel is SequenceLabel) {
+        for (currentLabel in sequenceLabel.labels) {
+            if (currentLabel is StmtLabel && currentLabel.choiceType != ChoiceType.NONE) {
+                path = currentLabel.choiceType
+                break
+            }
+        }
+    }
+
     for (cstmt in getCMetaData()!!.astNodes) {
-        val stmt = cstmt.edgeToWaypointKeyStmt()
+        val stmt = cstmt.edgeToWaypointKeyStmt(path)
         if (stmt != null) return stmt
     }
     return null
   }
-  // fun XcfaEdge.edgeToWaypointKeyStmt(): AssumeStmt? {
+  // fun XcfaEdge.edgeToWaypointKeyStmt(): Stmt? {
   //   println("[edgeToWaypointKeyStmt] Checking edge: $this")
   //   
   //   if (getCMetaData() == null) {
@@ -111,11 +125,12 @@ class WitnessWaypointsPass(
 //     private int offsetEnd = -1;
 //     private String sourceText = "";
 //     private ParserRuleContext ctx;
-  fun CStatement.edgeToWaypointKeyStmt(): AssumeStmt? {
+  fun CStatement.edgeToWaypointKeyStmt(path: ChoiceType): Stmt? {
     return edgesMap.get(
       WaypointKey(
         lineNumberStart,
         lineNumberStop == lineNumberStart,
+        path,
         this::class
       )
     )
@@ -123,9 +138,9 @@ class WitnessWaypointsPass(
 // public class CCompound extends CStatement {
 //
 //     private final List<CStatement> cStatementList;
-  fun CCompound.edgeToWaypointKeyStmt(): AssumeStmt? {
+  fun CCompound.edgeToWaypointKeyStmt(path: ChoiceType): Stmt? {
     for (cstmt in getcStatementList()) {
-      val stmt = cstmt.edgeToWaypointKeyStmt()
+      val stmt = cstmt.edgeToWaypointKeyStmt(path)
       if (stmt != null) return stmt
     }
     return null;
@@ -166,34 +181,16 @@ class WitnessWaypointsPass(
 
 
       if (stmt != null) {
-        println("Found a maching waypoint ${stmt}")
-    // logger.write(
-    //   Logger.Level.INFO,
-    //   "Create the Witness XCFA\n",
-    // )
+        // println("Found a maching waypoint ${stmt}")
         val baseLabels = when (val lbl = edge.label) {
           is SequenceLabel -> lbl.labels
           else       -> listOf(lbl)
         }
 
-        val waypointVarDecl = globalWaypointVar.wrappedVar
-        val waypointRef = waypointVarDecl.getRef() as Expr<IntType>
-
-        val incrementExpr = Add(
-            listOf<Expr<IntType>>(
-                waypointRef,
-                Int(1)
-            )
-        )
-
         val newLabel = SequenceLabel(listOf(
-           StmtLabel(stmt),
+          StmtLabel(stmt),
           *baseLabels.toTypedArray(),
-          // StmtLabel(AssignStmt.of(
-          //   waypointVarDecl,
-          //   incrementExpr
-          // ))
-        )) //TODO: maybe have to add it before or after the Stmt's
+        ))
         val newEdge = edge.withLabel(newLabel)
 
         builder.removeEdge(edge)
