@@ -306,7 +306,7 @@ fun <S : XcfaState<out PtrState<out ExprState>>, P : XcfaPrec<out Prec>> getXcfa
 
 /// EXPL
 
-private fun getExplXcfaInitFunc(
+public fun getExplXcfaInitFunc(
   xcfa: XCFA,
   solver: Solver,
 ): (XcfaPrec<PtrPrec<ExplPrec>>) -> List<XcfaState<PtrState<ExplState>>> {
@@ -372,7 +372,7 @@ class ExplXcfaAnalysis(
 
 /// PRED
 
-private fun getPredXcfaInitFunc(
+public fun getPredXcfaInitFunc(
   xcfa: XCFA,
   predAbstractor: PredAbstractor,
 ): (XcfaPrec<PtrPrec<PredPrec>>) -> List<XcfaState<PtrState<PredState>>> {

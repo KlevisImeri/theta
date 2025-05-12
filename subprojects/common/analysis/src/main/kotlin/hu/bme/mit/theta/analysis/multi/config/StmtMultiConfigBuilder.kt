@@ -101,7 +101,7 @@ sealed class StmtMultiConfigBuilder<
       StmtMultiAction<LAction, RAction>,
     > {
     val argBuilder = ArgBuilder.create(product.lts, product.side.analysis, target)
-    val abstractor = BasicArgAbstractor.builder(argBuilder).build()
+    val abstractor = BasicArgAbstractor.builder(argBuilder).logger(logger).build()
     val traceChecker = getTraceChecker()
     val precRefiner =
       JoiningPrecRefiner.create<
@@ -114,7 +114,7 @@ sealed class StmtMultiConfigBuilder<
       )
     val refiner = SingleExprTraceRefiner.create(traceChecker, precRefiner, pruneStrategy, logger)
     return MultiConfig(
-      ArgCegarChecker.create(abstractor, refiner),
+      ArgCegarChecker.create(abstractor, refiner, logger),
       MultiPrec(lInitPrec, rInitPrec, dInitPrec),
     )
   }

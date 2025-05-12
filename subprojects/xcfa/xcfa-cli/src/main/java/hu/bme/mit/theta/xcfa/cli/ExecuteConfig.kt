@@ -82,10 +82,9 @@ fun runConfig(
 
   val (xcfa, mcm, parseContext, witnessXcfa) = frontend(config, logger, uniqueLogger)
 
-  // TODO: validate(xcfa, witnessXcfva)
   preVerificationLogging(xcfa, mcm, parseContext, config, logger, uniqueLogger)
 
-  val result = backend(xcfa, mcm, parseContext, config, logger, uniqueLogger, throwDontExit)
+  val result = backend(xcfa, mcm, parseContext, config, logger, uniqueLogger, throwDontExit, witnessXcfa)
 
   postVerificationLogging(result, mcm, parseContext, config, logger, uniqueLogger)
 
@@ -259,27 +258,6 @@ private fun backend(
   throwDontExit: Boolean,
   witness: XCFA? = null,
 ): SafetyResult<*, *> =
-
-  // if (config.validateConfig.enabled == true) {
-  //   val stopwatch = Stopwatch.createStarted()
-  //   
-  //   val cechker = XcfaYamlWintnessValidator(
-  //     program: xcfa,
-  //     witness: witness,
-  //   ).build();
-  //
-  //   logger.write(
-  //     Logger.Level.INFO,
-  //     "Backend finished (in ${
-  //         stopwatch.elapsed(TimeUnit.MILLISECONDS)
-  //     } ms)\n",
-  //   )
-  //
-  //   logger.write(RESULT, result.toString() + "\n")
-  //   result
-  // }
-
-
   if (config.backendConfig.backend == Backend.NONE) {
     SafetyResult.unknown<EmptyProof, EmptyCex>()
   } else {
@@ -302,14 +280,19 @@ private fun backend(
       )
 
       val checker = if (config.validateConfig.enabled == true) {
-          // if (witness == null) {
-          //     throw IllegalArgumentException("Witness cannot be null when validation is enabled.")
-          // }
-          // XcfaYamlWintnessValidator( // WARN: be careful this modifies the program and witness xcfa
+          if (witness == null) {
+              throw IllegalArgumentException("Witness cannot be null when validation is enabled.")
+          }
+          XcfaWitnessValidatorCheckerBuilder(
+              program = xcfa,
+              witness = witness,
+              logger = logger
+          ).buildExplMultiSafetyChecker()
+          // XcfaWitnessValidatorCheckerBuilder(
           //     program = xcfa,
-          //     witness = witness
-          // ).build()
-          getChecker(xcfa, mcm, config, parseContext, logger, uniqueLogger)
+          //     witness = witness,
+          //     logger = logger
+          // ).buildPredMultiSafetyChecker()
       } else {
           getChecker(xcfa, mcm, config, parseContext, logger, uniqueLogger)
       }
