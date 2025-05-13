@@ -21,6 +21,8 @@ import hu.bme.mit.theta.core.type.inttype.IntExprs.Int
 // import hu.bme.mit.theta.core.type.inttype.IntExprs;
 import hu.bme.mit.theta.core.type.inttype.IntType
 import hu.bme.mit.theta.core.type.Expr;
+import hu.bme.mit.theta.core.decl.VarDecl;
+
 
 data class WaypointKey(
   val lineStart: Int,
@@ -58,6 +60,7 @@ class StmtRegistry {
 
 class WitnessWaypointsPass(
   private val edgesMap: StmtRegistry,
+  private val waypointVar: VarDecl<IntType>
 ) : ProcedurePass {
 
 //  data class XcfaEdge(
@@ -175,6 +178,12 @@ class WitnessWaypointsPass(
 
   override fun run(builder: XcfaProcedureBuilder): XcfaProcedureBuilder {
     // TODO: Varchanger class if you also need for program XCFA to have a global waypoint
+    builder.parent.addVar(XcfaGlobalVar(
+      wrappedVar = waypointVar,
+      initValue = Int(0),
+      threadLocal = false,
+      atomic = true
+    ))
     for (edge in builder.getEdges().toList()) {
       // println("Iterating over ${edge}")
       val stmt = edge.edgeToWaypointKeyStmt()

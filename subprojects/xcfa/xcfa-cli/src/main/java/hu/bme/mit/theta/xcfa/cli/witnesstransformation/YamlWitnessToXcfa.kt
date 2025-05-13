@@ -21,6 +21,11 @@ import hu.bme.mit.theta.core.decl.VarDecl;
 import hu.bme.mit.theta.core.decl.Decls.Var
 import hu.bme.mit.theta.frontend.transformation.model.statements.*;
 import hu.bme.mit.theta.core.stmt.AssignStmt
+import hu.bme.mit.theta.core.type.booltype.BoolType;
+import hu.bme.mit.theta.core.type.abstracttype.EqExpr;
+import hu.bme.mit.theta.core.type.anytype.RefExpr;
+import hu.bme.mit.theta.core.type.LitExpr;
+
 // import hu.bme.mit.theta.frontend.transformation.model.statements.CStatement
 // import hu.bme.mit.theta.frontend.transformation.model.statements.CIf
 // import hu.bme.mit.theta.frontend.transformation.model.statements.CCall
@@ -79,7 +84,8 @@ class YamlWitnessToXcfa(
   lateinit var currentLoc: XcfaLocation;
   lateinit var trapLoc: XcfaLocation;
   lateinit var errorLoc: XcfaLocation;
-  lateinit var waypointVar: VarDecl<IntType>; 
+  lateinit var programWaypointVar: VarDecl<IntType>; 
+  lateinit var witnessWaypointVar: VarDecl<IntType>;
   lateinit var edgesMap: StmtRegistry;
 
   fun run(): Pair<XCFA, XCFA> {
@@ -89,7 +95,7 @@ class YamlWitnessToXcfa(
     mainProcBuilder = XcfaProcedureBuilder("main", ProcedurePassManager());
     mainProcBuilder.createInitLoc()
     mainProcBuilder.createErrorLoc()
-    currentLoc = mainProcBuilder.initLoc //TODO: add to location Map
+    currentLoc = mainProcBuilder.initLoc
     errorLoc = mainProcBuilder.errorLoc.get()
     trapLoc = newLocation(Location("Trap", -1))
     return when (witness.entryType) {
@@ -103,14 +109,25 @@ class YamlWitnessToXcfa(
       Logger.Level.INFO,
       "Create the Witness XCFA\n",
     )
-    waypointVar = Var("waypoint", Int());
+    witnessWaypointVar = Var("witWaypoint", Int());
+    programWaypointVar = Var("progWaypoint", Int());
     xcfaBuilder.addVar(XcfaGlobalVar(
-      wrappedVar = waypointVar,
+      wrappedVar = witnessWaypointVar,
       initValue = Int(0),
       threadLocal = false,
       atomic = true
     ))
 
+    // fun XCFA.getMainProcedure(): XcfaProcedure =
+    //     procedures.find { it.name == "main" }
+    //         ?: error("no `main` procedure")
+    //
+    // fun XCFA.getMainVariables(): Set<VarDecl<*>> =
+    //     getMainProcedure().vars
+    //
+    // program.getMainVariables().forEach { v ->
+    //     mainProcBuilder.addVar(v)
+    // }
     var i = 1
     witness.content?.forEach { contentItem ->
         contentItem.segment?.forEach { waypoint ->
@@ -122,30 +139,33 @@ class YamlWitnessToXcfa(
     xcfaBuilder.addProcedure(mainProcBuilder)
     xcfaBuilder.addEntryPoint(mainProcBuilder, emptyList())
     
-
     val programXcfaWithWaypoints = program.optimizeFurther(ProcedurePassManager(listOf(
-      WitnessWaypointsPass(edgesMap)
+      WitnessWaypointsPass(edgesMap, programWaypointVar)
     )));
     val witnessXcfa = xcfaBuilder.build();
 
     return Pair(programXcfaWithWaypoints, witnessXcfa)
 }
 
-  private fun waypointToXcfa(waypoint: Waypoint, waypointvalue: Int) {
+  private fun waypointToXcfa(waypoint: Waypoint, waypointValue: Int) {
 
     val (type, constraint, location, action) = waypoint.waypoint
     val targetLoc = newLocation(location);
-    val waypointLabel = StmtLabel(AssumeStmt.create(
-      Eq(waypointVar.ref, Int(waypointvalue))
+    // val waypointLabel = StmtLabel(AssumeStmt.create(
+    //   Eq(waypointVar.ref, Int(waypointvalue))
+    // ))
+    val waypointLabel = StmtLabel(AssignStmt.of(
+      witnessWaypointVar, Int(waypointValue)
     ))
     val assignWaypointStmt = AssignStmt.of(
-      waypointVar, Int(waypointvalue)
+      programWaypointVar, Int(waypointValue)
     );
+
     val metadata = WitnessMetadata(waypoint.waypoint)
 
     when (type) {
 
-      WaypointType.ASSUMPTION -> {
+      WaypointType.ASSUMPTION -> { //TODO: You can add the assumtions ot program XCFA right here if not in MultiAnalysys
         if(constraint==null) {
           throw IllegalArgumentException("For waypoint of type ASSUMPTION the constraint should not be null")
         }
@@ -180,6 +200,7 @@ class YamlWitnessToXcfa(
         edgesMap.put(WaypointKey(
           lineStart = location.line - 1,
           endInSameLine = true,
+          type = CAssignment::class 
         ), assignWaypointStmt);
       }
 
@@ -334,12 +355,12 @@ class YamlWitnessToXcfa(
         metadata = EmptyMetaData
       )
       numberOfnodes++;
-      mainProcBuilder.addEdge(XcfaEdge(
-        newXcfaLocation,
-        newXcfaLocation,
-        NopLabel,
-        EmptyMetaData 
-      ))
+      // mainProcBuilder.addEdge(XcfaEdge(
+      //   newXcfaLocation,
+      //   newXcfaLocation,
+      //   NopLabel,
+      //   EmptyMetaData 
+      // ))
       return newXcfaLocation;
     }
   }
@@ -358,6 +379,28 @@ class YamlWitnessToXcfa(
       //throw IllegalArgumentException("We only support some function for their return!")
   }
 
+  // fun Expr<BoolType>.toAssignStmt(): AssignStmt<*>? {
+  //   if (this !is EqExpr<*, *>) return null
+  //   val (l, r) = this.getRightOp() to this.getLeftOp()
+  //   val (decl, lit) = when {
+  //       l is RefExpr<*> && r is LitExpr<*> -> l.decl as VarDecl<*> to r
+  //       r is RefExpr<*> && l is LitExpr<*> -> r.decl as VarDecl<*> to l
+  //       else                              -> return null
+  //   }
+  //   return AssignStmt.create(decl, lit)
+  // }
+
+  // private fun CExpToAssignStmt(value: String): AssignStmt {
+  //   return getExpressionFromC(
+  //       value,
+  //       parseContext,
+  //       false,
+  //       false,
+  //       warningLogger,
+  //       program.collectVars(),
+  //     ).toAssignStmt();
+  // }
+
   private fun CExpToAssumeStmt(value: String): AssumeStmt {
     return AssumeStmt.of(getExpressionFromC(
         value,
@@ -365,9 +408,10 @@ class YamlWitnessToXcfa(
         false,
         false,
         warningLogger,
-        program.collectVars(),  // TODO: i have a feeling i have to filter only the nessesary vars
+        program.collectVars(),
       ));
   }
+
 
 }
 

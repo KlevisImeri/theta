@@ -24,6 +24,18 @@
   content:
   - segment:
     - waypoint:
+        type: "assumption"
+        action: "follow"
+        constraint:
+          value: "n == 255"
+          format: "c_expression"
+        location:
+          file_name: "unsafe-program-example.c"
+          line: 11
+          column: 3
+          function: "main"
+  - segment:
+    - waypoint:
         type: "branching"
         action: "follow"
         constraint:

@@ -74,11 +74,11 @@ fun runConfig(
   uniqueLogger: Logger,
   throwDontExit: Boolean,
 ): SafetyResult<*, *> {
-  propagateInputOptions(config, logger, uniqueLogger)
-
-  registerAllSolverManagers(config.backendConfig.solverHome, logger)
-
-  validateInputOptions(config, logger, uniqueLogger)
+  // propagateInputOptions(config, logger, uniqueLogger)
+  //
+  // registerAllSolverManagers(config.backendConfig.solverHome, logger)
+  //
+  // validateInputOptions(config, logger, uniqueLogger)
 
   val (xcfa, mcm, parseContext, witnessXcfa) = frontend(config, logger, uniqueLogger)
 
@@ -278,6 +278,16 @@ private fun backend(
         Logger.Level.INFO,
         "Starting verification of ${if (xcfa.name == "") "UnnamedXcfa" else xcfa.name} using ${config.backendConfig.backend}\n",
       )
+
+      println("------------------------------------")
+      println("The Program XCFA is:")
+      println("------------------------------------\n")
+      println(xcfa.toDot())
+      println("\n------------------------------------")
+      println("The Witness XCFA is:")
+      println("------------------------------------\n")
+      println(witness!!.toDot())
+      println("------------------------------------")
 
       val checker = if (config.validateConfig.enabled == true) {
           if (witness == null) {

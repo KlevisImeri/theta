@@ -60,6 +60,14 @@ import hu.bme.mit.theta.core.stmt.AssumeStmt
 import hu.bme.mit.theta.core.type.Expr
 import hu.bme.mit.theta.xcfa.model.XcfaEdge
 import hu.bme.mit.theta.xcfa.model.StmtLabel
+import hu.bme.mit.theta.xcfa.model.SequenceLabel
+import hu.bme.mit.theta.xcfa.model.XcfaLabel
+import hu.bme.mit.theta.core.type.inttype.IntType
+import hu.bme.mit.theta.core.type.LitExpr;
+import hu.bme.mit.theta.analysis.multi.MultiState;
+import hu.bme.mit.theta.core.type.inttype.IntLitExpr;
+import hu.bme.mit.theta.analysis.expl.ExplLattice;
+
 // TODO: For the moment this is only for reach error
 
 class XcfaWitnessValidatorCheckerBuilder(
@@ -78,25 +86,34 @@ class XcfaWitnessValidatorCheckerBuilder(
     fun XCFA.allVars(): Set<VarDecl<*>> {
       val globals = globalVars.map { it.wrappedVar }
       val fromProcs = procedures.flatMap { proc ->
-        // val ps = proc.params.map { it.first }
-        // val ls = proc.vars
-        // ps + ls
+        val ps = proc.params.map { it.first }
+        val ls = proc.vars
+        ps + ls
         proc.vars
       }
-      // return (globals + fromProcs).toSet()
-      return globals.toSet();
+      return (globals + fromProcs).toSet()
+      // return globals.toSet();
+       // return setOf()
     }
 
-    fun XcfaEdge.getGuard(): Expr<BoolType>? =
-        (label as? StmtLabel)
-          ?.stmt
-          .let { if (it is AssumeStmt) it.getCond() else null }
+    fun XcfaLabel.getGuards(): List<Expr<BoolType>> = when (this) {
+        is SequenceLabel ->
+            labels.flatMap { it.getGuards() }
+        is StmtLabel -> {
+            val s = stmt
+            if (s is AssumeStmt) listOf(s.getCond()) else emptyList()
+        }
+        else -> emptyList()
+    }
+
+    fun XcfaEdge.getGuards(): List<Expr<BoolType>> =
+        label.getGuards()
 
     fun XCFA.getGuards(): Set<Expr<BoolType>> =
         procedures
           .asSequence()
-          .flatMap { proc -> proc.edges.asSequence() }
-          .mapNotNull { edge -> edge.getGuard() }
+          .flatMap { it.edges.asSequence() }
+          .flatMap { it.getGuards().asSequence() }
           .toSet()
 
     class ItpRefToXcfaPrec : RefutationToPrec<
@@ -166,11 +183,11 @@ class XcfaWitnessValidatorCheckerBuilder(
 
     public fun buildExplMultiSafetyChecker(): 
       SafetyChecker<
-        ARG<ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, UnitState>,
+        ARG<ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, PtrState<ExplState>>,
             StmtMultiAction<XcfaAction, XcfaAction>>,
-        Trace<ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, UnitState>,
+        Trace<ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, PtrState<ExplState>>,
               StmtMultiAction<XcfaAction, XcfaAction>>,
-        MultiPrec<XcfaPrec<PtrPrec<ExplPrec>>, XcfaPrec<PtrPrec<ExplPrec>>, UnitPrec>
+        MultiPrec<XcfaPrec<PtrPrec<ExplPrec>>, XcfaPrec<PtrPrec<ExplPrec>>, XcfaPrec<PtrPrec<ExplPrec>>>
       > {
       val mc = buildExplMultiConfig()
       return SafetyChecker { _: MultiPrec<*,*,*>? ->
@@ -182,22 +199,22 @@ class XcfaWitnessValidatorCheckerBuilder(
 
     private fun buildExplMultiConfig():
       MultiConfig<
-        UnitState,
+        PtrState<ExplState>,
         XcfaState<PtrState<ExplState>>,
         XcfaState<PtrState<ExplState>>,
         XcfaAction,
         XcfaAction,
         XcfaPrec<PtrPrec<ExplPrec>>,
         XcfaPrec<PtrPrec<ExplPrec>>,
-        UnitPrec,
-        ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, UnitState>,
+        XcfaPrec<PtrPrec<ExplPrec>>,
+        ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, PtrState<ExplState>>,
         StmtMultiAction<XcfaAction, XcfaAction>,
       > {
         val errorPred = getXcfaErrorPredicate(ErrorDetection.ERROR_LOCATION);
         val target = Predicate<ExprMultiState<
             XcfaState<PtrState<ExplState>>,
             XcfaState<PtrState<ExplState>>,
-            UnitState
+            PtrState<ExplState>
         >> { ms ->
             errorPred.test(ms.leftState) &&
             errorPred.test(ms.rightState)
@@ -208,10 +225,10 @@ class XcfaWitnessValidatorCheckerBuilder(
             target = target,
             lRefToPrec = ItpRefToXcfaPrec(),
             rRefToPrec = ItpRefToXcfaPrec(),
-            dRefToPrec = ItpRefToUnitPrec(),
-            lInitPrec = XcfaPrec(PtrPrec(ExplPrec.of(program.allVars()))),
+            dRefToPrec = ItpRefToXcfaPrec(),
+            lInitPrec = XcfaPrec(PtrPrec(ExplPrec.of(program.allVars()))), //TODO: Xcfa.collectVars
             rInitPrec = XcfaPrec(PtrPrec(ExplPrec.of(witness.allVars()))),
-            dInitPrec = UnitPrec.getInstance(),
+            dInitPrec = XcfaPrec(PtrPrec(ExplPrec.of(program.allVars()))),
             solverFactory = solverFactory,
             logger = logger,
             pruneStrategy = PruneStrategy.FULL
@@ -221,17 +238,32 @@ class XcfaWitnessValidatorCheckerBuilder(
     private fun createExplProductAnalysis() =
       StmtMultiBuilder(createExplXcfaAnalysisSide(program), getXcfaLts())
         .addRightSide(createExplXcfaAnalysisSide(witness), getXcfaLts())
-        .build(NextSideFunctions.Alternating(),
-          object : InitFunc<UnitState, UnitPrec> {
-            override fun getInitStates(prec: UnitPrec?) =
-              listOf(UnitState.getInstance())
+        .build({ ms: ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, PtrState<ExplState>> ->
+            val programExplState = ms.leftState.sGlobal.innerState;
+            val witnessExplState = ms.rightState.sGlobal.innerState;
+            val programWaypoint = programExplState.getVal().getDecls().find { it.name == "progWaypoint" } as VarDecl<IntType>?
+            val witnessWaypoint = witnessExplState.getVal().getDecls().find { it.name == "witWaypoint" } as VarDecl<IntType>?
+            when {
+              programWaypoint == null               -> MultiSide.LEFT
+              witnessWaypoint == null               -> MultiSide.RIGHT
+              else -> {
+                val pLit = programExplState.eval(programWaypoint).get() as IntLitExpr
+                val wLit = witnessExplState.eval(witnessWaypoint).get() as IntLitExpr
+                if (pLit.getValue() > wLit.getValue()) MultiSide.RIGHT
+                else                                 MultiSide.LEFT
+              }
+            }
+          },
+          object : InitFunc<PtrState<ExplState>, XcfaPrec<PtrPrec<ExplPrec>>> {
+            override fun getInitStates(prec: XcfaPrec<PtrPrec<ExplPrec>>) =
+              listOf(PtrState(ExplState.top()))
           }
         )
 
     private fun createExplXcfaAnalysisSide(xcfa: XCFA):
       MultiAnalysisSide<
         XcfaState<PtrState<ExplState>>,
-        UnitState,
+        PtrState<ExplState>,
         XcfaState<PtrState<ExplState>>,
         XcfaAction,
         XcfaPrec<PtrPrec<ExplPrec>>,
@@ -248,12 +280,20 @@ class XcfaWitnessValidatorCheckerBuilder(
         return MultiAnalysisSide(
           analysis = analysis,
           controlInitFunc = analysis.getInitFunc(),
-          combineStates = { control, data -> control },
+          combineStates = { control, data -> 
+            // println("combineStates:${control.sGlobal.innerState}  and ${data.innerState}  =  ${ExplLattice.getInstance().meet(control.sGlobal.innerState, data.innerState)}")
+          control.withState(PtrState(
+            ExplLattice.getInstance().meet(control.sGlobal.innerState, data.innerState)
+          )) },
           extractControlState = { state -> state },
-          extractDataState = { state -> UnitState.getInstance() },
+          extractDataState = { state -> state.sGlobal },
           extractControlPrec = { prec -> prec }
         )
    }
+
+
+
+    //--------------------------------------------------------------------------//
 
     public fun buildPredMultiSafetyChecker(): 
       SafetyChecker<
@@ -303,6 +343,8 @@ class XcfaWitnessValidatorCheckerBuilder(
           
           result
         }
+
+        // println("Guards:" + program.getGuards())
         
         return StmtMultiConfigBuilder.ItpStmtMultiConfigBuilder(
             product = createPredProductAnalysis(),
@@ -311,8 +353,8 @@ class XcfaWitnessValidatorCheckerBuilder(
             lRefToPrec = ItpRefToPredXcfaPrec(),
             rRefToPrec = ItpRefToPredXcfaPrec(),
             dRefToPrec = ItpRefToUnitPrec(),
-            lInitPrec = XcfaPrec(PtrPrec(PredPrec.of(program.getGuards()))),
-            rInitPrec = XcfaPrec(PtrPrec(PredPrec.of(witness.getGuards()))),
+            lInitPrec = XcfaPrec(PtrPrec(PredPrec.of())),
+            rInitPrec = XcfaPrec(PtrPrec(PredPrec.of())),
             dInitPrec = UnitPrec.getInstance(),
             solverFactory = solverFactory,
             logger = logger,
