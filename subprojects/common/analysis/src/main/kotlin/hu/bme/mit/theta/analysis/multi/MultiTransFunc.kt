@@ -51,6 +51,9 @@ class MultiTransFunc<
     action: MAction,
     prec: MultiPrec<LPrec, RPrec, DataPrec>?,
   ): MutableCollection<out MState> {
+    println("MULTITRANFUN GET SUSSTATES")
+    println(action)
+    println(prec)
     val nextSide: MultiSide = defineNextSide(state)
     val succStates: MutableList<MState> = mutableListOf()
     if (nextSide != MultiSide.RIGHT && action.leftAction != null) {
@@ -87,6 +90,8 @@ class MultiTransFunc<
         }
         .forEach(succStates::add)
     }
+    println("MultiTranFunc Successor states: ")
+    succStates.forEach { println(it) }
     return succStates
   }
 }

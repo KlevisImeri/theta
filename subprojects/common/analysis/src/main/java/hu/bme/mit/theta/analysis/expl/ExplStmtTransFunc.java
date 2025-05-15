@@ -68,7 +68,7 @@ public final class ExplStmtTransFunc implements TransFunc<ExplState, StmtAction,
             final ApplyResult applyResult = StmtApplier.apply(stmt, val, triedSolver);
 
             assert !triedSolver || applyResult != ApplyResult.BOTTOM;
-
+            //TODO: here you have to find where the min::255 get removed
             if (applyResult == ApplyResult.BOTTOM) {
                 return singleton(ExplState.bottom());
             } else if (applyResult == ApplyResult.FAILURE) {

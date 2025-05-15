@@ -63,6 +63,7 @@ fun <S : ExprState, P : Prec> InitFunc<S, P>.getPtrInitFunc(): InitFunc<PtrState
 fun <S : ExprState, P : Prec> TransFunc<S, in ExprAction, P>.getPtrTransFunc(
   isHavoc: Boolean = false
 ): TransFunc<PtrState<S>, PtrAction, PtrPrec<P>> = TransFunc { state, action, prec ->
+  println("PTRTRANSFUNC")
   val writeTriples = action.nextWriteTriples()
   val patchedPrec = prec.innerPrec.patch(writeTriples)
   val exprAction: ExprAction =

@@ -83,6 +83,6 @@ public final class AssumeStmt implements Stmt {
 
     @Override
     public String toString() {
-        return Utils.lispStringBuilder(STMT_LABEL).add(cond).toString();
+        return Utils.lispStringBuilder(STMT_LABEL).add(cond).add(hashCode).toString();
     }
 }

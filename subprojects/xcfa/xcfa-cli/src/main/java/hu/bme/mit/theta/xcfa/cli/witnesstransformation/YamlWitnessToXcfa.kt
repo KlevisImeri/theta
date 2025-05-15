@@ -118,16 +118,16 @@ class YamlWitnessToXcfa(
       atomic = true
     ))
 
-    // fun XCFA.getMainProcedure(): XcfaProcedure =
-    //     procedures.find { it.name == "main" }
-    //         ?: error("no `main` procedure")
-    //
-    // fun XCFA.getMainVariables(): Set<VarDecl<*>> =
-    //     getMainProcedure().vars
-    //
-    // program.getMainVariables().forEach { v ->
-    //     mainProcBuilder.addVar(v)
-    // }
+    fun XCFA.getMainProcedure(): XcfaProcedure =
+        procedures.find { it.name == "main" }
+            ?: error("no `main` procedure")
+
+    fun XCFA.getMainVariables(): Set<VarDecl<*>> =
+        getMainProcedure().vars
+
+    program.getMainVariables().forEach { v ->
+        mainProcBuilder.addVar(v)
+    }
     var i = 1
     witness.content?.forEach { contentItem ->
         contentItem.segment?.forEach { waypoint ->

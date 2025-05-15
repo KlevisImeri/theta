@@ -89,7 +89,7 @@ public abstract class QuantifiedExpr implements Expr<BoolType> {
     public final String toString() {
         final String paramString =
                 paramDecls.stream()
-                        .map(p -> "(" + p.getName() + " " + p.getType() + ")")
+                        .map(p -> "(" + p.getName() + " " + p.getType() + "" + p.getRef() + ")")
                         .collect(joining(" ", "(", ")"));
         return Utils.lispStringBuilder(getOperatorLabel())
                 .body()
