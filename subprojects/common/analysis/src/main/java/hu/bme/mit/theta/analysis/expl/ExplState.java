@@ -131,7 +131,7 @@ public abstract class ExplState extends Valuation implements ExprState {
                     .addAll(
                             val.getDecls().stream()
                                     .sorted(Comparator.comparing((Decl<?> decl) -> decl.getName()))
-                                    .map(d -> String.format("(%s %s %s)", d.getName(), eval(d).get(), System.identityHashCode(d)))
+                                    .map(d -> String.format("(%s %s)", d.getName(), eval(d).get()))
                     )
                     .toString();
         }

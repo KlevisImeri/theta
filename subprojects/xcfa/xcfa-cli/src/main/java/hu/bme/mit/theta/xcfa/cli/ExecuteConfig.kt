@@ -75,14 +75,22 @@ fun runConfig(
   throwDontExit: Boolean,
 ): SafetyResult<*, *> {
   propagateInputOptions(config, logger, uniqueLogger) //Applies the passes
-  //
+
   registerAllSolverManagers(config.backendConfig.solverHome, logger)
-  //
+
   validateInputOptions(config, logger, uniqueLogger)
 
-  val (xcfa, mcm, parseContext, witnessXcfa) = frontend(config, logger, uniqueLogger)
+  val (xcfa, mcm, parseContext, witnessXcfa) =
+    if (config.backendConfig.inProcess && config.backendConfig.parseInProcess) {
+      logger.writeln(INFO, "Not parsing input because a worker process will handle it later.")
+      FrontendResult()
+    } else {
+      val (xcfa, mcm, parseContext, witnessXcfa) = frontend(config, logger, uniqueLogger)
 
-  preVerificationLogging(xcfa, mcm, parseContext, config, logger, uniqueLogger)
+      preVerificationLogging(xcfa, mcm, parseContext, config, logger, uniqueLogger)
+
+      FrontendResult(xcfa, mcm, parseContext, witnessXcfa)
+    }
 
   val result = backend(xcfa, mcm, parseContext, config, logger, uniqueLogger, throwDontExit, witnessXcfa)
 
@@ -149,9 +157,9 @@ private fun validateInputOptions(config: XcfaConfig<*, *>, logger: Logger, uniqu
 }
 
 data class FrontendResult(
-    val xcfa: XCFA,
-    val mcm: MCM,
-    val parseContext: ParseContext,
+    val xcfa: XCFA? = null,
+    val mcm: MCM? = null,
+    val parseContext: ParseContext? = null,
     val witnessXcfa: XCFA? = null
 )
 fun frontend(
@@ -249,9 +257,9 @@ fun frontend(
 }
 
 private fun backend(
-  xcfa: XCFA,
-  mcm: MCM,
-  parseContext: ParseContext,
+  xcfa: XCFA?,
+  mcm: MCM?,
+  parseContext: ParseContext?,
   config: XcfaConfig<*, *>,
   logger: Logger,
   uniqueLogger: Logger,
@@ -262,12 +270,12 @@ private fun backend(
     SafetyResult.unknown<EmptyProof, EmptyCex>()
   } else {
     if (
-      xcfa.procedures.all {
+      xcfa?.procedures?.all {
         it.errorLoc.isEmpty && config.inputConfig.property == ErrorDetection.ERROR_LOCATION
-      }
+      } ?: false
     ) {
       val result = SafetyResult.safe<EmptyProof, EmptyCex>(EmptyProof.getInstance())
-      logger.write(Logger.Level.INFO, "Input is trivially safe\n")
+      logger.write(Logger.Level.RESULT, "Input is trivially safe\n")
 
       logger.write(RESULT, result.toString() + "\n")
       result
@@ -276,7 +284,7 @@ private fun backend(
 
       logger.write(
         Logger.Level.INFO,
-        "Starting verification of ${if (xcfa.name == "") "UnnamedXcfa" else xcfa.name} using ${config.backendConfig.backend}\n",
+        "Starting verification of ${if (xcfa?.name == "") "UnnamedXcfa" else (xcfa?.name ?: "DeferredXcfa")} using ${config.backendConfig.backend}\n${config}\n",
       )
 
       println("------------------------------------")
@@ -313,7 +321,7 @@ private fun backend(
           }
           .let ResultMapper@{ result ->
             when {
-              result.isSafe && xcfa.unsafeUnrollUsed -> {
+              result.isSafe && xcfa?.unsafeUnrollUsed ?: false -> {
                 // cannot report safe if force unroll was used
                 logger.write(RESULT, "Incomplete loop unroll used: safe result is unreliable.\n")
                 if (config.outputConfig.acceptUnreliableSafe)
@@ -455,13 +463,13 @@ private fun preVerificationLogging(
 
 private fun postVerificationLogging(
   safetyResult: SafetyResult<*, *>,
-  mcm: MCM,
-  parseContext: ParseContext,
+  mcm: MCM?,
+  parseContext: ParseContext?,
   config: XcfaConfig<*, *>,
   logger: Logger,
   uniqueLogger: Logger,
 ) {
-  if (config.outputConfig.enableOutput) {
+  if (config.outputConfig.enableOutput && mcm != null && parseContext != null) {
     try {
       // we only want to log the files if the current configuration is not --in-process or portfolio
       if (config.backendConfig.inProcess || config.backendConfig.backend == Backend.PORTFOLIO) {
