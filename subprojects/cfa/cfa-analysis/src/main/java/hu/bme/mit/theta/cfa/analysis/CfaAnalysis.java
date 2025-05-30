@@ -30,7 +30,7 @@ public final class CfaAnalysis<S extends ExprState, P extends Prec>
 
     private final PartialOrd<CfaState<S>> partialOrd;
     private final InitFunc<CfaState<S>, CfaPrec<P>> initFunc;
-    private final TransFunc<CfaState<S>, CfaAction, CfaPrec<P>> transFunc;
+    private final TransFunc<CfaState<S>, CfaAction, CfaPgTec<P>> transFunc;
 
     private CfaAnalysis(
             final Loc initLoc, final Analysis<S, ? super CfaAction, ? super P> analysis) {

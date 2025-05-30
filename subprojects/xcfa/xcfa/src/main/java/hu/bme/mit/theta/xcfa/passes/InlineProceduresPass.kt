@@ -30,6 +30,7 @@ import hu.bme.mit.theta.xcfa.model.*
 class InlineProceduresPass(val parseContext: ParseContext) : ProcedurePass {
 
   override fun run(builder: XcfaProcedureBuilder): XcfaProcedureBuilder {
+    println("Inlining procedure pass!")
     if (!builder.canInline()) return builder
     checkNotNull(builder.metaData["deterministic"])
     check(builder.metaData["inlined"] == null) {

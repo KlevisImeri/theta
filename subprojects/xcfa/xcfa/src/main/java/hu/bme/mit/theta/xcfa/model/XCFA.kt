@@ -33,7 +33,7 @@ class XCFA(
 
   val pointsToGraph by this.lazyPointsToGraph
 
-  var procedures: Set<XcfaProcedure> // procedure definitions
+ var procedures: Set<XcfaProcedure> // procedure definitions
     private set
 
   var initProcedures:

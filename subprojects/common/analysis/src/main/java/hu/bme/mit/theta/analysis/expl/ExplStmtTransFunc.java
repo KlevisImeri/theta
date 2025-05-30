@@ -61,17 +61,27 @@ public final class ExplStmtTransFunc implements TransFunc<ExplState, StmtAction,
     Collection<ExplState> getSuccStates(
             final ExplState state, final List<Stmt> stmts, final ExplPrec prec) {
         final MutableValuation val = MutableValuation.copyOf(state);
+        // System.out.println("GETSUCCSTATES");
+        // System.out.println("Before"+val);
+        // System.out.println(stmts);
+        // System.out.println(prec);
+
+ 
+
         boolean triedSolver = false;
 
         for (int i = 0; i < stmts.size(); i++) {
             final Stmt stmt = stmts.get(i);
             final ApplyResult applyResult = StmtApplier.apply(stmt, val, triedSolver);
+            // System.out.println("After0"+val);
 
             assert !triedSolver || applyResult != ApplyResult.BOTTOM;
 
             if (applyResult == ApplyResult.BOTTOM) {
+                // System.out.println("After1"+val);
                 return singleton(ExplState.bottom());
             } else if (applyResult == ApplyResult.FAILURE) {
+                // System.out.println("ApplyResult.FAILURE");
                 triedSolver = true;
                 final List<Stmt> remainingStmts = stmts.subList(i, stmts.size());
                 final StmtUnfoldResult toExprResult =
@@ -80,14 +90,18 @@ public final class ExplStmtTransFunc implements TransFunc<ExplState, StmtAction,
                 final VarIndexing nextIdx = toExprResult.getIndexing();
                 // We query (max + 1) states from the solver to see if there
                 // would be more than max
+                // System.out.println("maxSuccToEnumerate = " + maxSuccToEnumerate);
                 final int maxToQuery = maxSuccToEnumerate == 0 ? 0 : maxSuccToEnumerate + 1;
                 final Collection<ExplState> succStates =
                         ExprStates.createStatesForExpr(
                                 solver, expr, 0, prec::createState, nextIdx, maxToQuery);
 
                 if (succStates.isEmpty()) {
+                    // System.out.println("After2"+val);
                     return singleton(ExplState.bottom());
                 } else if (maxSuccToEnumerate == 0 || succStates.size() <= maxSuccToEnumerate) {
+                    // System.out.println("After3"+val);
+                    // System.out.println("succStates"+succStates);
                     return succStates;
                 } else {
                     final ApplyResult reapplyResult = StmtApplier.apply(stmt, val, true);
@@ -95,8 +109,12 @@ public final class ExplStmtTransFunc implements TransFunc<ExplState, StmtAction,
                 }
             }
         }
+        // System.out.println("AfterEnd"+val);
 
-        final ExplState abstracted = prec.createState(val);
+
+        // HACK: Disabled the precsion
+        // final ExplState abstracted = prec.createState(val); 
+        final ExplState abstracted = ExplState.of(val);
         return singleton(abstracted);
     }
 }

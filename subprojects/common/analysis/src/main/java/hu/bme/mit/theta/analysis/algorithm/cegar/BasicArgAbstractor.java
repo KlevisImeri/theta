@@ -103,16 +103,15 @@ public class BasicArgAbstractor<S extends State, A extends Action, P extends Pre
             while (!waitlist.isEmpty()) {
                 final ArgNode<S, A> node = waitlist.remove();
 
-                System.out.println("argiteration");
                 Collection<ArgNode<S, A>> newNodes = Collections.emptyList();
                 close(node, reachedSet.get(node));
                 if (!node.isSubsumed() && !node.isTarget()) {
                     newNodes = argBuilder.expand(node, prec);
-                    System.out.println(newNodes.size());
-                    System.out.println("New nodes:");
-                    for (ArgNode<S, A> newNode : newNodes) {
-                        System.out.println(newNode); // Assuming ArgNode has a meaningful toString() method
-                    }
+                    // System.out.println(newNodes.size());
+                    // System.out.println("New nodes:");
+                    // for (ArgNode<S, A> newNode : newNodes) {
+                    //     System.out.println(newNode); // Assuming ArgNode has a meaningful toString() method
+                    // }
                     reachedSet.addAll(newNodes);
                     waitlist.addAll(newNodes);
                 }

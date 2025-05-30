@@ -24,6 +24,18 @@
   content:
   - segment:
     - waypoint:
+        type: "assumption"
+        action: "follow"
+        constraint:
+          value: "n == 2"
+          format: "c_expression"
+        location:
+          file_name: "unsafe-program-example.c"
+          line: 11
+          column: 3
+          function: "main"
+  - segment:
+    - waypoint:
         type: "branching"
         action: "follow"
         constraint:
@@ -65,6 +77,28 @@
         location:
           file_name: "unsafe-program-example.c"
           line: 17
+          column: 3
+          function: "main"
+  - segment:
+    - waypoint:
+        type: "assumption"
+        action: "avoid"
+        constraint:
+          value: "v != 255"
+          format: "c_expression"
+        location:
+          file_name: "unsafe-program-example.c"
+          line: 19
+          column: 5
+          function: "main"
+    - waypoint:
+        type: "branching"
+        action: "follow"
+        constraint:
+          value: "true"
+        location:
+          file_name: "unsafe-program-example.c"
+          line: 22
           column: 3
           function: "main"
   - segment:

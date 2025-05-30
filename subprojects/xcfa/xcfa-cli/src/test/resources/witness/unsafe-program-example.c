@@ -23,9 +23,9 @@ int main() {
     reach_error();
     return 1;
   }
-  if (s > 65025) {
-    reach_error();
-    return 1;
-  }
+  // if (s > 65025) {
+  //   reach_error();
+  //   return 1;
+  // }
   return 0;
 }

@@ -29,6 +29,7 @@ import hu.bme.mit.theta.xcfa.cli.params.*
 import java.io.File
 import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig;
 import hu.bme.mit.theta.xcfa.model.*
+import hu.bme.mit.theta.common.visualization.writer.WebDebuggerLogger;
 
 class XcfaWitnessValidatorCheckerBuilderTest {
     companion object {
@@ -67,6 +68,8 @@ class XcfaWitnessValidatorCheckerBuilderTest {
       expectSafe: Boolean
     ) {
         val logger = ConsoleLogger(Logger.Level.VERBOSE) //RESULT VERBOSE
+        val uniqueLogger = UniqueWarningLogger(logger)
+        // WebDebuggerLogger.enableWebDebuggerLogger();
         val result = runConfig(
           XcfaConfig(
               inputConfig = InputConfig(
@@ -80,6 +83,8 @@ class XcfaWitnessValidatorCheckerBuilderTest {
                 debug = true,
                 stacktrace = true,
                 logLevel = Logger.Level.VERBOSE,
+                argdebug = false,
+                argToFile = false
               ),
               //--- fill up uninmportant ---//
               frontendConfig = FrontendConfig(
@@ -92,9 +97,11 @@ class XcfaWitnessValidatorCheckerBuilderTest {
               //--- fill up uninmportant ---//
           ),
           logger,
-          logger,
-          throwDontExit = true
+          uniqueLogger,
+          throwDontExit = false
         )
+        
+        WebDebuggerLogger.getInstance().writeToFile("./Arg.cfa");
 
         if (expectSafe) {
             Assertions.assertTrue(result.isSafe(), "Expected safe, but was $result")
@@ -102,7 +109,7 @@ class XcfaWitnessValidatorCheckerBuilderTest {
             Assertions.assertTrue(result.isUnsafe(), "Expected unsafe, but was $result")
         }
 
-       println("✅ [$cFile | ${witnessFile.substringAfterLast('/')}] => " +
+        println("✅ [$cFile | ${witnessFile.substringAfterLast('/')}] => " +
                 if (expectSafe) "SAFE" else "UNSAFE")
     }
 }

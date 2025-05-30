@@ -21,6 +21,15 @@ import hu.bme.mit.theta.core.decl.VarDecl;
 import hu.bme.mit.theta.core.decl.Decls.Var
 import hu.bme.mit.theta.frontend.transformation.model.statements.*;
 import hu.bme.mit.theta.core.stmt.AssignStmt
+import hu.bme.mit.theta.core.type.booltype.BoolType;
+import hu.bme.mit.theta.core.type.abstracttype.EqExpr;
+import hu.bme.mit.theta.core.type.anytype.RefExpr;
+import hu.bme.mit.theta.core.type.LitExpr;
+import hu.bme.mit.theta.core.type.booltype.BoolExprs.Bool
+import hu.bme.mit.theta.core.type.booltype.BoolExprs.False
+import hu.bme.mit.theta.core.type.booltype.BoolExprs.True
+import hu.bme.mit.theta.core.type.booltype.BoolExprs.Or
+
 // import hu.bme.mit.theta.frontend.transformation.model.statements.CStatement
 // import hu.bme.mit.theta.frontend.transformation.model.statements.CIf
 // import hu.bme.mit.theta.frontend.transformation.model.statements.CCall
@@ -80,23 +89,33 @@ class YamlWitnessToXcfa(
   lateinit var trapLoc: XcfaLocation;
   lateinit var errorLoc: XcfaLocation;
   lateinit var waypointVar: VarDecl<IntType>; 
-  lateinit var edgesMap: StmtRegistry;
+  lateinit var runVar: VarDecl<BoolType>; 
+  lateinit var edgesMap: SequenceLabelRegistry;
+  var prevfollowWaypoint: Int = 0;
+
 
   fun run(): Pair<XCFA, XCFA> {
     xcfaBuilder = XcfaBuilder("WitnessModel_${witness.metadata.uuid.take(5)}")
     locationMap = mutableMapOf<Location, XcfaLocation>()
-    edgesMap = StmtRegistry()
+    edgesMap = SequenceLabelRegistry()
     mainProcBuilder = XcfaProcedureBuilder("main", ProcedurePassManager());
     mainProcBuilder.createInitLoc()
     mainProcBuilder.createErrorLoc()
-    currentLoc = mainProcBuilder.initLoc //TODO: add to location Map
+    currentLoc = mainProcBuilder.initLoc
     errorLoc = mainProcBuilder.errorLoc.get()
-    trapLoc = newLocation(Location("Trap", -1))
+    // trapLoc = newLocation(Location("Trap", -1))
     return when (witness.entryType) {
       EntryType.VIOLATION -> violationWitnessToXcfa()
       EntryType.INVARIANTS -> correctnessWitnessesToXcfa()
     }
   }
+
+  fun XCFA.getMainProcedure(): XcfaProcedure =
+      procedures.find { it.name == "main" }
+          ?: error("no `main` procedure")
+
+  fun XCFA.getMainVariables(): Set<VarDecl<*>> =
+      getMainProcedure().vars
 
   private fun violationWitnessToXcfa(): Pair<XCFA, XCFA> {
     logger.write(
@@ -110,8 +129,21 @@ class YamlWitnessToXcfa(
       threadLocal = false,
       atomic = true
     ))
+    runVar = Var("run", Bool())
+    xcfaBuilder.addVar(XcfaGlobalVar(
+      wrappedVar = runVar,
+      initValue = False(),
+      threadLocal = false,
+      atomic = true
+    ))
 
+
+
+    program.getMainVariables().forEach { v ->
+        mainProcBuilder.addVar(v)
+    }
     var i = 1
+    prevfollowWaypoint = 0;
     witness.content?.forEach { contentItem ->
         contentItem.segment?.forEach { waypoint ->
             waypointToXcfa(waypoint, i)
@@ -122,25 +154,38 @@ class YamlWitnessToXcfa(
     xcfaBuilder.addProcedure(mainProcBuilder)
     xcfaBuilder.addEntryPoint(mainProcBuilder, emptyList())
     
-
     val programXcfaWithWaypoints = program.optimizeFurther(ProcedurePassManager(listOf(
-      WitnessWaypointsPass(edgesMap)
+      WitnessWaypointsPass(edgesMap, xcfaBuilder.getVars())
     )));
     val witnessXcfa = xcfaBuilder.build();
 
     return Pair(programXcfaWithWaypoints, witnessXcfa)
 }
 
-  private fun waypointToXcfa(waypoint: Waypoint, waypointvalue: Int) {
+  private fun waypointToXcfa(waypoint: Waypoint, waypointValue: Int) {
 
     val (type, constraint, location, action) = waypoint.waypoint
     val targetLoc = newLocation(location);
-    val waypointLabel = StmtLabel(AssumeStmt.create(
-      Eq(waypointVar.ref, Int(waypointvalue))
+    val waypointAssumeLabel = StmtLabel(AssumeStmt.create(
+      Eq(waypointVar.ref, Int(waypointValue))
     ))
-    val assignWaypointStmt = AssignStmt.of(
-      waypointVar, Int(waypointvalue)
-    );
+    val waypointAssignLabel = StmtLabel(AssignStmt.of(
+      waypointVar, Int(waypointValue)
+    ))
+    val runFalseLabel = StmtLabel(AssignStmt.of(
+      runVar, False()
+    ))
+    val runTrueLabel = StmtLabel(AssignStmt.of(
+      runVar, True()
+    ))
+
+    // val waypointLabel = StmtLabel(AssignStmt.of(
+    //   waypointVar, Int(waypointValue)
+    // ))
+    // val assignWaypointStmt = AssignStmt.of(
+    //   waypointVar, Int(waypointValue)
+    // );
+
     val metadata = WitnessMetadata(waypoint.waypoint)
 
     when (type) {
@@ -154,23 +199,34 @@ class YamlWitnessToXcfa(
           throw IllegalArgumentException("Only C_EXPRESSION is supported currently")
         }
 
-        val sequenceLabel = SequenceLabel(listOf(
-            waypointLabel,
-            StmtLabel(CExpToAssumeStmt(value)),
-        ))
 
         when (action) {
           Action.FOLLOW -> {
             mainProcBuilder.addEdge(XcfaEdge(
               currentLoc,
               targetLoc,
-              sequenceLabel,
+              SequenceLabel(listOf(
+                waypointAssumeLabel,
+                StmtLabel(CExpToAssumeStmt(value)),
+                runFalseLabel
+              )),
               metadata
             ))
+            addSegmentGuard(currentLoc, prevfollowWaypoint+1, waypointValue, runFalseLabel) 
+            prevfollowWaypoint = waypointValue;
             currentLoc = targetLoc
           }
-          Action.AVOID -> {
-            toTrapNode(sequenceLabel, metadata)
+           Action.AVOID -> {
+            mainProcBuilder.addEdge(XcfaEdge(
+              currentLoc,
+              currentLoc,
+              SequenceLabel(listOf(
+                waypointAssumeLabel,
+                StmtLabel(CExpToAssumeStmt("!($value)")),
+                runFalseLabel
+              )),
+              metadata
+            ))
           }
           else -> {
               throw IllegalArgumentException("Unknown action type: $action")
@@ -180,7 +236,11 @@ class YamlWitnessToXcfa(
         edgesMap.put(WaypointKey(
           lineStart = location.line - 1,
           endInSameLine = true,
-        ), assignWaypointStmt);
+          type = CAssignment::class //HACK: To remove dublicates for the moment
+        ), SequenceLabel(listOf(
+          waypointAssignLabel,
+          runTrueLabel
+        )));
       }
 
       WaypointType.TARGET -> {
@@ -189,11 +249,13 @@ class YamlWitnessToXcfa(
             currentLoc,
             errorLoc,
             SequenceLabel(listOf(
-              waypointLabel,
-              NopLabel,
+              waypointAssumeLabel,
+              runFalseLabel
             )),
             metadata
           ))
+          addSegmentGuard(currentLoc, prevfollowWaypoint+1, waypointValue, runFalseLabel) 
+          prevfollowWaypoint = waypointValue;
           currentLoc = errorLoc
         } else {
            throw IllegalArgumentException("For waypoint of type TARGET only action FOLLOW is allowed. Current action: ${action}")
@@ -201,40 +263,10 @@ class YamlWitnessToXcfa(
         edgesMap.put(WaypointKey(
           lineStart = location.line,
           endInSameLine = true,
-        ), assignWaypointStmt);
-      }
-
-      WaypointType.FUNCTION_ENTER -> {
-        throw TODO("Not implmented FUNCTION_ENTER")
-      }
-
-      WaypointType.FUNCTION_RETURN -> {
-        val label = getStmtLabelAtLocation(location)
-        when (action) {
-          Action.FOLLOW -> {
-            mainProcBuilder.addEdge(XcfaEdge(
-              currentLoc,
-              targetLoc,
-              SequenceLabel(listOf(
-                waypointLabel, 
-                label,
-              )),
-              metadata,
-            ))
-            currentLoc = targetLoc
-          }
-          Action.AVOID -> {
-             throw IllegalArgumentException("We don't know what to do when you avoid a function return!!!")
-            // toTrapNode(currentLoc, ?)  TODO: what type of label ...
-          }
-          else -> {
-            throw IllegalArgumentException("Unknown action type: $action")
-          }
-        }
-        edgesMap.put(WaypointKey( //TODO: you probably need more precision even the column
-          lineStart = location.line,
-          type = CCall::class 
-        ), assignWaypointStmt);
+        ), SequenceLabel(listOf(
+          waypointAssignLabel,
+          runTrueLabel
+        )));
       }
 
       WaypointType.BRANCHING -> {
@@ -249,11 +281,12 @@ class YamlWitnessToXcfa(
         if(value=="true" || value=="false") {
 
           val label = SequenceLabel(listOf(
-            waypointLabel,
+            waypointAssumeLabel,
             StmtLabel(
               SkipStmt.getInstance(),
               path
             ),
+            runFalseLabel
           ));
 
           when (action) {
@@ -264,10 +297,12 @@ class YamlWitnessToXcfa(
                 label,
                 metadata,
               ))
+              addSegmentGuard(currentLoc, prevfollowWaypoint+1, waypointValue, runFalseLabel) 
+              prevfollowWaypoint = waypointValue;
               currentLoc = targetLoc
             }
             Action.AVOID -> {
-              toTrapNode(label, metadata)
+              //no edge
             }
             else -> {
                 throw IllegalArgumentException("Unknown action type: $action")
@@ -281,12 +316,54 @@ class YamlWitnessToXcfa(
         edgesMap.put(WaypointKey(
           lineStart = location.line,
           path = path 
-        ), assignWaypointStmt);
+        ), SequenceLabel(listOf(
+            waypointAssignLabel,
+            runTrueLabel
+        )));
      }
 
-      WaypointType.RECURRENCE_CONDITION -> {
-        throw TODO("Not implmented RECURRENCE_CONDITION!")
-      }
+     WaypointType.FUNCTION_ENTER -> {
+       throw TODO("Not implmented FUNCTION_ENTER")
+     }
+
+     WaypointType.FUNCTION_RETURN -> {
+       val label = getStmtLabelAtLocation(location)
+       when (action) {
+         Action.FOLLOW -> {
+           mainProcBuilder.addEdge(XcfaEdge(
+             currentLoc,
+             targetLoc,
+             SequenceLabel(listOf(
+               waypointAssumeLabel, 
+               label,
+               runFalseLabel
+             )),
+             metadata,
+           ))
+            addSegmentGuard(currentLoc, prevfollowWaypoint+1, waypointValue, runFalseLabel) 
+            prevfollowWaypoint = waypointValue;
+           currentLoc = targetLoc
+         }
+         Action.AVOID -> {
+           throw IllegalArgumentException("We don't know what to do when you avoid a function return!!!")
+           // toTrapNode(currentLoc, ?)  TODO: what type of label ...
+         }
+         else -> {
+           throw IllegalArgumentException("Unknown action type: $action")
+         }
+       }
+       edgesMap.put(WaypointKey( //TODO: you probably need more precision even the column
+       lineStart = location.line,
+       type = CCall::class 
+     ), SequenceLabel(listOf(
+        waypointAssignLabel,
+        runTrueLabel
+     )));
+    }
+
+    WaypointType.RECURRENCE_CONDITION -> {
+      throw TODO("Not implmented RECURRENCE_CONDITION!")
+    }
 
     }
   }
@@ -330,19 +407,35 @@ class YamlWitnessToXcfa(
       val funcName = location.function ?: ""
       val newXcfaLocation = XcfaLocation(
         // name = "\"${location.fileName}:${funcName}:L${location.line}:${location.column ?: 0}\"",
-        name = "q$numberOfnodes",
+        name = "S$numberOfnodes",
         metadata = EmptyMetaData
       )
       numberOfnodes++;
-      mainProcBuilder.addEdge(XcfaEdge(
-        newXcfaLocation,
-        newXcfaLocation,
-        NopLabel,
-        EmptyMetaData 
-      ))
+      // mainProcBuilder.addEdge(XcfaEdge(
+      //   newXcfaLocation,
+      //   newXcfaLocation,
+      //   NopLabel,
+      //   EmptyMetaData 
+      // ))
       return newXcfaLocation;
     }
   }
+
+  private fun addSegmentGuard(location: XcfaLocation, lowerBound: Int, upperBould: Int, extraLabel: XcfaLabel) {
+    mainProcBuilder.addEdge(XcfaEdge(
+      location,
+      location,
+      SequenceLabel(listOf(
+        StmtLabel(AssumeStmt.of(Or(
+          Lt(waypointVar.ref, Int(lowerBound)), 
+          Gt(waypointVar.ref, Int(upperBould))
+        ))),
+        extraLabel
+      )),
+      EmptyMetaData
+    ))
+  }
+
 
   private fun toTrapNode(label: XcfaLabel, metadata: WitnessMetadata) { 
     mainProcBuilder.addEdge(XcfaEdge(
@@ -358,6 +451,28 @@ class YamlWitnessToXcfa(
       //throw IllegalArgumentException("We only support some function for their return!")
   }
 
+  // fun Expr<BoolType>.toAssignStmt(): AssignStmt<*>? {
+  //   if (this !is EqExpr<*, *>) return null
+  //   val (l, r) = this.getRightOp() to this.getLeftOp()
+  //   val (decl, lit) = when {
+  //       l is RefExpr<*> && r is LitExpr<*> -> l.decl as VarDecl<*> to r
+  //       r is RefExpr<*> && l is LitExpr<*> -> r.decl as VarDecl<*> to l
+  //       else                              -> return null
+  //   }
+  //   return AssignStmt.create(decl, lit)
+  // }
+
+  // private fun CExpToAssignStmt(value: String): AssignStmt {
+  //   return getExpressionFromC(
+  //       value,
+  //       parseContext,
+  //       false,
+  //       false,
+  //       warningLogger,
+  //       program.collectVars(),
+  //     ).toAssignStmt();
+  // }
+
   private fun CExpToAssumeStmt(value: String): AssumeStmt {
     return AssumeStmt.of(getExpressionFromC(
         value,
@@ -365,9 +480,10 @@ class YamlWitnessToXcfa(
         false,
         false,
         warningLogger,
-        program.collectVars(),  // TODO: i have a feeling i have to filter only the nessesary vars
+        mainProcBuilder.getVars(),
       ));
   }
+
 
 }
 

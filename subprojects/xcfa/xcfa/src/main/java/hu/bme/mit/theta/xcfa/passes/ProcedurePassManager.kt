@@ -35,7 +35,7 @@ class CPasses(checkOverflow: Boolean, parseContext: ParseContext, uniqueWarningL
       // handling intrinsics
       ErrorLocationPass(checkOverflow),
       FinalLocationPass(checkOverflow),
-      SvCompIntrinsicsPass(),
+      // SvCompIntrinicsPass(),
       FpFunctionsToExprsPass(parseContext),
       CLibraryFunctionsPass(),
     ),
@@ -61,7 +61,7 @@ class CPasses(checkOverflow: Boolean, parseContext: ParseContext, uniqueWarningL
       MemsafetyPass(parseContext),
       NoSideEffectPass(parseContext),
       NondetFunctionPass(),
-      LbePass(parseContext),
+      // LbePass(parseContext),
       NormalizePass(), // needed after lbe, TODO
       DeterministicPass(), // needed after lbe, TODO
       HavocPromotionAndRange(parseContext),

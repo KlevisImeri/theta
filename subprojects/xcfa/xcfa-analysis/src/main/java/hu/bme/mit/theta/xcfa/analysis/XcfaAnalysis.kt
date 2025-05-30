@@ -306,7 +306,7 @@ fun <S : XcfaState<out PtrState<out ExprState>>, P : XcfaPrec<out Prec>> getXcfa
 
 /// EXPL
 
-public fun getExplXcfaInitFunc(
+private fun getExplXcfaInitFunc(
   xcfa: XCFA,
   solver: Solver,
 ): (XcfaPrec<PtrPrec<ExplPrec>>) -> List<XcfaState<PtrState<ExplState>>> {
@@ -319,8 +319,16 @@ public fun getExplXcfaInitFunc(
           i,
           XcfaProcessState(
             initLocStack,
-            prefix = "T$i",
-            varLookup = LinkedList(listOf(createLookup(it.first, "T$i", ""))),
+            // HACK:  for now we only want an identity lookup no speacial variables for thread
+            // So varLookup starts as a stack (LinkedList) containing one Map<VarDecl<*>, VarDecl<*>>, which maps original variables to renamed ones like T0::x, T1::y, etc., to distinguish variables per thread.
+            // prefix = "T$i",
+            // varLookup = LinkedList(listOf(createLookup(it.first, "T$i", ""))),
+            prefix = "",
+            varLookup = LinkedList(
+              listOf(
+                (it.first.params.map { it.first } + it.first.vars).associateWith { it }
+              )
+            ),
           ),
         )
       }
@@ -372,7 +380,7 @@ class ExplXcfaAnalysis(
 
 /// PRED
 
-public fun getPredXcfaInitFunc(
+private fun getPredXcfaInitFunc(
   xcfa: XCFA,
   predAbstractor: PredAbstractor,
 ): (XcfaPrec<PtrPrec<PredPrec>>) -> List<XcfaState<PtrState<PredState>>> {

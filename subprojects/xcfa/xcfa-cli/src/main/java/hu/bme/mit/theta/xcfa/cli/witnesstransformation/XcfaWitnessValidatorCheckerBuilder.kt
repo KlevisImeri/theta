@@ -14,6 +14,7 @@ import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.analysis.multi.NextSideFunctions.Alternating
 import hu.bme.mit.theta.solver.SolverFactory;
 import hu.bme.mit.theta.solver.z3.Z3SolverFactory
+import hu.bme.mit.theta.solver.z3legacy.Z3LegacySolverFactory
 import hu.bme.mit.theta.common.logging.Logger;
 import hu.bme.mit.theta.analysis.algorithm.SafetyChecker;
 import hu.bme.mit.theta.analysis.algorithm.arg.ARG
@@ -44,8 +45,6 @@ import hu.bme.mit.theta.xcfa.analysis.getXcfaLts
 import hu.bme.mit.theta.analysis.multi.NextSideFunctions
 import hu.bme.mit.theta.xcfa.analysis.ExplXcfaAnalysis
 import hu.bme.mit.theta.xcfa.analysis.PredXcfaAnalysis
-import hu.bme.mit.theta.xcfa.analysis.getExplXcfaInitFunc
-import hu.bme.mit.theta.xcfa.analysis.getPredXcfaInitFunc
 import hu.bme.mit.theta.xcfa.analysis.getPartialOrder
 import hu.bme.mit.theta.analysis.expl.ExplOrd
 import hu.bme.mit.theta.analysis.pred.PredAbstractors;
@@ -56,10 +55,19 @@ import hu.bme.mit.theta.analysis.expr.refinement.RefutationToPrec
 import hu.bme.mit.theta.analysis.pred.ExprSplitters
 import hu.bme.mit.theta.analysis.pred.ItpRefToPredPrec
 import hu.bme.mit.theta.core.type.booltype.BoolType;
+import hu.bme.mit.theta.core.type.booltype.BoolLitExpr;
 import hu.bme.mit.theta.core.stmt.AssumeStmt
 import hu.bme.mit.theta.core.type.Expr
 import hu.bme.mit.theta.xcfa.model.XcfaEdge
 import hu.bme.mit.theta.xcfa.model.StmtLabel
+import hu.bme.mit.theta.xcfa.model.SequenceLabel
+import hu.bme.mit.theta.xcfa.model.XcfaLabel
+import hu.bme.mit.theta.core.type.inttype.IntType
+import hu.bme.mit.theta.core.type.LitExpr;
+import hu.bme.mit.theta.analysis.multi.MultiState;
+import hu.bme.mit.theta.core.type.inttype.IntLitExpr;
+import hu.bme.mit.theta.analysis.expl.ExplLattice;
+
 // TODO: For the moment this is only for reach error
 
 class XcfaWitnessValidatorCheckerBuilder(
@@ -78,25 +86,34 @@ class XcfaWitnessValidatorCheckerBuilder(
     fun XCFA.allVars(): Set<VarDecl<*>> {
       val globals = globalVars.map { it.wrappedVar }
       val fromProcs = procedures.flatMap { proc ->
-        // val ps = proc.params.map { it.first }
-        // val ls = proc.vars
-        // ps + ls
+        val ps = proc.params.map { it.first }
+        val ls = proc.vars
+        ps + ls
         proc.vars
       }
-      // return (globals + fromProcs).toSet()
-      return globals.toSet();
+      return (globals + fromProcs).toSet()
+      // return globals.toSet();
+       // return setOf()
     }
 
-    fun XcfaEdge.getGuard(): Expr<BoolType>? =
-        (label as? StmtLabel)
-          ?.stmt
-          .let { if (it is AssumeStmt) it.getCond() else null }
+    fun XcfaLabel.getGuards(): List<Expr<BoolType>> = when (this) {
+        is SequenceLabel ->
+            labels.flatMap { it.getGuards() }
+        is StmtLabel -> {
+            val s = stmt
+            if (s is AssumeStmt) listOf(s.getCond()) else emptyList()
+        }
+        else -> emptyList()
+    }
+
+    fun XcfaEdge.getGuards(): List<Expr<BoolType>> =
+        label.getGuards()
 
     fun XCFA.getGuards(): Set<Expr<BoolType>> =
         procedures
           .asSequence()
-          .flatMap { proc -> proc.edges.asSequence() }
-          .mapNotNull { edge -> edge.getGuard() }
+          .flatMap { it.edges.asSequence() }
+          .flatMap { it.getGuards().asSequence() }
           .toSet()
 
     class ItpRefToXcfaPrec : RefutationToPrec<
@@ -166,11 +183,11 @@ class XcfaWitnessValidatorCheckerBuilder(
 
     public fun buildExplMultiSafetyChecker(): 
       SafetyChecker<
-        ARG<ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, UnitState>,
+        ARG<ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, PtrState<ExplState>>,
             StmtMultiAction<XcfaAction, XcfaAction>>,
-        Trace<ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, UnitState>,
+        Trace<ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, PtrState<ExplState>>,
               StmtMultiAction<XcfaAction, XcfaAction>>,
-        MultiPrec<XcfaPrec<PtrPrec<ExplPrec>>, XcfaPrec<PtrPrec<ExplPrec>>, UnitPrec>
+        MultiPrec<XcfaPrec<PtrPrec<ExplPrec>>, XcfaPrec<PtrPrec<ExplPrec>>, XcfaPrec<PtrPrec<ExplPrec>>>
       > {
       val mc = buildExplMultiConfig()
       return SafetyChecker { _: MultiPrec<*,*,*>? ->
@@ -179,25 +196,24 @@ class XcfaWitnessValidatorCheckerBuilder(
     }
 
 
-
     private fun buildExplMultiConfig():
       MultiConfig<
-        UnitState,
+        PtrState<ExplState>,
         XcfaState<PtrState<ExplState>>,
         XcfaState<PtrState<ExplState>>,
         XcfaAction,
         XcfaAction,
         XcfaPrec<PtrPrec<ExplPrec>>,
         XcfaPrec<PtrPrec<ExplPrec>>,
-        UnitPrec,
-        ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, UnitState>,
+        XcfaPrec<PtrPrec<ExplPrec>>,
+        ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, PtrState<ExplState>>,
         StmtMultiAction<XcfaAction, XcfaAction>,
       > {
         val errorPred = getXcfaErrorPredicate(ErrorDetection.ERROR_LOCATION);
         val target = Predicate<ExprMultiState<
             XcfaState<PtrState<ExplState>>,
             XcfaState<PtrState<ExplState>>,
-            UnitState
+            PtrState<ExplState>
         >> { ms ->
             errorPred.test(ms.leftState) &&
             errorPred.test(ms.rightState)
@@ -208,10 +224,10 @@ class XcfaWitnessValidatorCheckerBuilder(
             target = target,
             lRefToPrec = ItpRefToXcfaPrec(),
             rRefToPrec = ItpRefToXcfaPrec(),
-            dRefToPrec = ItpRefToUnitPrec(),
-            lInitPrec = XcfaPrec(PtrPrec(ExplPrec.of(program.allVars()))),
-            rInitPrec = XcfaPrec(PtrPrec(ExplPrec.of(witness.allVars()))),
-            dInitPrec = UnitPrec.getInstance(),
+            dRefToPrec = ItpRefToXcfaPrec(),
+            lInitPrec = XcfaPrec(PtrPrec(ExplPrec.of(program.allVars()+witness.allVars()))),
+            rInitPrec = XcfaPrec(PtrPrec(ExplPrec.of(program.allVars()+witness.allVars()))),
+            dInitPrec = XcfaPrec(PtrPrec(ExplPrec.of(program.allVars()+witness.allVars()))), //TODO: Xcfa.collectVars
             solverFactory = solverFactory,
             logger = logger,
             pruneStrategy = PruneStrategy.FULL
@@ -220,18 +236,31 @@ class XcfaWitnessValidatorCheckerBuilder(
 
     private fun createExplProductAnalysis() =
       StmtMultiBuilder(createExplXcfaAnalysisSide(program), getXcfaLts())
-        .addRightSide(createExplXcfaAnalysisSide(witness), getXcfaLts())
-        .build(NextSideFunctions.Alternating(),
-          object : InitFunc<UnitState, UnitPrec> {
-            override fun getInitStates(prec: UnitPrec?) =
-              listOf(UnitState.getInstance())
+          .addRightSide(createExplXcfaAnalysisSide(witness), getXcfaLts())
+          .build({ ms: ExprMultiState<XcfaState<PtrState<ExplState>>, XcfaState<PtrState<ExplState>>, PtrState<ExplState>> ->
+              val explsharedState = ms.getDataState().innerState
+              val sharedVars = explsharedState.getVal().getDecls()
+              val runVar = sharedVars.find { it.name == "run" } as VarDecl<BoolType>?
+              
+              when {
+                  runVar == null -> MultiSide.LEFT
+                  else -> {
+                      val runValue = explsharedState.eval(runVar).get() as BoolLitExpr
+                      if (runValue.value) MultiSide.RIGHT
+                      else MultiSide.LEFT
+                  }
+              }
+          },
+          object : InitFunc<PtrState<ExplState>, XcfaPrec<PtrPrec<ExplPrec>>> {
+              override fun getInitStates(prec: XcfaPrec<PtrPrec<ExplPrec>>) =
+                  listOf(PtrState(ExplState.top()))
           }
-        )
+      )
 
     private fun createExplXcfaAnalysisSide(xcfa: XCFA):
       MultiAnalysisSide<
         XcfaState<PtrState<ExplState>>,
-        UnitState,
+        PtrState<ExplState>,
         XcfaState<PtrState<ExplState>>,
         XcfaAction,
         XcfaPrec<PtrPrec<ExplPrec>>,
@@ -240,20 +269,24 @@ class XcfaWitnessValidatorCheckerBuilder(
         val analysis = ExplXcfaAnalysis(
           xcfa = xcfa,
           solver = solverFactory.createSolver(),
-          maxEnum = 1,
+          maxEnum = 1, //TODO: ask about this paramter
           partialOrd = getPartialOrder(ExplOrd.getInstance().getPtrPartialOrd()),
-          isHavoc = true
+          isHavoc = false //TODO: 
         )
 
         return MultiAnalysisSide(
           analysis = analysis,
           controlInitFunc = analysis.getInitFunc(),
-          combineStates = { control, data -> control },
-          extractControlState = { state -> state },
-          extractDataState = { state -> UnitState.getInstance() },
-          extractControlPrec = { prec -> prec }
+          combineStates = { control, data -> control.withState(data) },
+          extractControlState = { state -> state.withState(PtrState(ExplState.top())) }, // TODO: you can just copy too
+          extractDataState = { state -> state.sGlobal },
+          extractControlPrec = { prec -> XcfaPrec(PtrPrec(ExplPrec.of(setOf()))) }
         )
    }
+
+
+
+    //--------------------------------------------------------------------------//
 
     public fun buildPredMultiSafetyChecker(): 
       SafetyChecker<
@@ -303,6 +336,8 @@ class XcfaWitnessValidatorCheckerBuilder(
           
           result
         }
+
+        // println("Guards:" + program.getGuards())
         
         return StmtMultiConfigBuilder.ItpStmtMultiConfigBuilder(
             product = createPredProductAnalysis(),
@@ -311,8 +346,8 @@ class XcfaWitnessValidatorCheckerBuilder(
             lRefToPrec = ItpRefToPredXcfaPrec(),
             rRefToPrec = ItpRefToPredXcfaPrec(),
             dRefToPrec = ItpRefToUnitPrec(),
-            lInitPrec = XcfaPrec(PtrPrec(PredPrec.of(program.getGuards()))),
-            rInitPrec = XcfaPrec(PtrPrec(PredPrec.of(witness.getGuards()))),
+            lInitPrec = XcfaPrec(PtrPrec(PredPrec.of())),
+            rInitPrec = XcfaPrec(PtrPrec(PredPrec.of())),
             dInitPrec = UnitPrec.getInstance(),
             solverFactory = solverFactory,
             logger = logger,
