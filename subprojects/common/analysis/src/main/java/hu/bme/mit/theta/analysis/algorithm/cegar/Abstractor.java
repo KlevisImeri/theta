@@ -29,4 +29,7 @@ public interface Abstractor<P extends Prec, Pr extends Proof> {
 
     /** Check witness with given precision */
     AbstractorResult check(Pr witness, P prec);
+
+    /** Change the stoping criterion */
+    void setStopCriterion(StopCriterion<S, A>);
 }

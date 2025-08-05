@@ -18,6 +18,7 @@ package hu.bme.mit.theta.analysis.algorithm;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import hu.bme.mit.theta.analysis.Cex;
+import hu.bme.mit.theta.analysis.algorithm.EmptyProof;
 import hu.bme.mit.theta.common.Utils;
 import java.util.Optional;
 
@@ -30,11 +31,6 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
         this.stats = checkNotNull(stats);
     }
 
-    private SafetyResult() {
-        this.proof = null;
-        this.stats = Optional.empty();
-    }
-
     @Override
     public Pr getProof() {
         return proof;
@@ -44,6 +40,8 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
     public Optional<Statistics> getStats() {
         return stats;
     }
+
+
 
     public static <Pr extends Proof, C extends Cex> Safe<Pr, C> safe(final Pr witness) {
         return new Safe<>(witness, Optional.empty());
@@ -55,8 +53,15 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
     }
 
     public static <Pr extends Proof, C extends Cex> Unknown<Pr, C> unknown() {
-        return new Unknown<>();
+        return new Unknown<>(new EmptyProof(), Optional.empty());
     }
+
+    public static <Pr extends Proof, C extends Cex> Partial<Pr, C> partial(final Pr witness) {
+        return new Partial<>(witness, Optional.empty());
+    }
+
+
+
 
     public static <Pr extends Proof, C extends Cex> Safe<Pr, C> safe(
             final Pr witness, final Statistics stats) {
@@ -69,16 +74,31 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
     }
 
     public static <Pr extends Proof, C extends Cex> Unknown<Pr, C> unknown(final Statistics stats) {
-        return new Unknown<>(Optional.of(stats));
+        return new Unknown<>(new EmptyProof(), Optional.of(stats));
     }
+
+    public static <Pr extends Proof, C extends Cex> Partial<Pr, C> partial(
+            final Pr witness, final Statistics stats) {
+        return new Partial<>(witness, Optional.of(stats));
+    }
+
+
 
     public abstract boolean isSafe();
 
     public abstract boolean isUnsafe();
 
+    public abstract boolean isUnknown();
+
+    public abstract boolean isPartial();
+
     public abstract Safe<Pr, C> asSafe();
 
     public abstract Unsafe<Pr, C> asUnsafe();
+
+    public abstract Unknown<Pr, C> asUnknown();
+
+    public abstract Partial<Pr, C> asPartial();
 
     ////
 
@@ -98,6 +118,16 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
         }
 
         @Override
+        public boolean isUnknown() {
+            return false;
+        }
+
+        @Override
+        public boolean isPartial() {
+            return false;
+        }
+
+        @Override
         public Safe<Pr, C> asSafe() {
             return this;
         }
@@ -109,6 +139,24 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
                             + Safe.class.getSimpleName()
                             + " to "
                             + Unsafe.class.getSimpleName());
+        }
+
+        @Override
+        public Unknown<Pr, C> asUnknown() {
+            throw new ClassCastException(
+                    "Cannot cast "
+                            + Safe.class.getSimpleName()
+                            + " to "
+                            + Unknown.class.getSimpleName());
+        }
+
+        @Override
+        public Partial<Pr, C> asPartial() {
+            throw new ClassCastException(
+                    "Cannot cast "
+                            + Safe.class.getSimpleName()
+                            + " to "
+                            + Partial.class.getSimpleName());
         }
 
         @Override
@@ -142,6 +190,16 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
         }
 
         @Override
+        public boolean isUnknown() {
+            return false;
+        }
+
+        @Override
+        public boolean isPartial() {
+            return false;
+        }
+
+        @Override
         public Safe<Pr, C> asSafe() {
             throw new ClassCastException(
                     "Cannot cast "
@@ -156,6 +214,24 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
         }
 
         @Override
+        public Unknown<Pr, C> asUnknown() {
+            throw new ClassCastException(
+                    "Cannot cast "
+                            + Unsafe.class.getSimpleName()
+                            + " to "
+                            + Unknown.class.getSimpleName());
+        }
+
+        @Override
+        public Partial<Pr, C> asPartial() {
+            throw new ClassCastException(
+                    "Cannot cast "
+                            + Unsafe.class.getSimpleName()
+                            + " to "
+                            + Partial.class.getSimpleName());
+        }
+
+        @Override
         public String toString() {
             return Utils.lispStringBuilder(SafetyResult.class.getSimpleName())
                     .add(Unsafe.class.getSimpleName())
@@ -166,12 +242,8 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
 
     public static final class Unknown<Pr extends Proof, C extends Cex> extends SafetyResult<Pr, C> {
 
-        public Unknown() {
-            super();
-        }
-
-        public Unknown(final Optional<Statistics> stats) {
-            super(null, stats);
+        private Unknown(final Pr proof, final Optional<Statistics> stats) {
+            super(proof, stats);
         }
 
         @Override
@@ -185,19 +257,124 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
         }
 
         @Override
+        public boolean isUnknown() {
+            return true;
+        }
+
+        @Override
+        public boolean isPartial() {
+            return false;
+        }
+
+        @Override
         public Safe<Pr, C> asSafe() {
-            return null;
+            throw new ClassCastException(
+                    "Cannot cast "
+                            + Unknown.class.getSimpleName()
+                            + " to "
+                            + Safe.class.getSimpleName());
         }
 
         @Override
         public Unsafe<Pr, C> asUnsafe() {
-            return null;
+            throw new ClassCastException(
+                    "Cannot cast "
+                            + Unknown.class.getSimpleName()
+                            + " to "
+                            + Unsafe.class.getSimpleName());
+
+        }
+
+        @Override
+        public Unknown<Pr, C> asUnknown() {
+          return this;
+        }
+
+        @Override
+        public Partial<Pr, C> asPartial() {
+            throw new ClassCastException(
+                    "Cannot cast "
+                            + Unknown.class.getSimpleName()
+                            + " to "
+                            + Partial.class.getSimpleName());
         }
 
         @Override
         public String toString() {
             return Utils.lispStringBuilder(SafetyResult.class.getSimpleName())
                     .add(Unknown.class.getSimpleName())
+                    .toString();
+        }
+    }
+
+    /**
+     * Represents a partial result, e.g., when an analysis terminates with a partial proof.
+     * This is so we can reuse any partial result (usually invariants) we get from any analysis
+     * into another analysis so we don't have to compute the same invariants again.
+     */
+    public static final class Partial<Pr extends Proof, C extends Cex> extends SafetyResult<Pr, C> {
+
+        private Partial(final Pr proof, final Optional<Statistics> stats) {
+            super(proof, stats);
+        }
+
+        @Override
+        public boolean isSafe() {
+            return false;
+        }
+
+        @Override
+        public boolean isUnsafe() {
+            return false;
+        }
+
+        @Override
+        public boolean isUnknown() {
+            return false;
+        }
+
+        @Override
+        public boolean isPartial() {
+            return true;
+        }
+
+        @Override
+        public Safe<Pr, C> asSafe() {
+            throw new ClassCastException(
+                    "Cannot cast "
+                            + Partial.class.getSimpleName()
+                            + " to "
+                            + Safe.class.getSimpleName());
+        }
+
+        @Override
+        public Unsafe<Pr, C> asUnsafe() {
+            throw new ClassCastException(
+                    "Cannot cast "
+                            + Partial.class.getSimpleName()
+                            + " to "
+                            + Unsafe.class.getSimpleName());
+
+        }
+
+        @Override
+        public Unknown<Pr, C> asUnknown() {
+            throw new ClassCastException(
+                    "Cannot cast "
+                            + Partial.class.getSimpleName()
+                            + " to "
+                            + Unknown.class.getSimpleName());
+        }
+
+        @Override
+        public Partial<Pr, C> asPartial() {
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return Utils.lispStringBuilder(SafetyResult.class.getSimpleName())
+                    .add(Partial.class.getSimpleName())
                     .toString();
         }
     }

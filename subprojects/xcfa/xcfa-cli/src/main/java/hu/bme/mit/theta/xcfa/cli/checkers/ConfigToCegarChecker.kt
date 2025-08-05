@@ -150,14 +150,17 @@ fun getCegarChecker(
         logger,
       )
 
-  val cegarChecker =
-    if (cegarConfig.porLevel == POR.AASPOR)
+  val cegarChecker: CegarChecker<
+    Prec,
+    ARG<XcfaState<PtrState<*>>, XcfaAction,
+    Trace<XcfaState<PtrState<*>>, XcfaAction>
+  > = if (cegarConfig.porLevel == POR.AASPOR)
       ArgCegarChecker.create(
         abstractor,
         AasporRefiner.create(refiner, cegarConfig.refinerConfig.pruneStrategy, ignoredVarRegistry),
         logger,
       )
-    else ArgCegarChecker.create(abstractor, refiner, logger)
+      else ArgCegarChecker.create(abstractor, refiner, logger)
 
   // initialize monitors
   MonitorCheckpoint.reset()
@@ -172,8 +175,8 @@ fun getCegarChecker(
       prec: XcfaPrec<*>?
     ): SafetyResult<LocationInvariants, Trace<XcfaState<PtrState<*>>, XcfaAction>> {
       val ret = cegarChecker.check(prec)
-      if (ret.isSafe) {
-        val arg = ret.asSafe().proof
+      if (ret.isSafe || ret.isPartial) {
+        val arg = if(ret.isSafe) { ret.asSafe().proof } else { ret.asPartial().proof};
 
         val locmap =
           xcfa.procedures
@@ -212,8 +215,12 @@ fun getCegarChecker(
                 .toList()
             }
 
-        return SafetyResult.safe(LocationInvariants(locmap))
-      } else {
+        return if(ret.isSafe) { 
+          SafetyResult.safe(LocationInvariants(locmap)) 
+        } else { 
+          SafetyResult.partial(LocationInvariants(locmap))
+        };
+      } else (ret.isUnsafe){
         return SafetyResult.unsafe(
           ret.asUnsafe().cex as Trace<XcfaState<PtrState<*>>, XcfaAction>,
           LocationInvariants(),

@@ -22,6 +22,7 @@ import hu.bme.mit.theta.solver.UnknownSolverStatusException
 import hu.bme.mit.theta.solver.javasmt.JavaSMTSolverException
 import hu.bme.mit.theta.solver.smtlib.solver.SmtLibSolverException
 import hu.bme.mit.theta.solver.validator.SolverValidationException
+import hu.bme.mit.theta.xcfa.cli.portfolio.PartialResultException
 import kotlin.system.exitProcess
 
 enum class ExitCodes(val code: Int) {
@@ -30,6 +31,7 @@ enum class ExitCodes(val code: Int) {
   TIMEOUT(201),
   SERVER_ERROR(202),
   PORTFOLIO_ERROR(203),
+  PARTIAL_RESULT(204),
   UNSUPPORTED_ELEMENT(209),
   FRONTEND_FAILED(210),
   INVALID_PARAM(211),
@@ -86,6 +88,9 @@ fun <T> exitOnError(stacktrace: Boolean, throwDontExit: Boolean, body: () -> T):
   } catch (e: UnknownSolverStatusException) {
     e.printCauseAndTrace(stacktrace)
     exitProcess(throwDontExit, e, ExitCodes.SOLVER_ERROR.code)
+  } catch (e: PartialResultException) {
+    e.printCauseAndTrace(stacktrace)
+    exitProcess(throwDontExit, e, ExitCodes.PARTIAL_RESULT.code)
   } catch (e: RuntimeException) {
     e.printCauseAndTrace(stacktrace)
     if (e.message?.contains("Solver problem") == true || e.message?.contains("z3") == true) {

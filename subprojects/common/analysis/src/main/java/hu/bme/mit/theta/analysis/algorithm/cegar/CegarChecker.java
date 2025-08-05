@@ -31,7 +31,9 @@ import hu.bme.mit.theta.common.logging.Logger.Level;
 import hu.bme.mit.theta.common.logging.NullLogger;
 import hu.bme.mit.theta.common.visualization.writer.JSONWriter;
 import hu.bme.mit.theta.common.visualization.writer.WebDebuggerLogger;
+// import hu.bme.mit.theta.analysis.algorithm.cegar.abstractor.StopCriterion;
 import java.util.concurrent.TimeUnit;
+
 
 /**
  * Counterexample-Guided Abstraction Refinement (CEGAR) loop implementation, that uses an Abstractor
@@ -108,7 +110,22 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             }
 
             if (abstractorResult.isUnsafe()) {
-                MonitorCheckpoint.Checkpoints.execute("CegarChecker.unsafeARG");
+                try {
+                  MonitorCheckpoint.Checkpoints.execute("CegarChecker.unsafeARG");
+                } catch(NotSolvableException e) {
+                  stopwatch.stop();
+                  SafetyResult<Pr, C> cegarResult = null;
+                  final CegarStatistics stats =
+                          new CegarStatistics(
+                                  stopwatch.elapsed(TimeUnit.MILLISECONDS),
+                                  abstractorTime,
+                                  refinerTime,
+                                  iteration);
+                  abstractor.setStopCriterion(StopCriterion.fullExploration());
+                  abstractor.check(proof, prec);
+                  return SafetyResult.partial(proof, stats)
+                }
+
 
                 P lastPrec = prec;
                 logger.write(Level.MAINSTEP, "| Refining abstraction...%n");

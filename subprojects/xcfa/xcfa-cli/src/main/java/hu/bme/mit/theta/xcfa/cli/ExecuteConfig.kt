@@ -63,12 +63,14 @@ import hu.bme.mit.theta.xcfa2chc.toSMT2CHC
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
+import  hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 fun runConfig(
   config: XcfaConfig<*, *>,
   logger: Logger,
   uniqueLogger: Logger,
   throwDontExit: Boolean,
+  witness: LocationInvariants? = null,
 ): SafetyResult<*, *> {
   propagateInputOptions(config, logger, uniqueLogger)
 
@@ -82,7 +84,7 @@ fun runConfig(
       Triple(null, null, null)
     } else {
 
-      val (xcfa, mcm, parseContext) = frontend(config, logger, uniqueLogger)
+      val (xcfa, mcm, parseContext) = frontend(config, logger, uniqueLogger, witness)
 
       preVerificationLogging(xcfa, mcm, parseContext, config, logger, uniqueLogger)
 
@@ -157,6 +159,7 @@ fun frontend(
   config: XcfaConfig<*, *>,
   logger: Logger,
   uniqueLogger: Logger,
+  witness: LocationInvariants? = null,
 ): Triple<XCFA, MCM, ParseContext> {
   if (config.inputConfig.xcfaWCtx != null) {
     val xcfa = config.inputConfig.xcfaWCtx!!.first
@@ -187,6 +190,9 @@ fun frontend(
   }
 
   val xcfa = getXcfa(config, parseContext, logger, uniqueLogger)
+  if(witness != null) {
+    val xcfa.optimizeFurther(ApplyLocationInvariantsPassManager(parseContext, witness))
+  }
   val mcm =
     if (config.inputConfig.catFile != null) {
       CatDslManager.createMCM(config.inputConfig.catFile!!)

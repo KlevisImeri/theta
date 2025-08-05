@@ -188,6 +188,8 @@ fun complexPortfolio25(
 
   val solverError = ExceptionTrigger(ErrorCodeException(SOLVER_ERROR.code), label = "SolverError")
 
+  val partialResultError = ExceptionTrigger(ErrorCodeException(PARTIAL_RESULT.code), label = "PartialResult")
+
   val anyError = ExceptionTrigger(label = "Anything")
 
   fun XcfaConfig<*, CegarConfig>.adaptConfig(
