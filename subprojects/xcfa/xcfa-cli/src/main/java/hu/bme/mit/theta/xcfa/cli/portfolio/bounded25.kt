@@ -28,6 +28,7 @@ import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import hu.bme.mit.theta.xcfa.passes.LoopUnrollPass
 import java.nio.file.Paths
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 fun boundedPortfolio25(
   xcfa: XCFA,
@@ -38,7 +39,10 @@ fun boundedPortfolio25(
   uniqueLogger: Logger,
 ): STM {
 
-  val checker = { config: XcfaConfig<*, *> -> runConfig(config, logger, uniqueLogger, true) }
+  fun checker(
+      config: XcfaConfig<*, *>,
+      witness: LocationInvariants? = null
+  ) = runConfig(config, logger, uniqueLogger, true, witness)
 
   var boundedBaseConfig =
     XcfaConfig(
@@ -196,7 +200,7 @@ fun boundedPortfolio25(
     ConfigNode(
       "MddZ3-GSAT-$inProcess",
       mddBaseConfig.adaptConfig(inProcess = inProcess, timeoutMs = 180_000),
-      checker,
+      ::checker,
     )
 
   fun getBmcConfig(inProcess: Boolean): Node {
@@ -207,7 +211,7 @@ fun boundedPortfolio25(
       ConfigNode(
         "BmcZ3-$inProcess",
         boundedBaseConfig.adaptConfig(inProcess = inProcess, bmcEnabled = true, timeoutMs = 30_000),
-        checker,
+        ::checker,
       )
     lastNode = configBmcZ3
     if (canUseMathsat) {
@@ -220,7 +224,7 @@ fun boundedPortfolio25(
             bmcEnabled = true,
             timeoutMs = 30_000,
           ),
-          checker,
+          ::checker,
         )
       edges.add(Edge(lastNode, configBmcMathsat, solverError))
       lastNode = configBmcMathsat
@@ -234,7 +238,7 @@ fun boundedPortfolio25(
           bmcEnabled = true,
           timeoutMs = 30_000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(Edge(lastNode, configBmcCvc5, solverError))
     lastNode = configBmcCvc5
@@ -255,7 +259,7 @@ fun boundedPortfolio25(
           indEnabled = true,
           timeoutMs = 300_000,
         ),
-        checker,
+        ::checker,
       )
     lastNode = configKindZ3
 
@@ -270,7 +274,7 @@ fun boundedPortfolio25(
           indSolver = "cvc5:1.0.8",
           timeoutMs = 300_000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(Edge(lastNode, configKindCvc5, solverError))
     lastNode = configKindCvc5
@@ -287,7 +291,7 @@ fun boundedPortfolio25(
             indSolver = "mathsat:5.6.10",
             timeoutMs = 300_000,
           ),
-          checker,
+          ::checker,
         )
       edges.add(Edge(lastNode, configKindMathsat, solverError))
       lastNode = configKindMathsat
@@ -310,7 +314,7 @@ fun boundedPortfolio25(
           cegar = true,
           timeoutMs = 300_000,
         ),
-        checker,
+        ::checker,
       )
     lastNode = configIMCZ3abstract
 
@@ -324,7 +328,7 @@ fun boundedPortfolio25(
           reversed = true,
           timeoutMs = 300_000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(Edge(lastNode, configRIMCZ3, solverError))
     lastNode = configRIMCZ3
@@ -341,7 +345,7 @@ fun boundedPortfolio25(
           indSolver = "cvc5:1.0.8",
           timeoutMs = 300_000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(Edge(lastNode, configRIMCCvc5, solverError))
     lastNode = configRIMCCvc5
@@ -359,7 +363,7 @@ fun boundedPortfolio25(
             indSolver = "mathsat:5.6.10",
             timeoutMs = 300_000,
           ),
-          checker,
+          ::checker,
         )
       edges.add(Edge(lastNode, configRIMCMathsat, solverError))
       lastNode = configRIMCMathsat

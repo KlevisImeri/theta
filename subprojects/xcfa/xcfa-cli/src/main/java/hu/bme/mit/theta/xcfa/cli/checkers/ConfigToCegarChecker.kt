@@ -46,6 +46,8 @@ import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 import hu.bme.mit.theta.xcfa.cli.utils.getSolver
 import hu.bme.mit.theta.xcfa.dereferences
 import hu.bme.mit.theta.xcfa.model.XCFA
+import hu.bme.mit.theta.analysis.algorithm.cegar.CegarChecker
+import hu.bme.mit.theta.analysis.algorithm.arg.ARG;
 
 fun getCegarChecker(
   xcfa: XCFA,
@@ -152,8 +154,8 @@ fun getCegarChecker(
 
   val cegarChecker: CegarChecker<
     Prec,
-    ARG<XcfaState<PtrState<*>>, XcfaAction,
-    Trace<XcfaState<PtrState<*>>, XcfaAction>
+    ARG<ExprState, ExprAction>,
+    Trace<ExprState, ExprAction>
   > = if (cegarConfig.porLevel == POR.AASPOR)
       ArgCegarChecker.create(
         abstractor,
@@ -220,7 +222,7 @@ fun getCegarChecker(
         } else { 
           SafetyResult.partial(LocationInvariants(locmap))
         };
-      } else (ret.isUnsafe){
+      } else {
         return SafetyResult.unsafe(
           ret.asUnsafe().cex as Trace<XcfaState<PtrState<*>>, XcfaAction>,
           LocationInvariants(),

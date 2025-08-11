@@ -18,7 +18,6 @@ package hu.bme.mit.theta.analysis.algorithm;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import hu.bme.mit.theta.analysis.Cex;
-import hu.bme.mit.theta.analysis.algorithm.EmptyProof;
 import hu.bme.mit.theta.common.Utils;
 import java.util.Optional;
 
@@ -28,6 +27,11 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
 
     private SafetyResult(final Pr proof, final Optional<Statistics> stats) {
         this.proof = checkNotNull(proof);
+        this.stats = checkNotNull(stats);
+    }
+
+    private SafetyResult(final Optional<Statistics> stats) {
+        this.proof = null;
         this.stats = checkNotNull(stats);
     }
 
@@ -41,8 +45,6 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
         return stats;
     }
 
-
-
     public static <Pr extends Proof, C extends Cex> Safe<Pr, C> safe(final Pr witness) {
         return new Safe<>(witness, Optional.empty());
     }
@@ -53,15 +55,12 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
     }
 
     public static <Pr extends Proof, C extends Cex> Unknown<Pr, C> unknown() {
-        return new Unknown<>(new EmptyProof(), Optional.empty());
+        return new Unknown<>(Optional.empty());
     }
 
     public static <Pr extends Proof, C extends Cex> Partial<Pr, C> partial(final Pr witness) {
         return new Partial<>(witness, Optional.empty());
     }
-
-
-
 
     public static <Pr extends Proof, C extends Cex> Safe<Pr, C> safe(
             final Pr witness, final Statistics stats) {
@@ -74,15 +73,13 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
     }
 
     public static <Pr extends Proof, C extends Cex> Unknown<Pr, C> unknown(final Statistics stats) {
-        return new Unknown<>(new EmptyProof(), Optional.of(stats));
+        return new Unknown<>(Optional.of(stats));
     }
 
     public static <Pr extends Proof, C extends Cex> Partial<Pr, C> partial(
             final Pr witness, final Statistics stats) {
         return new Partial<>(witness, Optional.of(stats));
     }
-
-
 
     public abstract boolean isSafe();
 
@@ -242,8 +239,8 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
 
     public static final class Unknown<Pr extends Proof, C extends Cex> extends SafetyResult<Pr, C> {
 
-        private Unknown(final Pr proof, final Optional<Statistics> stats) {
-            super(proof, stats);
+        private Unknown(final Optional<Statistics> stats) {
+            super(stats);
         }
 
         @Override
@@ -282,12 +279,11 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
                             + Unknown.class.getSimpleName()
                             + " to "
                             + Unsafe.class.getSimpleName());
-
         }
 
         @Override
         public Unknown<Pr, C> asUnknown() {
-          return this;
+            return this;
         }
 
         @Override
@@ -308,9 +304,9 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
     }
 
     /**
-     * Represents a partial result, e.g., when an analysis terminates with a partial proof.
-     * This is so we can reuse any partial result (usually invariants) we get from any analysis
-     * into another analysis so we don't have to compute the same invariants again.
+     * Represents a partial result, e.g., when an analysis terminates with a partial proof. This is
+     * so we can reuse any partial result (usually invariants) we get from any analysis into another
+     * analysis so we don't have to compute the same invariants again.
      */
     public static final class Partial<Pr extends Proof, C extends Cex> extends SafetyResult<Pr, C> {
 
@@ -354,7 +350,6 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
                             + Partial.class.getSimpleName()
                             + " to "
                             + Unsafe.class.getSimpleName());
-
         }
 
         @Override

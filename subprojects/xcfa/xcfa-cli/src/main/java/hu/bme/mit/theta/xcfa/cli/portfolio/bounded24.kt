@@ -26,6 +26,7 @@ import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import hu.bme.mit.theta.xcfa.passes.LoopUnrollPass
 import java.nio.file.Paths
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 fun boundedPortfolio24(
   xcfa: XCFA,
@@ -36,7 +37,10 @@ fun boundedPortfolio24(
   uniqueLogger: Logger,
 ): STM {
 
-  val checker = { config: XcfaConfig<*, *> -> runConfig(config, logger, uniqueLogger, true) }
+  fun checker(
+      config: XcfaConfig<*, *>,
+      witness: LocationInvariants? = null
+  ) = runConfig(config, logger, uniqueLogger, true, witness)
 
   var baseConfig =
     XcfaConfig(
@@ -153,7 +157,7 @@ fun boundedPortfolio24(
       ConfigNode(
         "BmcZ3-$inProcess",
         baseConfig.adaptConfig(inProcess = inProcess, bmcEnabled = true, timeoutMs = 30000),
-        checker,
+        ::checker,
       )
     val configBmcMathsat =
       ConfigNode(
@@ -164,7 +168,7 @@ fun boundedPortfolio24(
           bmcEnabled = true,
           timeoutMs = 30000,
         ),
-        checker,
+        ::checker,
       )
     val configIndZ3 =
       ConfigNode(
@@ -175,7 +179,7 @@ fun boundedPortfolio24(
           indEnabled = true,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     val configIndMathsat =
       ConfigNode(
@@ -188,7 +192,7 @@ fun boundedPortfolio24(
           indEnabled = true,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     val configItpCvc5 =
       ConfigNode(
@@ -199,7 +203,7 @@ fun boundedPortfolio24(
           itpSolver = "cvc5:1.0.8",
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     val configItpMathsat =
       ConfigNode(
@@ -210,7 +214,7 @@ fun boundedPortfolio24(
           itpEnabled = true,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
 
     edges.add(Edge(configBmcZ3, configBmcMathsat, solverError))

@@ -29,6 +29,7 @@ import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import hu.bme.mit.theta.xcfa.passes.LoopUnrollPass
 import java.nio.file.Paths
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 fun complexPortfolio24(
   xcfa: XCFA,
@@ -38,8 +39,10 @@ fun complexPortfolio24(
   logger: Logger,
   uniqueLogger: Logger,
 ): STM {
-
-  val checker = { config: XcfaConfig<*, *> -> runConfig(config, logger, uniqueLogger, true) }
+  fun checker(
+      config: XcfaConfig<*, *>,
+      witness: LocationInvariants? = null
+  ) = runConfig(config, logger, uniqueLogger, true, witness)
 
   var baseConfig =
     XcfaConfig(
@@ -209,7 +212,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     val config_BITWISE_EXPL_NWT_IT_WP_Z3 =
       ConfigNode(
@@ -222,7 +225,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_BITWISE_EXPL_NWT_IT_WP_cvc5, config_BITWISE_EXPL_NWT_IT_WP_Z3, solverError)
@@ -238,7 +241,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_BITWISE_EXPL_NWT_IT_WP_Z3, config_BITWISE_EXPL_NWT_IT_WP_mathsat, solverError)
@@ -254,7 +257,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -288,7 +291,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -308,7 +311,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -335,7 +338,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_BITWISE_EXPL_SEQ_ITP_mathsat, config_BITWISE_EXPL_SEQ_ITP_cvc5, solverError)
@@ -351,7 +354,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 200000,
         ),
-        checker,
+        ::checker,
       )
     val config_FLOAT_EXPL_NWT_IT_WP_Z3 =
       ConfigNode(
@@ -364,7 +367,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 200000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(Edge(config_FLOAT_EXPL_NWT_IT_WP_cvc5, config_FLOAT_EXPL_NWT_IT_WP_Z3, solverError))
     val config_FLOAT_EXPL_NWT_IT_WP_mathsat =
@@ -379,7 +382,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 200000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_FLOAT_EXPL_NWT_IT_WP_Z3, config_FLOAT_EXPL_NWT_IT_WP_mathsat, solverError)
@@ -396,7 +399,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -430,7 +433,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_FLOAT_PRED_CART_SEQ_ITP_mathsat, config_FLOAT_PRED_CART_SEQ_ITP_cvc5, solverError)
@@ -447,7 +450,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -474,7 +477,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(Edge(config_FLOAT_EXPL_SEQ_ITP_mathsat, config_FLOAT_EXPL_SEQ_ITP_cvc5, solverError))
     val config_LIN_INT_EXPL_NWT_IT_WP_mathsat =
@@ -488,7 +491,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     val config_LIN_INT_EXPL_NWT_IT_WP_Z3 =
       ConfigNode(
@@ -501,7 +504,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_LIN_INT_EXPL_NWT_IT_WP_mathsat, config_LIN_INT_EXPL_NWT_IT_WP_Z3, solverError)
@@ -517,7 +520,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -544,7 +547,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_LIN_INT_EXPL_SEQ_ITP_Z3, config_LIN_INT_EXPL_SEQ_ITP_mathsat, solverError)
@@ -560,7 +563,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -587,7 +590,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -607,7 +610,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -627,7 +630,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     val config_NONLIN_INT_EXPL_NWT_IT_WP_mathsat =
       ConfigNode(
@@ -640,7 +643,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -660,7 +663,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -687,7 +690,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_NONLIN_INT_EXPL_SEQ_ITP_Z3, config_NONLIN_INT_EXPL_SEQ_ITP_z3, solverError)
@@ -703,7 +706,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 200000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -730,7 +733,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -750,7 +753,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -770,7 +773,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -797,7 +800,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     val config_ARR_EXPL_NWT_IT_WP_Z3 =
       ConfigNode(
@@ -810,7 +813,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(Edge(config_ARR_EXPL_NWT_IT_WP_cvc5, config_ARR_EXPL_NWT_IT_WP_Z3, solverError))
     val config_ARR_PRED_CART_SEQ_ITP_Z3 =
@@ -824,7 +827,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -851,7 +854,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(Edge(config_ARR_PRED_CART_SEQ_ITP_Z3, config_ARR_PRED_CART_SEQ_ITP_z3, solverError))
     val config_ARR_PRED_CART_SEQ_ITP_princess =
@@ -865,7 +868,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 500000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -892,7 +895,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 500000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_ARR_PRED_CART_SEQ_ITP_princess, config_ARR_PRED_CART_SEQ_ITP_cvc5, solverError)
@@ -908,7 +911,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 150000,
         ),
-        checker,
+        ::checker,
       )
     val config_MULTITHREAD_EXPL_SEQ_ITP_mathsat =
       ConfigNode(
@@ -921,7 +924,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 150000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_MULTITHREAD_EXPL_SEQ_ITP_Z3, config_MULTITHREAD_EXPL_SEQ_ITP_mathsat, solverError)
@@ -937,7 +940,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -964,7 +967,7 @@ fun complexPortfolio24(
           refinement = Refinement.NWT_IT_WP,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -984,7 +987,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -1011,7 +1014,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -1031,7 +1034,7 @@ fun complexPortfolio24(
           refinement = Refinement.SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(

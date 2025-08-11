@@ -19,20 +19,21 @@ import hu.bme.mit.theta.analysis.algorithm.SafetyResult
 import hu.bme.mit.theta.xcfa.cli.params.Backend
 import hu.bme.mit.theta.xcfa.cli.params.BoundedConfig
 import hu.bme.mit.theta.xcfa.cli.params.XcfaConfig
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 abstract class Node(val name: String) {
 
   val outEdges: MutableSet<Edge> = LinkedHashSet()
   var parent: STM? = null
 
-  abstract fun execute(partialResult: LocationInvariants): Pair<Any, SafetyResult<*, *>>
+  abstract fun execute(partialResult: LocationInvariants? = null): Pair<Any, SafetyResult<*, *>>
 
   abstract fun visualize(): String
 }
 
 class HierarchicalNode(name: String, val innerSTM: STM) : Node(name) {
 
-  override fun execute(partialResult: LocationInvariants): Pair<Any, SafetyResult<*, *>> = innerSTM.execute(partialResult)
+  override fun execute(partialResult: LocationInvariants?): Pair<Any, SafetyResult<*, *>> = innerSTM.execute(partialResult)
 
   override fun visualize(): String =
     """state $name {
@@ -62,10 +63,10 @@ fun XcfaConfig<*, *>.visualize(): String =
 class ConfigNode(
   name: String,
   private val config: XcfaConfig<*, *>,
-  private val check: (config: XcfaConfig<*, *>, partialResult: LocationInvariants) -> SafetyResult<*, *>,
+  private val check: (config: XcfaConfig<*, *>, partialResult: LocationInvariants?) -> SafetyResult<*, *>,
 ) : Node(name) {
 
-  override fun execute(partialResult: LocationInvariants): Pair<Any, SafetyResult<*, *>> {
+  override fun execute(partialResult: LocationInvariants?): Pair<Any, SafetyResult<*, *>> {
     println("Current configuration: $config")
     return Pair(Pair(name, config), check(config, partialResult))
   }
@@ -147,23 +148,23 @@ ${edges.map { it.visualize() }.reduce { a, b -> "$a\n$b" }}
 """
       .trimMargin()
 
-  fun execute(): Pair<Any, SafetyResult<*, *>> {
+  fun execute(partialResult: LocationInvariants? = null): Pair<Any, SafetyResult<*, *>> {
     var currentNode: Node = initNode
-    val partialResult: LocationInvarints? = null; 
-    // WARN: In the future we should merge locationInvarints of results and not just reasing 
-    fun mergeLocatoinInvariants(loc1: LocationInvariants, loc2: LocationInvarints) { return loc2; } 
+    var currentPartialResult: LocationInvariants? = partialResult
+    // WARN: In the future we should merge locationInvarints properly
+    fun mergeLocatoinInvariants(loc1: LocationInvariants?, loc2: LocationInvariants ): LocationInvariants { return loc2; }
     while (true) {
       try {
-        val res = currentNode.execute(partialResult)
+        val (x, res) = currentNode.execute(currentPartialResult)
         if (res.isPartial) {
           val proof = res.asPartial().proof
           if (proof !is LocationInvariants) {
             println("For the moment XCFA can only process LocationInvariants as partial results between analyses!")
           } else {
-            val partialResult = proof
+            currentPartialResult = mergeLocatoinInvariants(currentPartialResult, proof);
             throw PartialResultException()
           }
-        } else return res;
+        } else return Pair(x, res);
       } catch (e: Throwable) {
         println("Caught exception: $e")
         val edge: Edge? = currentNode.outEdges.find { it.trigger(e) }

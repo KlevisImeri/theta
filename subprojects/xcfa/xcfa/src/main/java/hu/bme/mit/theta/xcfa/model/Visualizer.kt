@@ -77,3 +77,52 @@ private fun xcfaProcedureToDot(
   }
   return builder.toString()
 }
+
+val MetadataLabelCustomizer: LabelCustomizer = { edge ->
+  // val labelType = edge.label::class.simpleName?.substringBefore('@')?.substringAfterLast('.') ?: "Unknown";
+  // val metadata = edge.metadata
+  // val formattedMetadata =
+  //   when {
+  //     metadata == null || metadata.toString().contains("EmptyMetaData") -> ""
+  //     else -> " $metadata"
+  //   }
+  // "${labelType} ${edge.label}${formattedMetadata}"
+  ""
+}
+
+// WARN: may be needed
+// loc.metadata.toString()
+//   .replace("\n", "\\n")
+//   .replace(Regex("\\s+"), " ")
+
+fun XCFA.toStringFormatted(): String = buildString {
+  appendLine("XCFA: $name")
+  appendLine("  Global Vars:")
+  globalVars.forEach {
+    appendLine(
+      "    - ${it.wrappedVar.name}: ${it.wrappedVar.type} = ${it.initValue} (threadLocal=${it.threadLocal}, atomic=${it.atomic})"
+    )
+  }
+  appendLine("  Procedures:")
+  procedures.forEach { proc ->
+    appendLine("    ${proc.name}(${proc.params.joinToString { "${it.first.name}:${it.second}" }})")
+    appendLine("    Vars: ${proc.vars.joinToString { "${it.name}:${it.type}" }}")
+    appendLine("      Locs:")
+    proc.locs.forEach { loc ->
+      appendLine(
+        "        - ${loc.name} ${if (loc.initial) "{init}" else ""}${if (loc.final) "{final}" else ""}${if (loc.error) "{error}" else ""}"
+      )
+      appendLine("        - ${loc.metadata.toString().replace(",", ",\n                ")}")
+    }
+    appendLine("      Edges:")
+    proc.edges.forEach { edge ->
+      appendLine("        ${edge.source.name} --${edge.label}--> ${edge.target.name}")
+      appendLine("        - ${edge.metadata.toString().replace(",", ",\n                ")}")
+    }
+    proc.finalLoc.ifPresent { appendLine("      Final: ${it.name}") }
+    proc.errorLoc.ifPresent { appendLine("      Error: ${it.name}") }
+  }
+  appendLine("  Init Procedures:")
+  initProcedures.forEach { (proc, args) -> appendLine("    ${proc.name}(${args.joinToString()})") }
+  appendLine("  Unsafe Unroll Used: $unsafeUnrollUsed")
+}

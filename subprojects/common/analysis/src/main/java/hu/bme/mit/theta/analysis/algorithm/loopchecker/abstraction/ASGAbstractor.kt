@@ -31,7 +31,7 @@ import hu.bme.mit.theta.common.logging.Logger
 class ASGAbstractor<S : ExprState, A : ExprAction, P : Prec>(
   private val analysis: Analysis<S, in A, in P>,
   private val lts: LTS<in S, A>,
-  private val acceptancePredicate: AcceptancePredicate<S, A>,
+  private var acceptancePredicate: AcceptancePredicate<S, A>,
   private val searchStrategy: LoopCheckerSearchStrategy,
   private val logger: Logger,
 ) : Abstractor<P, ASG<S, A>> {
@@ -58,5 +58,16 @@ class ASGAbstractor<S : ExprState, A : ExprAction, P : Prec>(
     val searchResult = searchStrategy.search(ASG, acceptancePredicate, expander, logger)
     ASG.traces = searchResult.toList()
     return AbstractorResult(searchResult.isEmpty())
+  }
+
+  override fun unroll(
+    ASG: ASG<S, A>,
+    prec: P,
+  ) { // WARN: it can be wrong just approximate implementation
+    val tmpAcceptancePredicate = acceptancePredicate
+    acceptancePredicate =
+      AcceptancePredicate<S, A>(statePredicate = { _ -> false }, actionPredicate = { _ -> false })
+    check(ASG, prec)
+    acceptancePredicate = tmpAcceptancePredicate
   }
 }

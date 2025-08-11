@@ -63,7 +63,10 @@ import hu.bme.mit.theta.xcfa2chc.toSMT2CHC
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
-import  hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
+import hu.bme.mit.theta.xcfa.model.MetadataLabelCustomizer
+import hu.bme.mit.theta.xcfa.model.optimizeFurther
+import hu.bme.mit.theta.xcfa.cli.witnesstransformation.ApplyLocationInvariantsPassManager
 
 fun runConfig(
   config: XcfaConfig<*, *>,
@@ -189,10 +192,17 @@ fun frontend(
     parseContext.architecture = cConfig.architecture
   }
 
+  println("--------------XCFA------------------");
   val xcfa = getXcfa(config, parseContext, logger, uniqueLogger)
+  println(xcfa.toDot(MetadataLabelCustomizer));
+  println("\n--------------Witness------------------");
+  println(witness);
   if(witness != null) {
-    val xcfa.optimizeFurther(ApplyLocationInvariantsPassManager(parseContext, witness))
+    xcfa.optimizeFurther(ApplyLocationInvariantsPassManager(parseContext, witness));
   }
+  println("\n--------------XCFA+Witness------------------");
+  println(xcfa.toDot(MetadataLabelCustomizer));
+
   val mcm =
     if (config.inputConfig.catFile != null) {
       CatDslManager.createMCM(config.inputConfig.catFile!!)

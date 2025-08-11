@@ -28,6 +28,7 @@ import hu.bme.mit.theta.xcfa.cli.params.Refinement.BW_BIN_ITP
 import hu.bme.mit.theta.xcfa.cli.runConfig
 import hu.bme.mit.theta.xcfa.collectVars
 import hu.bme.mit.theta.xcfa.model.XCFA
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 fun chcCompPortfolioModel25(
   xcfa: XCFA,
@@ -37,7 +38,11 @@ fun chcCompPortfolioModel25(
   logger: Logger,
   uniqueLogger: Logger,
 ): STM {
-  val checker = { config: XcfaConfig<*, *> -> runConfig(config, logger, uniqueLogger, true) }
+
+  fun checker(
+      config: XcfaConfig<*, *>,
+      witness: LocationInvariants? = null
+  ) = runConfig(config, logger, uniqueLogger, true, witness)
 
   val baseCegarConfig = baseCegarConfig(xcfa, mcm, parseContext, portfolioConfig, false)
   val baseBoundedConfig = baseBoundedConfig(xcfa, mcm, parseContext, portfolioConfig, false)
@@ -58,7 +63,7 @@ fun chcCompPortfolioModel25(
           abstractionSolver = solver,
           refinementSolver = solver,
         ),
-        checker,
+        ::checker,
       )
     }
     val cart = { timeout: Long, solver: String ->
@@ -73,7 +78,7 @@ fun chcCompPortfolioModel25(
           abstractionSolver = solver,
           refinementSolver = solver,
         ),
-        checker,
+        ::checker,
       )
     }
 
@@ -88,7 +93,7 @@ fun chcCompPortfolioModel25(
           abstractionSolver = solver,
           refinementSolver = solver,
         ),
-        checker,
+        ::checker,
       )
     }
 
@@ -103,7 +108,7 @@ fun chcCompPortfolioModel25(
           timeoutMs = timeout,
           bmcSolver = solver,
         ),
-        checker,
+        ::checker,
       )
     }
 
@@ -119,7 +124,7 @@ fun chcCompPortfolioModel25(
           bmcSolver = solver,
           indSolver = solver,
         ),
-        checker,
+        ::checker,
       )
     }
 
@@ -134,7 +139,7 @@ fun chcCompPortfolioModel25(
           timeoutMs = timeout,
           itpSolver = solver,
         ),
-        checker,
+        ::checker,
       )
     }
 
@@ -149,7 +154,7 @@ fun chcCompPortfolioModel25(
               parseInProcess = true,
             )
         ),
-        checker,
+        ::checker,
       )
     }
 
@@ -172,7 +177,7 @@ fun chcCompPortfolioModel25(
           outputConfig = baseCegarConfig.outputConfig,
           debugConfig = portfolioConfig.debugConfig,
         ),
-        checker,
+        ::checker,
       )
 
     val types = xcfa.collectVars().map { it.type }.toSet()

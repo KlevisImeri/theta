@@ -18,6 +18,7 @@ package hu.bme.mit.theta.xcfa.cli.witnesstransformation
 import hu.bme.mit.theta.frontend.ParseContext
 import hu.bme.mit.theta.xcfa.passes.*
 import hu.bme.mit.theta.xcfa.witnesses.YamlWitness
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 class ApplyLocationInvariantsPassManager(parseContext: ParseContext, witness: LocationInvariants) :
   ProcedurePassManager(

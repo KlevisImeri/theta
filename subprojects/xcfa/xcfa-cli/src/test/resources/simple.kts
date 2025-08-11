@@ -26,6 +26,7 @@ import hu.bme.mit.theta.xcfa.cli.portfolio.*
 import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import java.nio.file.Paths
+import hu.bme.mit.theta.xcfa.cli.portfolio.checker
 
 fun portfolio(
   xcfa: XCFA,
@@ -35,8 +36,6 @@ fun portfolio(
   logger: Logger,
   uniqueLogger: Logger,
 ): STM {
-
-  val checker = { config: XcfaConfig<*, *> -> runConfig(config, logger, uniqueLogger, true) }
 
   var baseConfig =
     XcfaConfig(
@@ -129,7 +128,7 @@ fun portfolio(
       baseConfig.copy(backendConfig = baseConfig.backendConfig.copy(specConfig = recursiveConfig))
   }
 
-  return STM(ConfigNode("BaseConfig", baseConfig, checker), setOf())
+  return STM(ConfigNode("BaseConfig", baseConfig, ::checker), setOf())
 }
 
 portfolio(xcfa, mcm, parseContext, portfolioConfig, logger, uniqueLogger)

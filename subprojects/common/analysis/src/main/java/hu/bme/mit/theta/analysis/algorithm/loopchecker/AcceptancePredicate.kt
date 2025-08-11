@@ -35,7 +35,8 @@ class AcceptancePredicate<S : State, A : Action>(
   override fun test(t: Pair<S?, A?>): Boolean {
     val state = t.first
     val action = t.second
-    if (statePredicate == null && action == null) return false
+    if (statePredicate == null && action == null)
+      return false // WARN: maybe action here should be actionPredicate
     return (statePredicate == null || statePredicate.invoke(state)) &&
       (actionPredicate == null || (action != null && actionPredicate.invoke(action)))
   }

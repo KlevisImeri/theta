@@ -27,6 +27,7 @@ import hu.bme.mit.theta.xcfa.cli.runConfig
 import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import java.nio.file.Paths
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 fun complexPortfolio23(
   xcfa: XCFA,
@@ -37,7 +38,10 @@ fun complexPortfolio23(
   uniqueLogger: Logger,
 ): STM {
 
-  val checker = { config: XcfaConfig<*, *> -> runConfig(config, logger, uniqueLogger, true) }
+  fun checker(
+      config: XcfaConfig<*, *>,
+      witness: LocationInvariants? = null
+  ) = runConfig(config, logger, uniqueLogger, true, witness)
 
   var baseConfig =
     XcfaConfig(
@@ -195,7 +199,7 @@ fun complexPortfolio23(
             refinementSolver = "z3:4.10.1",
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
       val config_2_1 =
         ConfigNode(
@@ -206,7 +210,7 @@ fun complexPortfolio23(
             refinementSolver = "z3:4.10.1",
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
       val config_3_1 =
         ConfigNode(
@@ -216,23 +220,23 @@ fun complexPortfolio23(
             abstractionSolver = "z3:4.10.1",
             refinementSolver = "z3:4.10.1",
           ),
-          checker,
+          ::checker,
         )
 
       val config_1_2 =
         ConfigNode(
           "QuickFullExpl_Z3_$inProcess",
           quickExplConfig.adaptConfig(inProcess = inProcess),
-          checker,
+          ::checker,
         )
       val config_2_2 =
         ConfigNode(
           "EmptyExpl_Z3_$inProcess",
           emptyExplConfig.adaptConfig(inProcess = inProcess),
-          checker,
+          ::checker,
         )
       val config_3_2 =
-        ConfigNode("PredCart_Z3_$inProcess", predConfig.adaptConfig(inProcess = inProcess), checker)
+        ConfigNode("PredCart_Z3_$inProcess", predConfig.adaptConfig(inProcess = inProcess), ::checker)
 
       val config_1_3 =
         ConfigNode(
@@ -242,7 +246,7 @@ fun complexPortfolio23(
             abstractionSolver = "princess:2022-07-01",
             refinementSolver = "princess:2022-07-01",
           ),
-          checker,
+          ::checker,
         )
       val config_2_3 =
         ConfigNode(
@@ -252,7 +256,7 @@ fun complexPortfolio23(
             abstractionSolver = "princess:2022-07-01",
             refinementSolver = "princess:2022-07-01",
           ),
-          checker,
+          ::checker,
         )
       val config_3_3 =
         ConfigNode(
@@ -262,7 +266,7 @@ fun complexPortfolio23(
             abstractionSolver = "mathsat:5.6.8",
             refinementSolver = "mathsat:5.6.8",
           ),
-          checker,
+          ::checker,
         )
 
       val config_1_4 =
@@ -273,7 +277,7 @@ fun complexPortfolio23(
             abstractionSolver = "mathsat:5.6.8",
             refinementSolver = "mathsat:5.6.8",
           ),
-          checker,
+          ::checker,
         )
       val config_2_4 =
         ConfigNode(
@@ -283,7 +287,7 @@ fun complexPortfolio23(
             abstractionSolver = "mathsat:5.6.8",
             refinementSolver = "mathsat:5.6.8",
           ),
-          checker,
+          ::checker,
         )
       val config_3_4 =
         ConfigNode(
@@ -293,7 +297,7 @@ fun complexPortfolio23(
             abstractionSolver = "princess:2022-07-01",
             refinementSolver = "princess:2022-07-01",
           ),
-          checker,
+          ::checker,
         )
 
       val timeouts =
@@ -358,13 +362,13 @@ fun complexPortfolio23(
         ConfigNode(
           "QuickFullExpl_Z3_$inProcess",
           quickExplConfig.adaptConfig(inProcess = inProcess, refinement = Refinement.NWT_IT_WP),
-          checker,
+          ::checker,
         )
       val config_2_1 =
         ConfigNode(
           "EmptyExpl_Z3_$inProcess",
           emptyExplConfig.adaptConfig(inProcess = inProcess, refinement = Refinement.NWT_IT_WP),
-          checker,
+          ::checker,
         )
       val config_3_1 =
         ConfigNode(
@@ -374,7 +378,7 @@ fun complexPortfolio23(
             abstractionSolver = "mathsat:5.6.8",
             refinementSolver = "mathsat:5.6.8",
           ),
-          checker,
+          ::checker,
         )
 
       val config_1_2 =
@@ -386,7 +390,7 @@ fun complexPortfolio23(
             refinementSolver = "cvc5:1.0.2",
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
       val config_2_2 =
         ConfigNode(
@@ -397,7 +401,7 @@ fun complexPortfolio23(
             refinementSolver = "cvc5:1.0.2",
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
       val config_3_2 =
         ConfigNode(
@@ -407,7 +411,7 @@ fun complexPortfolio23(
             abstractionSolver = "z3:4.10.1",
             refinementSolver = "z3:4.10.1",
           ),
-          checker,
+          ::checker,
         )
 
       val config_1_3 =
@@ -419,7 +423,7 @@ fun complexPortfolio23(
             refinementSolver = "mathsat:5.6.8",
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
       val config_2_3 =
         ConfigNode(
@@ -430,7 +434,7 @@ fun complexPortfolio23(
             refinementSolver = "mathsat:5.6.8",
             refinement = Refinement.SEQ_ITP,
           ),
-          checker,
+          ::checker,
         )
       val config_3_3 =
         ConfigNode(
@@ -441,7 +445,7 @@ fun complexPortfolio23(
             refinementSolver = "cvc5:1.0.2",
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
 
       val timeouts =
@@ -506,7 +510,7 @@ fun complexPortfolio23(
             refinementSolver = "cvc5:1.0.2",
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
       val config_2_1 =
         ConfigNode(
@@ -517,7 +521,7 @@ fun complexPortfolio23(
             refinementSolver = "cvc5:1.0.2",
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
       val config_3_1 =
         ConfigNode(
@@ -527,7 +531,7 @@ fun complexPortfolio23(
             abstractionSolver = "mathsat:5.6.8",
             refinementSolver = "mathsat:5.6.8",
           ),
-          checker,
+          ::checker,
         )
 
       val config_1_2 =
@@ -539,7 +543,7 @@ fun complexPortfolio23(
             refinementSolver = "cvc5:1.0.2",
             refinement = Refinement.SEQ_ITP,
           ),
-          checker,
+          ::checker,
         )
       val config_2_2 =
         ConfigNode(
@@ -550,7 +554,7 @@ fun complexPortfolio23(
             refinementSolver = "cvc5:1.0.2",
             refinement = Refinement.SEQ_ITP,
           ),
-          checker,
+          ::checker,
         )
       val config_3_2 =
         ConfigNode(
@@ -561,7 +565,7 @@ fun complexPortfolio23(
             refinementSolver = "bitwuzla:latest",
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
 
       val config_1_3 =
@@ -575,7 +579,7 @@ fun complexPortfolio23(
             validateRefinementSolver = true,
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
       val config_2_3 =
         ConfigNode(
@@ -588,7 +592,7 @@ fun complexPortfolio23(
             validateRefinementSolver = true,
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
       val config_3_3 =
         ConfigNode(
@@ -599,7 +603,7 @@ fun complexPortfolio23(
             refinementSolver = "cvc5:1.0.2",
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
 
       val config_1_4 =
@@ -612,7 +616,7 @@ fun complexPortfolio23(
             validateAbstractionSolver = true,
             validateRefinementSolver = true,
           ),
-          checker,
+          ::checker,
         )
       val config_2_4 =
         ConfigNode(
@@ -624,7 +628,7 @@ fun complexPortfolio23(
             validateAbstractionSolver = true,
             validateRefinementSolver = true,
           ),
-          checker,
+          ::checker,
         )
       val config_3_4 =
         ConfigNode(
@@ -636,7 +640,7 @@ fun complexPortfolio23(
             validateAbstractionSolver = true,
             validateRefinementSolver = true,
           ),
-          checker,
+          ::checker,
         )
 
       val config_1_5 =
@@ -650,7 +654,7 @@ fun complexPortfolio23(
             validateRefinementSolver = true,
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
       val config_2_5 =
         ConfigNode(
@@ -663,7 +667,7 @@ fun complexPortfolio23(
             validateRefinementSolver = true,
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
       val config_3_5 =
         ConfigNode(
@@ -674,7 +678,7 @@ fun complexPortfolio23(
             refinementSolver = "Z3",
             refinement = Refinement.NWT_IT_WP,
           ),
-          checker,
+          ::checker,
         )
 
       val timeouts =

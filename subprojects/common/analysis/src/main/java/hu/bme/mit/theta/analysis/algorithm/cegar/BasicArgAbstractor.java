@@ -44,7 +44,7 @@ public class BasicArgAbstractor<S extends State, A extends Action, P extends Pre
     protected final ArgBuilder<S, A, P> argBuilder;
     protected final Function<? super S, ?> projection;
     protected final Waitlist<ArgNode<S, A>> waitlist;
-    protected final StopCriterion<S, A> stopCriterion;
+    protected StopCriterion<S, A> stopCriterion;
     protected final Logger logger;
 
     protected BasicArgAbstractor(
@@ -143,6 +143,14 @@ public class BasicArgAbstractor<S extends State, A extends Action, P extends Pre
                 return;
             }
         }
+    }
+
+    @Override
+    public void unroll(final ARG<S, A> arg, final P prec) {
+        StopCriterion<S, A> tmpStopCriterion = stopCriterion;
+        stopCriterion = StopCriterions.fullExploration();
+        check(arg, prec);
+        stopCriterion = tmpStopCriterion;
     }
 
     @Override

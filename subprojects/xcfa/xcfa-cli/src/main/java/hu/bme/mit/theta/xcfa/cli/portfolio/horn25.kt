@@ -26,6 +26,7 @@ import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import hu.bme.mit.theta.xcfa.passes.LoopUnrollPass
 import java.nio.file.Paths
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 fun hornPortfolio25(
   xcfa: XCFA,
@@ -36,7 +37,10 @@ fun hornPortfolio25(
   uniqueLogger: Logger,
 ): STM {
 
-  val checker = { config: XcfaConfig<*, *> -> runConfig(config, logger, uniqueLogger, true) }
+  fun checker(
+      config: XcfaConfig<*, *>,
+      witness: LocationInvariants? = null
+  ) = runConfig(config, logger, uniqueLogger, true, witness)
 
   var baseConfig =
     XcfaConfig(
@@ -131,25 +135,25 @@ fun hornPortfolio25(
       ConfigNode(
         "Z3-$inProcess",
         baseConfig.adaptConfig(inProcess = inProcess, timeoutMs = 100_000),
-        checker,
+        ::checker,
       )
     val configZ3native =
       ConfigNode(
         "Z3native-$inProcess",
         baseConfig.adaptConfig(inProcess = inProcess, solver = "Z3:4.13", timeoutMs = 100_000),
-        checker,
+        ::checker,
       )
     val configEldarica =
       ConfigNode(
         "Eldarica-$inProcess",
         baseConfig.adaptConfig(inProcess = inProcess, solver = "eldarica:2.1", timeoutMs = 500_000),
-        checker,
+        ::checker,
       )
     val configGolem =
       ConfigNode(
         "Golem-$inProcess",
         baseConfig.adaptConfig(inProcess = inProcess, solver = "golem:0.5.0", timeoutMs = 300_000),
-        checker,
+        ::checker,
       )
 
     edges.add(Edge(configZ3, configZ3native, anyError))

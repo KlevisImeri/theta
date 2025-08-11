@@ -50,6 +50,7 @@ import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import hu.bme.mit.theta.xcfa.passes.LoopUnrollPass
 import java.nio.file.Paths
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 fun complexPortfolio25(
   xcfa: XCFA,
@@ -60,7 +61,10 @@ fun complexPortfolio25(
   uniqueLogger: Logger,
 ): STM {
 
-  val checker = { config: XcfaConfig<*, *> -> runConfig(config, logger, uniqueLogger, true) }
+  fun checker(
+      config: XcfaConfig<*, *>,
+      witness: LocationInvariants? = null
+  ) = runConfig(config, logger, uniqueLogger, true, witness)
 
   var baseConfig =
     XcfaConfig(
@@ -188,7 +192,7 @@ fun complexPortfolio25(
 
   val solverError = ExceptionTrigger(ErrorCodeException(SOLVER_ERROR.code), label = "SolverError")
 
-  val partialResultError = ExceptionTrigger(ErrorCodeException(PARTIAL_RESULT.code), label = "PartialResult")
+  val partialResultError = ExceptionTrigger(ErrorCodeException(ExitCodes.PARTIAL_RESULT.code), label = "PartialResult")
 
   val anyError = ExceptionTrigger(label = "Anything")
 
@@ -243,13 +247,13 @@ fun complexPortfolio25(
       ConfigNode(
         "PTR-expl-inproc",
         baseConfig.adaptConfig(inProcess = true, domain = EXPL, timeoutMs = 100_000),
-        checker,
+        ::checker,
       )
     val predTrue =
       ConfigNode(
         "PTR-pred-inproc",
         baseConfig.adaptConfig(inProcess = true, domain = PRED_CART),
-        checker,
+        ::checker,
       )
     inProcEdges.add(Edge(explTrue, predTrue, timeoutOrNotSolvableError))
     val inproc = HierarchicalNode("inProc", STM(explTrue, inProcEdges))
@@ -258,13 +262,13 @@ fun complexPortfolio25(
       ConfigNode(
         "PTR-expl-notinproc",
         baseConfig.adaptConfig(inProcess = false, domain = EXPL, timeoutMs = 100_000),
-        checker,
+        ::checker,
       )
     val predFalse =
       ConfigNode(
         "PTR-pred-notinproc",
         baseConfig.adaptConfig(inProcess = false, domain = PRED_CART),
-        checker,
+        ::checker,
       )
     notInProcEdges.add(Edge(explFalse, predFalse, anyError))
     val notinproc = HierarchicalNode("notInProc", STM(explFalse, notInProcEdges))
@@ -286,7 +290,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     val config_BITWISE_EXPL_NWT_IT_WP_Z3 =
       ConfigNode(
@@ -299,7 +303,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_BITWISE_EXPL_NWT_IT_WP_cvc5, config_BITWISE_EXPL_NWT_IT_WP_Z3, solverError)
@@ -315,7 +319,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_BITWISE_EXPL_NWT_IT_WP_Z3, config_BITWISE_EXPL_NWT_IT_WP_mathsat, solverError)
@@ -331,7 +335,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -365,7 +369,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -385,7 +389,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -412,7 +416,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_BITWISE_EXPL_SEQ_ITP_mathsat, config_BITWISE_EXPL_SEQ_ITP_cvc5, solverError)
@@ -428,7 +432,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 200000,
         ),
-        checker,
+        ::checker,
       )
     val config_FLOAT_EXPL_NWT_IT_WP_Z3 =
       ConfigNode(
@@ -441,7 +445,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 200000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(Edge(config_FLOAT_EXPL_NWT_IT_WP_cvc5, config_FLOAT_EXPL_NWT_IT_WP_Z3, solverError))
     val config_FLOAT_EXPL_NWT_IT_WP_mathsat =
@@ -456,7 +460,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 200000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_FLOAT_EXPL_NWT_IT_WP_Z3, config_FLOAT_EXPL_NWT_IT_WP_mathsat, solverError)
@@ -473,7 +477,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -507,7 +511,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_FLOAT_PRED_CART_SEQ_ITP_mathsat, config_FLOAT_PRED_CART_SEQ_ITP_cvc5, solverError)
@@ -524,7 +528,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -551,7 +555,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(Edge(config_FLOAT_EXPL_SEQ_ITP_mathsat, config_FLOAT_EXPL_SEQ_ITP_cvc5, solverError))
     val config_LIN_INT_EXPL_NWT_IT_WP_mathsat =
@@ -565,7 +569,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     val config_LIN_INT_EXPL_NWT_IT_WP_Z3 =
       ConfigNode(
@@ -578,7 +582,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_LIN_INT_EXPL_NWT_IT_WP_mathsat, config_LIN_INT_EXPL_NWT_IT_WP_Z3, solverError)
@@ -594,7 +598,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -621,7 +625,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_LIN_INT_EXPL_SEQ_ITP_Z3, config_LIN_INT_EXPL_SEQ_ITP_mathsat, solverError)
@@ -637,7 +641,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -664,7 +668,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -684,7 +688,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -704,7 +708,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     val config_NONLIN_INT_EXPL_NWT_IT_WP_mathsat =
       ConfigNode(
@@ -717,7 +721,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -737,7 +741,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -764,7 +768,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_NONLIN_INT_EXPL_SEQ_ITP_Z3, config_NONLIN_INT_EXPL_SEQ_ITP_z3, solverError)
@@ -780,7 +784,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 200000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -807,7 +811,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -827,7 +831,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -847,7 +851,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -874,7 +878,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     val config_ARR_EXPL_NWT_IT_WP_Z3 =
       ConfigNode(
@@ -887,7 +891,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 100000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(Edge(config_ARR_EXPL_NWT_IT_WP_cvc5, config_ARR_EXPL_NWT_IT_WP_Z3, solverError))
     val config_ARR_PRED_CART_SEQ_ITP_Z3 =
@@ -901,7 +905,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -928,7 +932,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(Edge(config_ARR_PRED_CART_SEQ_ITP_Z3, config_ARR_PRED_CART_SEQ_ITP_z3, solverError))
     val config_ARR_PRED_CART_SEQ_ITP_princess =
@@ -942,7 +946,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 500000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -969,7 +973,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 500000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_ARR_PRED_CART_SEQ_ITP_princess, config_ARR_PRED_CART_SEQ_ITP_cvc5, solverError)
@@ -985,7 +989,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 150000,
         ),
-        checker,
+        ::checker,
       )
     val config_MULTITHREAD_EXPL_SEQ_ITP_mathsat =
       ConfigNode(
@@ -998,7 +1002,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 150000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(config_MULTITHREAD_EXPL_SEQ_ITP_Z3, config_MULTITHREAD_EXPL_SEQ_ITP_mathsat, solverError)
@@ -1014,7 +1018,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -1041,7 +1045,7 @@ fun complexPortfolio25(
           refinement = NWT_IT_WP,
           timeoutMs = 300000,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -1061,7 +1065,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -1088,7 +1092,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -1108,7 +1112,7 @@ fun complexPortfolio25(
           refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
-        checker,
+        ::checker,
       )
     edges.add(
       Edge(
@@ -1160,8 +1164,8 @@ fun complexPortfolio25(
   var notInProcessStm = getStm(mainTrait, false)
 
   if (parseContext.multiThreading && baseConfig.inputConfig.property == ERROR_LOCATION) {
-    val inProcOc = ConfigNode("OC", ocConfig(true), checker)
-    val notInProcOc = ConfigNode("OC", ocConfig(false), checker)
+    val inProcOc = ConfigNode("OC", ocConfig(true), ::checker)
+    val notInProcOc = ConfigNode("OC", ocConfig(false), ::checker)
     val inProcessCegar = HierarchicalNode("InProcessCegar", inProcessStm)
     val notInProcessCegar = HierarchicalNode("NotInprocessCegar", notInProcessStm)
     val exitOcInProcessEdge = Edge(inProcOc, inProcessCegar, ExceptionTrigger(label = "Anything"))
