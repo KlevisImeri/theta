@@ -107,7 +107,7 @@ interface SpecFrontendConfig : Config
 
 data class FrontendConfig<T : SpecFrontendConfig>(
   @Parameter(names = ["--lbe"], description = "Level of LBE (NO_LBE, LBE_LOCAL, LBE_SEQ, LBE_FULL)")
-  var lbeLevel: LbePass.LbeLevel = LbePass.LbeLevel.LBE_SEQ,
+  var lbeLevel: LbePass.LbeLevel = LbePass.LbeLevel.LBE_SEQ, // WARN: LBE_SEQ shoudl be default
   @Parameter(names = ["--static-coi"], description = "Enable static cone-of-influence")
   var staticCoi: Boolean = false,
   @Parameter(

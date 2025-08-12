@@ -1,0 +1,3 @@
+- [ ] Look at Error(Verification stuck)
+- [ ] Stop by iteration count
+- [ ] Look how to stop by timuce

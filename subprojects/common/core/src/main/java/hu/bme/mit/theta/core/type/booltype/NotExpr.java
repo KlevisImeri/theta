@@ -26,7 +26,7 @@ public final class NotExpr extends UnaryExpr<BoolType, BoolType> {
 
     private static final int HASH_SEED = 127;
 
-    private static final String OPERAND_LABEL = "not";
+    private static final String OPERAND_LABEL = "!";
 
     private NotExpr(final Expr<BoolType> op) {
         super(op);

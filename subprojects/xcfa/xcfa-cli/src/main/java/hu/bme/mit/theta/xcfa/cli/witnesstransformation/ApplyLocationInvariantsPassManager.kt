@@ -16,19 +16,18 @@
 package hu.bme.mit.theta.xcfa.cli.witnesstransformation
 
 import hu.bme.mit.theta.frontend.ParseContext
-import hu.bme.mit.theta.xcfa.passes.*
-import hu.bme.mit.theta.xcfa.witnesses.YamlWitness
 import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
+import hu.bme.mit.theta.xcfa.passes.*
 
 class ApplyLocationInvariantsPassManager(parseContext: ParseContext, witness: LocationInvariants) :
   ProcedurePassManager(
     listOf(
-      NormalizePass(), // needed after lbe, TODO
-      DeterministicPass(), // needed after lbe, TODO
-      EliminateSelfLoops(),
-      ApplyLocationInvariantsPass(parseContext, witness),
-      LbePass(parseContext),
-      NormalizePass(), // needed after lbe, TODO
-      DeterministicPass(), // needed after lbe, TODO
+      // NormalizePass(), // needed after lbe, TODO
+      // DeterministicPass(), // needed after lbe, TODO
+      // EliminateSelfLoops(),
+      ApplyLocationInvariantsPass(parseContext, witness)
+      // LbePass(parseContext),
+      // NormalizePass(), // needed after lbe, TODO
+      // DeterministicPass(), // needed after lbe, TODO
     )
   )

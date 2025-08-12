@@ -33,6 +33,7 @@ import hu.bme.mit.theta.common.logging.NullLogger;
 import hu.bme.mit.theta.common.visualization.writer.JSONWriter;
 import hu.bme.mit.theta.common.visualization.writer.WebDebuggerLogger;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * Counterexample-Guided Abstraction Refinement (CEGAR) loop implementation, that uses an Abstractor
@@ -79,25 +80,39 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
         return proof;
     }
 
+    private static class StatsHolder {
+        long abstractorTime = 0;
+        long refinerTime = 0;
+        int iteration = 0;
+    }
+
     @Override
     public SafetyResult<Pr, C> check(final P initPrec) {
         logger.write(Level.INFO, "Configuration: %s%n", this);
         final Stopwatch stopwatch = Stopwatch.createStarted();
-        long abstractorTime = 0;
-        long refinerTime = 0;
+        final StatsHolder statsHolder = new StatsHolder();
+        final Supplier<CegarStatistics> getStats =
+                () -> {
+                    stopwatch.stop();
+                    return new CegarStatistics(
+                            stopwatch.elapsed(TimeUnit.MILLISECONDS),
+                            statsHolder.abstractorTime,
+                            statsHolder.refinerTime,
+                            statsHolder.iteration);
+                };
         RefinerResult<P, C> refinerResult = null;
         AbstractorResult abstractorResult;
         P prec = initPrec;
-        int iteration = 0;
         WebDebuggerLogger wdl = WebDebuggerLogger.getInstance();
         do {
-            ++iteration;
+            statsHolder.iteration++;
 
-            logger.write(Level.MAINSTEP, "Iteration %d%n", iteration);
+            logger.write(Level.MAINSTEP, "Iteration %d%n", statsHolder.iteration);
             logger.write(Level.MAINSTEP, "| Checking abstraction...%n");
             final long abstractorStartTime = stopwatch.elapsed(TimeUnit.MILLISECONDS);
             abstractorResult = abstractor.check(proof, prec);
-            abstractorTime += stopwatch.elapsed(TimeUnit.MILLISECONDS) - abstractorStartTime;
+            statsHolder.abstractorTime +=
+                    stopwatch.elapsed(TimeUnit.MILLISECONDS) - abstractorStartTime;
             logger.write(
                     Level.MAINSTEP, "| Checking abstraction done, result: %s%n", abstractorResult);
 
@@ -105,7 +120,7 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
                 String argGraph =
                         JSONWriter.getInstance().writeString(proofVisualizer.visualize(proof));
                 String precString = prec.toString();
-                wdl.addIteration(iteration, argGraph, precString);
+                wdl.addIteration(statsHolder.iteration, argGraph, precString);
             }
 
             if (abstractorResult.isUnsafe()) {
@@ -113,23 +128,16 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
                     MonitorCheckpoint.Checkpoints.execute("CegarChecker.unsafeARG");
                 } catch (NotSolvableException e) {
                     System.out.println("----Infinit Loop Detected by CexMonitor----");
-                    stopwatch.stop();
-                    SafetyResult<Pr, C> cegarResult = null;
-                    final CegarStatistics stats =
-                            new CegarStatistics(
-                                    stopwatch.elapsed(TimeUnit.MILLISECONDS),
-                                    abstractorTime,
-                                    refinerTime,
-                                    iteration);
-                    // abstractor.unroll(proof, prec);
-                    return SafetyResult.partial(proof, stats);
+                    abstractor.unroll(proof, prec);
+                    return SafetyResult.partial(proof, getStats.get());
                 }
 
                 P lastPrec = prec;
                 logger.write(Level.MAINSTEP, "| Refining abstraction...%n");
                 final long refinerStartTime = stopwatch.elapsed(TimeUnit.MILLISECONDS);
                 refinerResult = refiner.refine(proof, prec);
-                refinerTime += stopwatch.elapsed(TimeUnit.MILLISECONDS) - refinerStartTime;
+                statsHolder.refinerTime +=
+                        stopwatch.elapsed(TimeUnit.MILLISECONDS) - refinerStartTime;
                 logger.write(
                         Level.MAINSTEP, "Refining abstraction done, result: %s%n", refinerResult);
 
@@ -151,14 +159,8 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
 
         } while (!abstractorResult.isSafe() && !refinerResult.isUnsafe());
 
-        stopwatch.stop();
         SafetyResult<Pr, C> cegarResult = null;
-        final CegarStatistics stats =
-                new CegarStatistics(
-                        stopwatch.elapsed(TimeUnit.MILLISECONDS),
-                        abstractorTime,
-                        refinerTime,
-                        iteration);
+        final CegarStatistics stats = getStats.get();
 
         assert abstractorResult.isSafe() || refinerResult.isUnsafe();
 

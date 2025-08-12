@@ -45,12 +45,12 @@ import hu.bme.mit.theta.xcfa.cli.params.Refinement.NWT_IT_WP
 import hu.bme.mit.theta.xcfa.cli.params.Refinement.SEQ_ITP
 import hu.bme.mit.theta.xcfa.cli.params.Search.*
 import hu.bme.mit.theta.xcfa.cli.runConfig
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 import hu.bme.mit.theta.xcfa.dereferences
 import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import hu.bme.mit.theta.xcfa.passes.LoopUnrollPass
 import java.nio.file.Paths
-import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 fun complexPortfolio25(
   xcfa: XCFA,
@@ -61,10 +61,8 @@ fun complexPortfolio25(
   uniqueLogger: Logger,
 ): STM {
 
-  fun checker(
-      config: XcfaConfig<*, *>,
-      witness: LocationInvariants? = null
-  ) = runConfig(config, logger, uniqueLogger, true, witness)
+  fun checker(config: XcfaConfig<*, *>, witness: LocationInvariants? = null) =
+    runConfig(config, logger, uniqueLogger, true, witness)
 
   var baseConfig =
     XcfaConfig(
@@ -192,7 +190,8 @@ fun complexPortfolio25(
 
   val solverError = ExceptionTrigger(ErrorCodeException(SOLVER_ERROR.code), label = "SolverError")
 
-  val partialResultError = ExceptionTrigger(ErrorCodeException(ExitCodes.PARTIAL_RESULT.code), label = "PartialResult")
+  val partialResultError =
+    ExceptionTrigger(ErrorCodeException(ExitCodes.PARTIAL_RESULT.code), label = "PartialResult")
 
   val anyError = ExceptionTrigger(label = "Anything")
 

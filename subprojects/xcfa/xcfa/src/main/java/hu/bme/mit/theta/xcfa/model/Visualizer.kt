@@ -73,13 +73,16 @@ private fun xcfaProcedureToDot(
   edges.forEach {
     builder.appendLine(
       "${it.source.name} -> ${it.target.name} [label=\"${it.label} ${edgeLabelCustomizer?.invoke(it) ?: ""}\"];"
+        .replace("\n", "\\n")
+        .replace(Regex("\\s+"), " ")
     )
   }
   return builder.toString()
 }
 
 val MetadataLabelCustomizer: LabelCustomizer = { edge ->
-  // val labelType = edge.label::class.simpleName?.substringBefore('@')?.substringAfterLast('.') ?: "Unknown";
+  // val labelType = edge.label::class.simpleName?.substringBefore('@')?.substringAfterLast('.') ?:
+  // "Unknown";
   // val metadata = edge.metadata
   // val formattedMetadata =
   //   when {

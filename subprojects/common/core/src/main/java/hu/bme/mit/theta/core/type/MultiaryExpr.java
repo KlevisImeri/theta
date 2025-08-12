@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import hu.bme.mit.theta.common.Utils;
 import hu.bme.mit.theta.core.utils.TypeUtils;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class MultiaryExpr<OpType extends Type, ExprType extends Type>
         implements Expr<ExprType> {
@@ -71,7 +72,11 @@ public abstract class MultiaryExpr<OpType extends Type, ExprType extends Type>
 
     @Override
     public final String toString() {
-        return Utils.lispStringBuilder(getOperatorLabel()).body().addAll(ops).toString();
+        // return Utils.lispStringBuilder(getOperatorLabel()).body().addAll(ops).toString();
+        String opLabel = getOperatorLabel();
+        return ops.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(" " + opLabel + " ", "(", ")"));
     }
 
     public abstract MultiaryExpr<OpType, ExprType> with(final Iterable<? extends Expr<OpType>> ops);

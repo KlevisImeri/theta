@@ -25,11 +25,11 @@ import hu.bme.mit.theta.xcfa.analysis.ErrorDetection
 import hu.bme.mit.theta.xcfa.analysis.isInlined
 import hu.bme.mit.theta.xcfa.cli.params.*
 import hu.bme.mit.theta.xcfa.cli.runConfig
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import hu.bme.mit.theta.xcfa.passes.LoopUnrollPass
 import java.nio.file.Paths
-import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 fun complexPortfolio24(
   xcfa: XCFA,
@@ -39,10 +39,8 @@ fun complexPortfolio24(
   logger: Logger,
   uniqueLogger: Logger,
 ): STM {
-  fun checker(
-      config: XcfaConfig<*, *>,
-      witness: LocationInvariants? = null
-  ) = runConfig(config, logger, uniqueLogger, true, witness)
+  fun checker(config: XcfaConfig<*, *>, witness: LocationInvariants? = null) =
+    runConfig(config, logger, uniqueLogger, true, witness)
 
   var baseConfig =
     XcfaConfig(

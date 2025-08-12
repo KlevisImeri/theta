@@ -51,10 +51,14 @@ import hu.bme.mit.theta.xcfa.analysis.por.XcfaSporLts
 import hu.bme.mit.theta.xcfa.cli.checkers.getChecker
 import hu.bme.mit.theta.xcfa.cli.params.*
 import hu.bme.mit.theta.xcfa.cli.utils.*
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
+import hu.bme.mit.theta.xcfa.cli.witnesstransformation.ApplyLocationInvariantsPassManager
 import hu.bme.mit.theta.xcfa.cli.witnesstransformation.XcfaTraceConcretizer
 import hu.bme.mit.theta.xcfa.getFlatLabels
+import hu.bme.mit.theta.xcfa.model.MetadataLabelCustomizer
 import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.model.XcfaLabel
+import hu.bme.mit.theta.xcfa.model.optimizeFurther
 import hu.bme.mit.theta.xcfa.model.toDot
 import hu.bme.mit.theta.xcfa.passes.*
 import hu.bme.mit.theta.xcfa.toC
@@ -63,10 +67,6 @@ import hu.bme.mit.theta.xcfa2chc.toSMT2CHC
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
-import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
-import hu.bme.mit.theta.xcfa.model.MetadataLabelCustomizer
-import hu.bme.mit.theta.xcfa.model.optimizeFurther
-import hu.bme.mit.theta.xcfa.cli.witnesstransformation.ApplyLocationInvariantsPassManager
 
 fun runConfig(
   config: XcfaConfig<*, *>,
@@ -164,15 +164,33 @@ fun frontend(
   uniqueLogger: Logger,
   witness: LocationInvariants? = null,
 ): Triple<XCFA, MCM, ParseContext> {
+  val addWitnessToXcfa = { xcfa: XCFA, parseContext: ParseContext ->
+    println("--------------XCFA------------------")
+    println(xcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
+
+    println("\n--------------Witness------------------")
+    println(witness)
+
+    if (witness == null) {
+      xcfa
+    } else {
+      val updatedXcfa =
+        xcfa.optimizeFurther(ApplyLocationInvariantsPassManager(parseContext, witness))
+      println("\n--------------XCFA+Witness------------------")
+      println(updatedXcfa.toDot(MetadataLabelCustomizer))
+      updatedXcfa
+    }
+  }
   if (config.inputConfig.xcfaWCtx != null) {
-    val xcfa = config.inputConfig.xcfaWCtx!!.first
+    var (xcfa, mcm, parseContext) = config.inputConfig.xcfaWCtx!!
+    xcfa = addWitnessToXcfa(xcfa, parseContext)
     ConeOfInfluence =
       if (config.inputConfig.xcfaWCtx!!.third.multiThreading) {
         XcfaCoiMultiThread(xcfa)
       } else {
         XcfaCoiSingleThread(xcfa)
       }
-    return config.inputConfig.xcfaWCtx!!
+    return Triple(xcfa, mcm, parseContext)
   }
 
   val stopwatch = Stopwatch.createStarted()
@@ -192,16 +210,7 @@ fun frontend(
     parseContext.architecture = cConfig.architecture
   }
 
-  println("--------------XCFA------------------");
-  val xcfa = getXcfa(config, parseContext, logger, uniqueLogger)
-  println(xcfa.toDot(MetadataLabelCustomizer));
-  println("\n--------------Witness------------------");
-  println(witness);
-  if(witness != null) {
-    xcfa.optimizeFurther(ApplyLocationInvariantsPassManager(parseContext, witness));
-  }
-  println("\n--------------XCFA+Witness------------------");
-  println(xcfa.toDot(MetadataLabelCustomizer));
+  val xcfa = addWitnessToXcfa(getXcfa(config, parseContext, logger, uniqueLogger), parseContext)
 
   val mcm =
     if (config.inputConfig.catFile != null) {

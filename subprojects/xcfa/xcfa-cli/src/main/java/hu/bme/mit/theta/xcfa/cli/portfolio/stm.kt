@@ -33,7 +33,8 @@ abstract class Node(val name: String) {
 
 class HierarchicalNode(name: String, val innerSTM: STM) : Node(name) {
 
-  override fun execute(partialResult: LocationInvariants?): Pair<Any, SafetyResult<*, *>> = innerSTM.execute(partialResult)
+  override fun execute(partialResult: LocationInvariants?): Pair<Any, SafetyResult<*, *>> =
+    innerSTM.execute(partialResult)
 
   override fun visualize(): String =
     """state $name {
@@ -63,7 +64,8 @@ fun XcfaConfig<*, *>.visualize(): String =
 class ConfigNode(
   name: String,
   private val config: XcfaConfig<*, *>,
-  private val check: (config: XcfaConfig<*, *>, partialResult: LocationInvariants?) -> SafetyResult<*, *>,
+  private val check:
+    (config: XcfaConfig<*, *>, partialResult: LocationInvariants?) -> SafetyResult<*, *>,
 ) : Node(name) {
 
   override fun execute(partialResult: LocationInvariants?): Pair<Any, SafetyResult<*, *>> {
@@ -152,19 +154,26 @@ ${edges.map { it.visualize() }.reduce { a, b -> "$a\n$b" }}
     var currentNode: Node = initNode
     var currentPartialResult: LocationInvariants? = partialResult
     // WARN: In the future we should merge locationInvarints properly
-    fun mergeLocatoinInvariants(loc1: LocationInvariants?, loc2: LocationInvariants ): LocationInvariants { return loc2; }
+    fun mergeLocatoinInvariants(
+      loc1: LocationInvariants?,
+      loc2: LocationInvariants,
+    ): LocationInvariants {
+      return loc2
+    }
     while (true) {
       try {
         val (x, res) = currentNode.execute(currentPartialResult)
         if (res.isPartial) {
           val proof = res.asPartial().proof
           if (proof !is LocationInvariants) {
-            println("For the moment XCFA can only process LocationInvariants as partial results between analyses!")
+            println(
+              "For the moment XCFA can only process LocationInvariants as partial results between analyses!"
+            )
           } else {
-            currentPartialResult = mergeLocatoinInvariants(currentPartialResult, proof);
+            currentPartialResult = mergeLocatoinInvariants(currentPartialResult, proof)
             throw PartialResultException()
           }
-        } else return Pair(x, res);
+        } else return Pair(x, res)
       } catch (e: Throwable) {
         println("Caught exception: $e")
         val edge: Edge? = currentNode.outEdges.find { it.trigger(e) }

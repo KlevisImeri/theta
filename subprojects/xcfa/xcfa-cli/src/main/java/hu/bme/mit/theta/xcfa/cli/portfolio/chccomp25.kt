@@ -26,9 +26,9 @@ import hu.bme.mit.theta.xcfa.cli.params.*
 import hu.bme.mit.theta.xcfa.cli.params.Domain.*
 import hu.bme.mit.theta.xcfa.cli.params.Refinement.BW_BIN_ITP
 import hu.bme.mit.theta.xcfa.cli.runConfig
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 import hu.bme.mit.theta.xcfa.collectVars
 import hu.bme.mit.theta.xcfa.model.XCFA
-import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 fun chcCompPortfolio25(
   xcfa: XCFA,
@@ -39,10 +39,8 @@ fun chcCompPortfolio25(
   uniqueLogger: Logger,
 ): STM {
 
-  fun checker(
-      config: XcfaConfig<*, *>,
-      witness: LocationInvariants? = null
-  ) = runConfig(config, logger, uniqueLogger, true, witness)
+  fun checker(config: XcfaConfig<*, *>, witness: LocationInvariants? = null) =
+    runConfig(config, logger, uniqueLogger, true, witness)
 
   val baseCegarConfig = baseCegarConfig(xcfa, mcm, parseContext, portfolioConfig, false)
   val baseBoundedConfig = baseBoundedConfig(xcfa, mcm, parseContext, portfolioConfig, false)

@@ -219,11 +219,9 @@ constructor(val labels: List<XcfaLabel>, override val metadata: MetaData = Empty
     return SequenceStmt(labels.map { it.toStmt() })
   }
 
-  override fun toString(): String {
-    val sj = StringJoiner(",", "[", "]")
-    labels.forEach { sj.add(it.toString()) }
-    return sj.toString()
-  }
+
+  override fun toString(): String =
+    "${this::class.simpleName?.substringBefore('@')?.substringAfterLast('.')}[${labels.joinToString(",\n")}]"
 }
 
 data class NondetLabel

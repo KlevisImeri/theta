@@ -28,15 +28,16 @@ data class LocationInvariants(
   override fun getPartitions(): Map<XcfaLocation, Collection<ExprState>> = locationInvariants
 
   override fun toString(): String {
-    val formattedInvariants = getPartitions()
+    val formattedInvariants =
+      getPartitions()
         .filter { (_, states) -> states.isNotEmpty() }
         .entries
         // .sortedBy { it.key.name }
         .joinToString(separator = " ") { entry ->
-            val invariantsString = entry.value.joinToString(separator = "") { state -> "($state)" }
-            "${entry.key.name}[$invariantsString]"
+          val invariantsString = entry.value.joinToString(separator = "")
+          "\n  ${entry.key.name}[$invariantsString]"
         }
 
-    return "($formattedInvariants)"
+    return "${this::class.simpleName?.substringBefore('@')?.substringAfterLast('.')}($formattedInvariants\n)"
   }
 }

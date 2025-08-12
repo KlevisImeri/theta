@@ -32,7 +32,7 @@ import hu.bme.mit.theta.core.type.Type;
 public final class AssignStmt<DeclType extends Type> implements Stmt {
 
     private static final int HASH_SEED = 409;
-    private static final String STMT_LABEL = "assign";
+    private static final String STMT_LABEL = ":=";
 
     private volatile int hashCode = 0;
 
@@ -97,6 +97,7 @@ public final class AssignStmt<DeclType extends Type> implements Stmt {
 
     @Override
     public String toString() {
-        return Utils.lispStringBuilder(STMT_LABEL).add(varDecl.getName()).add(expr).toString();
+        // return Utils.lispStringBuilder(STMT_LABEL).add(varDecl.getName()).add(expr).toString();
+        return varDecl.getName() + " " + STMT_LABEL + " " + expr;
     }
 }

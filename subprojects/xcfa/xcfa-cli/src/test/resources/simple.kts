@@ -23,10 +23,10 @@ import hu.bme.mit.theta.xcfa.analysis.isInlined
 import hu.bme.mit.theta.xcfa.cli.*
 import hu.bme.mit.theta.xcfa.cli.params.*
 import hu.bme.mit.theta.xcfa.cli.portfolio.*
+import hu.bme.mit.theta.xcfa.cli.portfolio.checker
 import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import java.nio.file.Paths
-import hu.bme.mit.theta.xcfa.cli.portfolio.checker
 
 fun portfolio(
   xcfa: XCFA,

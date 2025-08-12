@@ -30,7 +30,7 @@ public final class OrExpr extends MultiaryExpr<BoolType, BoolType> {
 
     private static final int HASH_SEED = 131;
 
-    private static final String OPERATOR_LABEL = "or";
+    private static final String OPERATOR_LABEL = "∨";
 
     private OrExpr(final Iterable<? extends Expr<BoolType>> ops) {
         super(ops);

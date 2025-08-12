@@ -24,10 +24,10 @@ import hu.bme.mit.theta.graphsolver.patterns.constraints.MCM
 import hu.bme.mit.theta.xcfa.analysis.ErrorDetection
 import hu.bme.mit.theta.xcfa.cli.params.*
 import hu.bme.mit.theta.xcfa.cli.runConfig
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import java.nio.file.Paths
-import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
 fun complexPortfolio23(
   xcfa: XCFA,
@@ -38,10 +38,8 @@ fun complexPortfolio23(
   uniqueLogger: Logger,
 ): STM {
 
-  fun checker(
-      config: XcfaConfig<*, *>,
-      witness: LocationInvariants? = null
-  ) = runConfig(config, logger, uniqueLogger, true, witness)
+  fun checker(config: XcfaConfig<*, *>, witness: LocationInvariants? = null) =
+    runConfig(config, logger, uniqueLogger, true, witness)
 
   var baseConfig =
     XcfaConfig(
@@ -236,7 +234,11 @@ fun complexPortfolio23(
           ::checker,
         )
       val config_3_2 =
-        ConfigNode("PredCart_Z3_$inProcess", predConfig.adaptConfig(inProcess = inProcess), ::checker)
+        ConfigNode(
+          "PredCart_Z3_$inProcess",
+          predConfig.adaptConfig(inProcess = inProcess),
+          ::checker,
+        )
 
       val config_1_3 =
         ConfigNode(

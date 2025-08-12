@@ -39,8 +39,6 @@ import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import hu.bme.mit.theta.xcfa.passes.LoopUnrollPass
 import java.nio.file.Paths
-import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
-import hu.bme.mit.theta.xcfa.cli.runConfig
 
 fun baseCegarConfig(
   xcfa: XCFA,

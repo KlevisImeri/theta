@@ -29,7 +29,7 @@ import java.util.List;
 public final class AndExpr extends MultiaryExpr<BoolType, BoolType> {
 
     private static final int HASH_SEED = 41;
-    private static final String OPERATOR_LABEL = "and";
+    private static final String OPERATOR_LABEL = "∧";
 
     private AndExpr(final Iterable<? extends Expr<BoolType>> ops) {
         super(ops);

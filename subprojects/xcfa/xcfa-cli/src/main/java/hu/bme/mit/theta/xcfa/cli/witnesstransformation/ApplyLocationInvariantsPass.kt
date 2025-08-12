@@ -15,18 +15,15 @@
  */
 package hu.bme.mit.theta.xcfa.cli.witnesstransformation
 
-import hu.bme.mit.theta.c2xcfa.CMetaData
 import hu.bme.mit.theta.frontend.ParseContext
-import hu.bme.mit.theta.xcfa.model.XcfaEdge
-import hu.bme.mit.theta.xcfa.model.XcfaLocation
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 import hu.bme.mit.theta.xcfa.model.XcfaProcedureBuilder
 import hu.bme.mit.theta.xcfa.passes.ProcedurePass
 import hu.bme.mit.theta.xcfa.witnesses.*
-import  hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 
-class ApplyLocationInvariantsPass(parseContext: ParseContext, val witness: LocationInvariants) : ProcedurePass {
+class ApplyLocationInvariantsPass(parseContext: ParseContext, val witness: LocationInvariants) :
+  ProcedurePass {
   override fun run(builder: XcfaProcedureBuilder): XcfaProcedureBuilder {
-    return builder;
+    return builder
   }
 }
-

@@ -20,10 +20,12 @@ import hu.bme.mit.theta.analysis.Prec
 import hu.bme.mit.theta.analysis.Trace
 import hu.bme.mit.theta.analysis.algorithm.SafetyChecker
 import hu.bme.mit.theta.analysis.algorithm.SafetyResult
+import hu.bme.mit.theta.analysis.algorithm.arg.ARG
 import hu.bme.mit.theta.analysis.algorithm.arg.ArgNode
 import hu.bme.mit.theta.analysis.algorithm.cegar.ArgAbstractor
 import hu.bme.mit.theta.analysis.algorithm.cegar.ArgCegarChecker
 import hu.bme.mit.theta.analysis.algorithm.cegar.ArgRefiner
+import hu.bme.mit.theta.analysis.algorithm.cegar.CegarChecker
 import hu.bme.mit.theta.analysis.expl.ExplState
 import hu.bme.mit.theta.analysis.expr.ExprAction
 import hu.bme.mit.theta.analysis.expr.ExprState
@@ -46,8 +48,6 @@ import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 import hu.bme.mit.theta.xcfa.cli.utils.getSolver
 import hu.bme.mit.theta.xcfa.dereferences
 import hu.bme.mit.theta.xcfa.model.XCFA
-import hu.bme.mit.theta.analysis.algorithm.cegar.CegarChecker
-import hu.bme.mit.theta.analysis.algorithm.arg.ARG;
 
 fun getCegarChecker(
   xcfa: XCFA,
@@ -152,17 +152,14 @@ fun getCegarChecker(
         logger,
       )
 
-  val cegarChecker: CegarChecker<
-    Prec,
-    ARG<ExprState, ExprAction>,
-    Trace<ExprState, ExprAction>
-  > = if (cegarConfig.porLevel == POR.AASPOR)
+  val cegarChecker: CegarChecker<Prec, ARG<ExprState, ExprAction>, Trace<ExprState, ExprAction>> =
+    if (cegarConfig.porLevel == POR.AASPOR)
       ArgCegarChecker.create(
         abstractor,
         AasporRefiner.create(refiner, cegarConfig.refinerConfig.pruneStrategy, ignoredVarRegistry),
         logger,
       )
-      else ArgCegarChecker.create(abstractor, refiner, logger)
+    else ArgCegarChecker.create(abstractor, refiner, logger)
 
   // initialize monitors
   MonitorCheckpoint.reset()
@@ -178,7 +175,12 @@ fun getCegarChecker(
     ): SafetyResult<LocationInvariants, Trace<XcfaState<PtrState<*>>, XcfaAction>> {
       val ret = cegarChecker.check(prec)
       if (ret.isSafe || ret.isPartial) {
-        val arg = if(ret.isSafe) { ret.asSafe().proof } else { ret.asPartial().proof};
+        val arg =
+          if (ret.isSafe) {
+            ret.asSafe().proof
+          } else {
+            ret.asPartial().proof
+          }
 
         val locmap =
           xcfa.procedures
@@ -217,11 +219,11 @@ fun getCegarChecker(
                 .toList()
             }
 
-        return if(ret.isSafe) { 
-          SafetyResult.safe(LocationInvariants(locmap)) 
-        } else { 
+        return if (ret.isSafe) {
+          SafetyResult.safe(LocationInvariants(locmap))
+        } else {
           SafetyResult.partial(LocationInvariants(locmap))
-        };
+        }
       } else {
         return SafetyResult.unsafe(
           ret.asUnsafe().cex as Trace<XcfaState<PtrState<*>>, XcfaAction>,
