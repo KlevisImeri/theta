@@ -44,7 +44,7 @@ The tool supports the following commands and their arguments:
     * `--name`: Install the solver version under this custom name (<solver_name>:<name>), instead of
       the default (<solver_name>:<solver_version>)
     * `--solver-path`: The path of the solver to install. The solver will not be downloaded, instead
-      the binary on this path will be used. Caveat emptor: the version must be specified correctly,
+      the binary on this path will be used. Caveat emptor:rthe version must be specified correctly,
       there is no automatic detection.
     * `--tempt-murphy`: Enables the installation of unsupported solver versions. If you enable this,
       you can expect things to break, as these solvers were not tested with Theta at all!

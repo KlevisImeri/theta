@@ -184,6 +184,10 @@ private fun getGson(
     FrontendMetadata::class.java,
     FrontendMetadataAdapter { gson },
   )
+  gsonBuilder.registerTypeHierarchyAdapter(
+    LocationInvariants::class.java,
+    LocationInvariantsAdapter { gson },
+  )
   gson = gsonBuilder.create()
   return gson
 }

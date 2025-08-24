@@ -26,6 +26,8 @@ import hu.bme.mit.theta.xcfa.cli.params.Backend.CEGAR
 import hu.bme.mit.theta.xcfa.cli.params.CexMonitorOptions.CHECK
 import hu.bme.mit.theta.xcfa.cli.params.ConeOfInfluenceMode.NO_COI
 import hu.bme.mit.theta.xcfa.cli.params.Domain.PRED_CART
+import hu.bme.mit.theta.xcfa.cli.params.ExprSplitterOptions.CONJUNCTS
+import hu.bme.mit.theta.xcfa.cli.params.ExprSplitterOptions.ATOMS
 import hu.bme.mit.theta.xcfa.cli.params.ExprSplitterOptions.WHOLE
 import hu.bme.mit.theta.xcfa.cli.params.InitPrec.*
 import hu.bme.mit.theta.xcfa.cli.params.POR.*
@@ -42,28 +44,33 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig.ArchitectureType.ILP32
+import hu.bme.mit.theta.xcfa.cli.witnesstransformation.ApplyLocationInvariantsPassManager
+import hu.bme.mit.theta.xcfa.cli.witnesstransformation.XcfaTraceConcretizer
+import hu.bme.mit.theta.xcfa.getFlatLabels
+import hu.bme.mit.theta.xcfa.model.MetadataLabelCustomizer
+import hu.bme.mit.theta.xcfa.model.XCFA
+import hu.bme.mit.theta.xcfa.model.XcfaLabel
+import hu.bme.mit.theta.xcfa.model.optimizeFurther
 
 class ReusePartialResultsTest {
   companion object {
     @JvmStatic
     fun partialResultExamples(): Stream<Arguments> {
       return Stream.of(
-        // Arguments.of(
-        //     "/c/partialResultTest/multivar_1-1.c",
-        //     true
-        // ),
-        // Arguments.of( //WARN: overkill
-        //     "/c/partialResultTest/large_const.c",
-        //     true
-        // ),
-        Arguments.of("/c/partialResultTest/bresenham-ll_unwindbound10.c", true),
-        // Arguments.of( "/c/partialResultTest/safe-program-example-expl.c", true ),
-        // Arguments.of( "/c/partialResultTest/safe-program-example.c", true),
-        // Arguments.of( "/c/partialResultTest/bresenham-ll_valuebound1.c", true),
-        // Arguments.of(
-        //     "/c/partialResultTest/unsafe-program-example.c",
-        //     false
-        // ),
+        // Arguments.of("/c/partialResultTest/multivar_1-1.c", true),
+        // Arguments.of("/c/partialResultTest/safe-program-example-expl.c", true ),
+        // Arguments.of("/c/partialResultTest/safe-program-example.c", true),
+        // Arguments.of("/c/partialResultTest/unsafe-program-example.c", false),
+        //
+        // Arguments.of("/c/partialResultTest/large_const.c", true), // INFO: overkill for solver
+        // Arguments.of("/c/partialResultTest/AllInterval-015.c", true), // INFO: TIMEOUT
+        // Arguments.of("/c/partialResultTest/bresenham-ll_unwindbound10.c", true),
+        // Arguments.of("/c/partialResultTest/bresenham-ll_valuebound1.c", true), //INFO:: long partial res
+        //
+        Arguments.of("/c/partialResultTest/cohendiv-ll.c", true), //INFO: maybe we can understand
+        // Arguments.of("/c/partialResultTest/egcd-ll_unwindbound2.c", true), //INFO:: long partial res
+        //
+        // Arguments.of("/c/partialResultTest/klevis.c", true),
       )
     }
   }
@@ -76,88 +83,89 @@ class ReusePartialResultsTest {
       val uniqueLogger = UniqueWarningLogger(logger)
       // WebDebuggerLogger.enableWebDebuggerLogger();
 
-      // val result = runConfig( // INFO: portfolio
-      //   XcfaConfig<SpecFrontendConfig, SpecBackendConfig>(
-      //       inputConfig = InputConfig(
-      //           input = File(javaClass.getResource(cFile)!!.path)
-      //       ),
-      //       debugConfig = DebugConfig(
-      //         debug = true,
-      //         stacktrace = true,
-      //         logLevel = Logger.Level.VERBOSE,
-      //         argdebug = false,
-      //         argToFile = false
-      //       ),
-      //       frontendConfig = FrontendConfig(
-      //         specConfig = CFrontendConfig(arithmetic =
-      // ArchitectureConfig.ArithmeticType.efficient),
-      //       ),
-      //       backendConfig = BackendConfig(
-      //         backend = Backend.PORTFOLIO,
-      //         specConfig = PortfolioConfig()
-      //       ),
-      //       outputConfig = OutputConfig(),
-      //   ),
-      //   logger,
-      //   uniqueLogger,
-      //   throwDontExit = false
-      // )
-
-      val result = runConfig( // INFO: baseConfig
-          XcfaConfig(
-            inputConfig = InputConfig(input = File(javaClass.getResource(cFile)!!.path)),
-            debugConfig =
-              DebugConfig(
-                debug = true,
-                stacktrace = true,
-                logLevel = Logger.Level.VERBOSE,
-                argdebug = false,
-                argToFile = false,
-              ),
-            frontendConfig =
-              FrontendConfig(
-                lbeLevel = LbePass.LbeLevel.LBE_SEQ,
-                specConfig = CFrontendConfig(
-                  arithmetic = efficient,
-                  architecture = ILP32
-                )
-              ),
-            backendConfig =
-              BackendConfig(
-                backend = CEGAR,
-                timeoutMs = 0,
-                specConfig =
-                  CegarConfig(
-                    initPrec = EMPTY,
-                    porLevel = NOPOR,
-                    porRandomSeed = -1,
-                    coi = NO_COI,
-                    cexMonitor = CHECK,
-                    abstractorConfig =
-                      CegarAbstractorConfig(
-                        abstractionSolver = "Z3",
-                        validateAbstractionSolver = false,
-                        domain = PRED_CART,
-                        maxEnum = 1,
-                        search = ERR,
-                      ),
-                    refinerConfig =
-                      CegarRefinerConfig(
-                        refinementSolver = "Z3",
-                        validateRefinementSolver = false,
-                        refinement = SEQ_ITP,
-                        exprSplitter = WHOLE,
-                        pruneStrategy = LAZY,
-                      ),
-                  ),
-              ),
+      val result = runConfig( // INFO: portfolio
+        XcfaConfig<SpecFrontendConfig, SpecBackendConfig>(
+            inputConfig = InputConfig(
+                input = File(javaClass.getResource(cFile)!!.path)
+            ),
+            debugConfig = DebugConfig(
+              debug = false,
+              stacktrace = true,
+              logLevel = Logger.Level.VERBOSE,
+              argdebug = false,
+              argToFile = false
+            ),
+            frontendConfig = FrontendConfig(
+              specConfig = CFrontendConfig(arithmetic =
+      ArchitectureConfig.ArithmeticType.efficient),
+            ),
+            backendConfig = BackendConfig(
+              backend = Backend.PORTFOLIO,
+              specConfig = PortfolioConfig(portfolio = "COMPLEX25PRED")
+            ),
             outputConfig = OutputConfig(),
-          ),
-          logger,
-          uniqueLogger,
-          throwDontExit = false,
-        )
+        ),
+        logger,
+        uniqueLogger,
+        throwDontExit = false
+      )
+      // val result = runConfig( // INFO: baseConfig
+      //     XcfaConfig(
+      //       inputConfig = InputConfig(input = File(javaClass.getResource(cFile)!!.path)),
+      //       debugConfig =
+      //         DebugConfig(
+      //           debug = true,
+      //           stacktrace = true,
+      //           logLevel = Logger.Level.VERBOSE,
+      //           argdebug = false,
+      //           argToFile = false,
+      //         ),
+      //       frontendConfig =
+      //         FrontendConfig(
+      //           lbeLevel = LbePass.LbeLevel.LBE_SEQ,
+      //           specConfig = CFrontendConfig(
+      //             arithmetic = efficient,
+      //             architecture = ILP32
+      //           )
+      //         ),
+      //       backendConfig =
+      //         BackendConfig(
+      //           backend = CEGAR,
+      //           timeoutMs = 0,
+      //           specConfig =
+      //             CegarConfig(
+      //               initPrec = EMPTY,
+      //               porLevel = NOPOR,
+      //               porRandomSeed = -1,
+      //               coi = NO_COI,
+      //               cexMonitor = CHECK,
+      //               abstractorConfig =
+      //                 CegarAbstractorConfig(
+      //                   abstractionSolver = "Z3",
+      //                   validateAbstractionSolver = false,
+      //                   domain = PRED_CART,
+      //                   maxEnum = 1,
+      //                   search = ERR,
+      //                 ),
+      //               refinerConfig =
+      //                 CegarRefinerConfig(
+      //                   refinementSolver = "Z3",
+      //                   validateRefinementSolver = false,
+      //                   refinement = SEQ_ITP,
+      //                   exprSplitter = WHOLE, // CONJUNCTS | WHOLE | ATOM
+      //                   pruneStrategy = LAZY,
+      //                 ),
+      //             ),
+      //         ),
+      //       outputConfig = OutputConfig(),
+      //     ),
+      //     logger,
+      //     uniqueLogger,
+      //     throwDontExit = false,
+      //   )
+
       println("\n\nRES: ${result.getProof().toString().replace("main::", "")}");
+
 
       // WebDebuggerLogger.getInstance().writeToFile("./Arg.cfa");
       //

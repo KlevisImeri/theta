@@ -3,6 +3,7 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
+ *  You may in compliance with the License.
  *  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
@@ -34,7 +35,6 @@ import hu.bme.mit.theta.xcfa.cli.params.Backend.OC
 import hu.bme.mit.theta.xcfa.cli.params.CexMonitorOptions.CHECK
 import hu.bme.mit.theta.xcfa.cli.params.ConeOfInfluenceMode.COI
 import hu.bme.mit.theta.xcfa.cli.params.ConeOfInfluenceMode.NO_COI
-import hu.bme.mit.theta.xcfa.cli.params.Domain.EXPL
 import hu.bme.mit.theta.xcfa.cli.params.Domain.PRED_CART
 import hu.bme.mit.theta.xcfa.cli.params.ExitCodes.SERVER_ERROR
 import hu.bme.mit.theta.xcfa.cli.params.ExitCodes.SOLVER_ERROR
@@ -52,7 +52,7 @@ import hu.bme.mit.theta.xcfa.passes.LbePass
 import hu.bme.mit.theta.xcfa.passes.LoopUnrollPass
 import java.nio.file.Paths
 
-fun complexPortfolio25(
+fun complexPortfolio25PredOnly(
   xcfa: XCFA,
   mcm: MCM,
   parseContext: ParseContext,
@@ -96,7 +96,7 @@ fun complexPortfolio25(
                 CegarAbstractorConfig(
                   abstractionSolver = "Z3",
                   validateAbstractionSolver = false,
-                  domain = EXPL,
+                  domain = PRED_CART, // Changed default to PRED_CART
                   maxEnum = 1,
                   search = ERR,
                 ),
@@ -242,35 +242,21 @@ fun complexPortfolio25(
     val notInProcEdges = LinkedHashSet<Edge>()
     val edges = LinkedHashSet<Edge>()
 
-    val explTrue =
-      ConfigNode(
-        "PTR-expl-inproc",
-        baseConfig.adaptConfig(inProcess = true, domain = EXPL, timeoutMs = 100_000),
-        ::checker,
-      )
     val predTrue =
       ConfigNode(
         "PTR-pred-inproc",
         baseConfig.adaptConfig(inProcess = true, domain = PRED_CART),
         ::checker,
       )
-    inProcEdges.add(Edge(explTrue, predTrue, timeoutOrNotSolvableError))
-    val inproc = HierarchicalNode("inProc", STM(explTrue, inProcEdges))
+    val inproc = HierarchicalNode("inProc", STM(predTrue, inProcEdges))
 
-    val explFalse =
-      ConfigNode(
-        "PTR-expl-notinproc",
-        baseConfig.adaptConfig(inProcess = false, domain = EXPL, timeoutMs = 100_000),
-        ::checker,
-      )
     val predFalse =
       ConfigNode(
         "PTR-pred-notinproc",
         baseConfig.adaptConfig(inProcess = false, domain = PRED_CART),
         ::checker,
       )
-    notInProcEdges.add(Edge(explFalse, predFalse, anyError))
-    val notinproc = HierarchicalNode("notInProc", STM(explFalse, notInProcEdges))
+    val notinproc = HierarchicalNode("notInProc", STM(predFalse, notInProcEdges))
 
     edges.add(Edge(inproc, notinproc, anyError))
     return if (portfolioConfig.debugConfig.debug) notinproc.innerSTM else STM(inproc, edges)
@@ -278,12 +264,12 @@ fun complexPortfolio25(
 
   fun getStm(trait: ArithmeticTrait, inProcess: Boolean): STM {
     val edges = LinkedHashSet<Edge>()
-    val config_BITWISE_EXPL_NWT_IT_WP_cvc5 =
+    val config_BITWISE_PRED_CART_NWT_IT_WP_cvc5 =
       ConfigNode(
-        "BITWISE_EXPL_NWT_IT_WP_cvc5:1.0.8-$inProcess",
+        "BITWISE_PRED_CART_NWT_IT_WP_cvc5:1.0.8-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "cvc5:1.0.8",
           refinementSolver = "cvc5:1.0.8",
           refinement = NWT_IT_WP,
@@ -291,12 +277,12 @@ fun complexPortfolio25(
         ),
         ::checker,
       )
-    val config_BITWISE_EXPL_NWT_IT_WP_Z3 =
+    val config_BITWISE_PRED_CART_NWT_IT_WP_Z3 =
       ConfigNode(
-        "BITWISE_EXPL_NWT_IT_WP_Z3-$inProcess",
+        "BITWISE_PRED_CART_NWT_IT_WP_Z3-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "Z3",
           refinementSolver = "Z3",
           refinement = NWT_IT_WP,
@@ -305,14 +291,14 @@ fun complexPortfolio25(
         ::checker,
       )
     edges.add(
-      Edge(config_BITWISE_EXPL_NWT_IT_WP_cvc5, config_BITWISE_EXPL_NWT_IT_WP_Z3, solverError)
+      Edge(config_BITWISE_PRED_CART_NWT_IT_WP_cvc5, config_BITWISE_PRED_CART_NWT_IT_WP_Z3, solverError)
     )
-    val config_BITWISE_EXPL_NWT_IT_WP_mathsat =
+    val config_BITWISE_PRED_CART_NWT_IT_WP_mathsat =
       ConfigNode(
-        "BITWISE_EXPL_NWT_IT_WP_mathsat:5.6.10-$inProcess",
+        "BITWISE_PRED_CART_NWT_IT_WP_mathsat:5.6.10-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "mathsat:5.6.10",
           refinementSolver = "mathsat:5.6.10",
           refinement = NWT_IT_WP,
@@ -321,7 +307,7 @@ fun complexPortfolio25(
         ::checker,
       )
     edges.add(
-      Edge(config_BITWISE_EXPL_NWT_IT_WP_Z3, config_BITWISE_EXPL_NWT_IT_WP_mathsat, solverError)
+      Edge(config_BITWISE_PRED_CART_NWT_IT_WP_Z3, config_BITWISE_PRED_CART_NWT_IT_WP_mathsat, solverError)
     )
     val config_BITWISE_PRED_CART_SEQ_ITP_mathsat =
       ConfigNode(
@@ -338,21 +324,21 @@ fun complexPortfolio25(
       )
     edges.add(
       Edge(
-        config_BITWISE_EXPL_NWT_IT_WP_cvc5,
+        config_BITWISE_PRED_CART_NWT_IT_WP_cvc5,
         config_BITWISE_PRED_CART_SEQ_ITP_mathsat,
         if (inProcess) timeoutOrNotSolvableError else anyError,
       )
     )
     edges.add(
       Edge(
-        config_BITWISE_EXPL_NWT_IT_WP_Z3,
+        config_BITWISE_PRED_CART_NWT_IT_WP_Z3,
         config_BITWISE_PRED_CART_SEQ_ITP_mathsat,
         if (inProcess) timeoutOrNotSolvableError else anyError,
       )
     )
     edges.add(
       Edge(
-        config_BITWISE_EXPL_NWT_IT_WP_mathsat,
+        config_BITWISE_PRED_CART_NWT_IT_WP_mathsat,
         config_BITWISE_PRED_CART_SEQ_ITP_mathsat,
         if (inProcess) timeoutOrSolverError else anyError,
       )
@@ -377,12 +363,12 @@ fun complexPortfolio25(
         solverError,
       )
     )
-    val config_BITWISE_EXPL_SEQ_ITP_mathsat =
+    val config_BITWISE_PRED_CART_SEQ_ITP_mathsat2 =
       ConfigNode(
-        "BITWISE_EXPL_SEQ_ITP_mathsat:5.6.10-$inProcess",
+        "BITWISE_PRED_CART_SEQ_ITP_mathsat:5.6.10-$inProcess-2",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "mathsat:5.6.10",
           refinementSolver = "mathsat:5.6.10",
           refinement = SEQ_ITP,
@@ -393,23 +379,23 @@ fun complexPortfolio25(
     edges.add(
       Edge(
         config_BITWISE_PRED_CART_SEQ_ITP_mathsat,
-        config_BITWISE_EXPL_SEQ_ITP_mathsat,
+        config_BITWISE_PRED_CART_SEQ_ITP_mathsat2,
         if (inProcess) timeoutOrNotSolvableError else anyError,
       )
     )
     edges.add(
       Edge(
         config_BITWISE_PRED_CART_SEQ_ITP_cvc5,
-        config_BITWISE_EXPL_SEQ_ITP_mathsat,
+        config_BITWISE_PRED_CART_SEQ_ITP_mathsat2,
         if (inProcess) timeoutOrSolverError else anyError,
       )
     )
-    val config_BITWISE_EXPL_SEQ_ITP_cvc5 =
+    val config_BITWISE_PRED_CART_SEQ_ITP_cvc5_2 =
       ConfigNode(
-        "BITWISE_EXPL_SEQ_ITP_cvc5:1.0.8-$inProcess",
+        "BITWISE_PRED_CART_SEQ_ITP_cvc5:1.0.8-$inProcess-2",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "cvc5:1.0.8",
           refinementSolver = "cvc5:1.0.8",
           refinement = SEQ_ITP,
@@ -418,14 +404,14 @@ fun complexPortfolio25(
         ::checker,
       )
     edges.add(
-      Edge(config_BITWISE_EXPL_SEQ_ITP_mathsat, config_BITWISE_EXPL_SEQ_ITP_cvc5, solverError)
+      Edge(config_BITWISE_PRED_CART_SEQ_ITP_mathsat2, config_BITWISE_PRED_CART_SEQ_ITP_cvc5_2, solverError)
     )
-    val config_FLOAT_EXPL_NWT_IT_WP_cvc5 =
+    val config_FLOAT_PRED_CART_NWT_IT_WP_cvc5 =
       ConfigNode(
-        "FLOAT_EXPL_NWT_IT_WP_cvc5:1.0.8-$inProcess",
+        "FLOAT_PRED_CART_NWT_IT_WP_cvc5:1.0.8-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "cvc5:1.0.8",
           refinementSolver = "cvc5:1.0.8",
           refinement = NWT_IT_WP,
@@ -433,12 +419,12 @@ fun complexPortfolio25(
         ),
         ::checker,
       )
-    val config_FLOAT_EXPL_NWT_IT_WP_Z3 =
+    val config_FLOAT_PRED_CART_NWT_IT_WP_Z3 =
       ConfigNode(
-        "FLOAT_EXPL_NWT_IT_WP_Z3-$inProcess",
+        "FLOAT_PRED_CART_NWT_IT_WP_Z3-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "Z3",
           refinementSolver = "Z3",
           refinement = NWT_IT_WP,
@@ -446,13 +432,13 @@ fun complexPortfolio25(
         ),
         ::checker,
       )
-    edges.add(Edge(config_FLOAT_EXPL_NWT_IT_WP_cvc5, config_FLOAT_EXPL_NWT_IT_WP_Z3, solverError))
-    val config_FLOAT_EXPL_NWT_IT_WP_mathsat =
+    edges.add(Edge(config_FLOAT_PRED_CART_NWT_IT_WP_cvc5, config_FLOAT_PRED_CART_NWT_IT_WP_Z3, solverError))
+    val config_FLOAT_PRED_CART_NWT_IT_WP_mathsat =
       ConfigNode(
-        "FLOAT_EXPL_NWT_IT_WP_mathsat:5.6.10-$inProcess",
+        "FLOAT_PRED_CART_NWT_IT_WP_mathsat:5.6.10-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "mathsat:5.6.10",
           refinementSolver = "mathsat:5.6.10",
           validateRefinementSolver = true,
@@ -462,7 +448,7 @@ fun complexPortfolio25(
         ::checker,
       )
     edges.add(
-      Edge(config_FLOAT_EXPL_NWT_IT_WP_Z3, config_FLOAT_EXPL_NWT_IT_WP_mathsat, solverError)
+      Edge(config_FLOAT_PRED_CART_NWT_IT_WP_Z3, config_FLOAT_PRED_CART_NWT_IT_WP_mathsat, solverError)
     )
     val config_FLOAT_PRED_CART_SEQ_ITP_mathsat =
       ConfigNode(
@@ -480,21 +466,21 @@ fun complexPortfolio25(
       )
     edges.add(
       Edge(
-        config_FLOAT_EXPL_NWT_IT_WP_cvc5,
+        config_FLOAT_PRED_CART_NWT_IT_WP_cvc5,
         config_FLOAT_PRED_CART_SEQ_ITP_mathsat,
         if (inProcess) timeoutOrNotSolvableError else anyError,
       )
     )
     edges.add(
       Edge(
-        config_FLOAT_EXPL_NWT_IT_WP_Z3,
+        config_FLOAT_PRED_CART_NWT_IT_WP_Z3,
         config_FLOAT_PRED_CART_SEQ_ITP_mathsat,
         if (inProcess) timeoutOrNotSolvableError else anyError,
       )
     )
     edges.add(
       Edge(
-        config_FLOAT_EXPL_NWT_IT_WP_mathsat,
+        config_FLOAT_PRED_CART_NWT_IT_WP_mathsat,
         config_FLOAT_PRED_CART_SEQ_ITP_mathsat,
         if (inProcess) timeoutOrSolverError else anyError,
       )
@@ -515,12 +501,12 @@ fun complexPortfolio25(
     edges.add(
       Edge(config_FLOAT_PRED_CART_SEQ_ITP_mathsat, config_FLOAT_PRED_CART_SEQ_ITP_cvc5, solverError)
     )
-    val config_FLOAT_EXPL_SEQ_ITP_mathsat =
+    val config_FLOAT_PRED_CART_SEQ_ITP_mathsat2 =
       ConfigNode(
-        "FLOAT_EXPL_SEQ_ITP_mathsat:5.6.10-$inProcess",
+        "FLOAT_PRED_CART_SEQ_ITP_mathsat:5.6.10-$inProcess-2",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "mathsat:5.6.10",
           refinementSolver = "mathsat:5.6.10",
           validateRefinementSolver = true,
@@ -532,23 +518,23 @@ fun complexPortfolio25(
     edges.add(
       Edge(
         config_FLOAT_PRED_CART_SEQ_ITP_mathsat,
-        config_FLOAT_EXPL_SEQ_ITP_mathsat,
+        config_FLOAT_PRED_CART_SEQ_ITP_mathsat2,
         if (inProcess) timeoutOrNotSolvableError else anyError,
       )
     )
     edges.add(
       Edge(
         config_FLOAT_PRED_CART_SEQ_ITP_cvc5,
-        config_FLOAT_EXPL_SEQ_ITP_mathsat,
+        config_FLOAT_PRED_CART_SEQ_ITP_mathsat2,
         if (inProcess) timeoutOrSolverError else anyError,
       )
     )
-    val config_FLOAT_EXPL_SEQ_ITP_cvc5 =
+    val config_FLOAT_PRED_CART_SEQ_ITP_cvc5_2 =
       ConfigNode(
-        "FLOAT_EXPL_SEQ_ITP_cvc5:1.0.8-$inProcess",
+        "FLOAT_PRED_CART_SEQ_ITP_cvc5:1.0.8-$inProcess-2",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "cvc5:1.0.8",
           refinementSolver = "cvc5:1.0.8",
           refinement = SEQ_ITP,
@@ -556,13 +542,13 @@ fun complexPortfolio25(
         ),
         ::checker,
       )
-    edges.add(Edge(config_FLOAT_EXPL_SEQ_ITP_mathsat, config_FLOAT_EXPL_SEQ_ITP_cvc5, solverError))
-    val config_LIN_INT_EXPL_NWT_IT_WP_mathsat =
+    edges.add(Edge(config_FLOAT_PRED_CART_SEQ_ITP_mathsat2, config_FLOAT_PRED_CART_SEQ_ITP_cvc5_2, solverError))
+    val config_LIN_INT_PRED_CART_NWT_IT_WP_mathsat =
       ConfigNode(
-        "LIN_INT_EXPL_NWT_IT_WP_mathsat:5.6.10-$inProcess",
+        "LIN_INT_PRED_CART_NWT_IT_WP_mathsat:5.6.10-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "mathsat:5.6.10",
           refinementSolver = "mathsat:5.6.10",
           refinement = NWT_IT_WP,
@@ -570,12 +556,12 @@ fun complexPortfolio25(
         ),
         ::checker,
       )
-    val config_LIN_INT_EXPL_NWT_IT_WP_Z3 =
+    val config_LIN_INT_PRED_CART_NWT_IT_WP_Z3 =
       ConfigNode(
-        "LIN_INT_EXPL_NWT_IT_WP_Z3-$inProcess",
+        "LIN_INT_PRED_CART_NWT_IT_WP_Z3-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "Z3",
           refinementSolver = "Z3",
           refinement = NWT_IT_WP,
@@ -584,50 +570,7 @@ fun complexPortfolio25(
         ::checker,
       )
     edges.add(
-      Edge(config_LIN_INT_EXPL_NWT_IT_WP_mathsat, config_LIN_INT_EXPL_NWT_IT_WP_Z3, solverError)
-    )
-    val config_LIN_INT_EXPL_SEQ_ITP_Z3 =
-      ConfigNode(
-        "LIN_INT_EXPL_SEQ_ITP_Z3-$inProcess",
-        baseConfig.adaptConfig(
-          inProcess = inProcess,
-          domain = EXPL,
-          abstractionSolver = "Z3",
-          refinementSolver = "Z3",
-          refinement = SEQ_ITP,
-          timeoutMs = 300000,
-        ),
-        ::checker,
-      )
-    edges.add(
-      Edge(
-        config_LIN_INT_EXPL_NWT_IT_WP_mathsat,
-        config_LIN_INT_EXPL_SEQ_ITP_Z3,
-        if (inProcess) timeoutOrNotSolvableError else anyError,
-      )
-    )
-    edges.add(
-      Edge(
-        config_LIN_INT_EXPL_NWT_IT_WP_Z3,
-        config_LIN_INT_EXPL_SEQ_ITP_Z3,
-        if (inProcess) timeoutOrSolverError else anyError,
-      )
-    )
-    val config_LIN_INT_EXPL_SEQ_ITP_mathsat =
-      ConfigNode(
-        "LIN_INT_EXPL_SEQ_ITP_mathsat:5.6.10-$inProcess",
-        baseConfig.adaptConfig(
-          inProcess = inProcess,
-          domain = EXPL,
-          abstractionSolver = "mathsat:5.6.10",
-          refinementSolver = "mathsat:5.6.10",
-          refinement = SEQ_ITP,
-          timeoutMs = 300000,
-        ),
-        ::checker,
-      )
-    edges.add(
-      Edge(config_LIN_INT_EXPL_SEQ_ITP_Z3, config_LIN_INT_EXPL_SEQ_ITP_mathsat, solverError)
+      Edge(config_LIN_INT_PRED_CART_NWT_IT_WP_mathsat, config_LIN_INT_PRED_CART_NWT_IT_WP_Z3, solverError)
     )
     val config_LIN_INT_PRED_CART_SEQ_ITP_Z3 =
       ConfigNode(
@@ -638,20 +581,20 @@ fun complexPortfolio25(
           abstractionSolver = "Z3",
           refinementSolver = "Z3",
           refinement = SEQ_ITP,
-          timeoutMs = 0,
+          timeoutMs = 300000,
         ),
         ::checker,
       )
     edges.add(
       Edge(
-        config_LIN_INT_EXPL_SEQ_ITP_Z3,
+        config_LIN_INT_PRED_CART_NWT_IT_WP_mathsat,
         config_LIN_INT_PRED_CART_SEQ_ITP_Z3,
         if (inProcess) timeoutOrNotSolvableError else anyError,
       )
     )
     edges.add(
       Edge(
-        config_LIN_INT_EXPL_SEQ_ITP_mathsat,
+        config_LIN_INT_PRED_CART_NWT_IT_WP_Z3,
         config_LIN_INT_PRED_CART_SEQ_ITP_Z3,
         if (inProcess) timeoutOrSolverError else anyError,
       )
@@ -665,6 +608,22 @@ fun complexPortfolio25(
           abstractionSolver = "mathsat:5.6.10",
           refinementSolver = "mathsat:5.6.10",
           refinement = SEQ_ITP,
+          timeoutMs = 300000,
+        ),
+        ::checker,
+      )
+    edges.add(
+      Edge(config_LIN_INT_PRED_CART_SEQ_ITP_Z3, config_LIN_INT_PRED_CART_SEQ_ITP_mathsat, solverError)
+    )
+    val config_LIN_INT_PRED_CART_SEQ_ITP_Z3_2 =
+      ConfigNode(
+        "LIN_INT_PRED_CART_SEQ_ITP_Z3-$inProcess-2",
+        baseConfig.adaptConfig(
+          inProcess = inProcess,
+          domain = PRED_CART,
+          abstractionSolver = "Z3",
+          refinementSolver = "Z3",
+          refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
         ::checker,
@@ -672,7 +631,34 @@ fun complexPortfolio25(
     edges.add(
       Edge(
         config_LIN_INT_PRED_CART_SEQ_ITP_Z3,
+        config_LIN_INT_PRED_CART_SEQ_ITP_Z3_2,
+        if (inProcess) timeoutOrNotSolvableError else anyError,
+      )
+    )
+    edges.add(
+      Edge(
         config_LIN_INT_PRED_CART_SEQ_ITP_mathsat,
+        config_LIN_INT_PRED_CART_SEQ_ITP_Z3_2,
+        if (inProcess) timeoutOrSolverError else anyError,
+      )
+    )
+    val config_LIN_INT_PRED_CART_SEQ_ITP_mathsat_2 =
+      ConfigNode(
+        "LIN_INT_PRED_CART_SEQ_ITP_mathsat:5.6.10-$inProcess-2",
+        baseConfig.adaptConfig(
+          inProcess = inProcess,
+          domain = PRED_CART,
+          abstractionSolver = "mathsat:5.6.10",
+          refinementSolver = "mathsat:5.6.10",
+          refinement = SEQ_ITP,
+          timeoutMs = 0,
+        ),
+        ::checker,
+      )
+    edges.add(
+      Edge(
+        config_LIN_INT_PRED_CART_SEQ_ITP_Z3_2,
+        config_LIN_INT_PRED_CART_SEQ_ITP_mathsat_2,
         solverError,
       )
     )
@@ -691,17 +677,17 @@ fun complexPortfolio25(
       )
     edges.add(
       Edge(
-        config_LIN_INT_PRED_CART_SEQ_ITP_mathsat,
+        config_LIN_INT_PRED_CART_SEQ_ITP_mathsat_2,
         config_LIN_INT_PRED_CART_SEQ_ITP_z3,
         solverError,
       )
     )
-    val config_NONLIN_INT_EXPL_NWT_IT_WP_Z3 =
+    val config_NONLIN_INT_PRED_CART_NWT_IT_WP_Z3 =
       ConfigNode(
-        "NONLIN_INT_EXPL_NWT_IT_WP_Z3-$inProcess",
+        "NONLIN_INT_PRED_CART_NWT_IT_WP_Z3-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "Z3",
           refinementSolver = "Z3",
           refinement = NWT_IT_WP,
@@ -709,114 +695,24 @@ fun complexPortfolio25(
         ),
         ::checker,
       )
-    val config_NONLIN_INT_EXPL_NWT_IT_WP_mathsat =
+    val config_NONLIN_INT_PRED_CART_NWT_IT_WP_mathsat =
       ConfigNode(
-        "NONLIN_INT_EXPL_NWT_IT_WP_mathsat:5.6.10-$inProcess",
-        baseConfig.adaptConfig(
-          inProcess = inProcess,
-          domain = EXPL,
-          abstractionSolver = "mathsat:5.6.10",
-          refinementSolver = "mathsat:5.6.10",
-          refinement = NWT_IT_WP,
-          timeoutMs = 10000,
-        ),
-        ::checker,
-      )
-    edges.add(
-      Edge(
-        config_NONLIN_INT_EXPL_NWT_IT_WP_Z3,
-        config_NONLIN_INT_EXPL_NWT_IT_WP_mathsat,
-        solverError,
-      )
-    )
-    val config_NONLIN_INT_EXPL_SEQ_ITP_Z3 =
-      ConfigNode(
-        "NONLIN_INT_EXPL_SEQ_ITP_Z3-$inProcess",
-        baseConfig.adaptConfig(
-          inProcess = inProcess,
-          domain = EXPL,
-          abstractionSolver = "Z3",
-          refinementSolver = "Z3",
-          refinement = SEQ_ITP,
-          timeoutMs = 10000,
-        ),
-        ::checker,
-      )
-    edges.add(
-      Edge(
-        config_NONLIN_INT_EXPL_NWT_IT_WP_Z3,
-        config_NONLIN_INT_EXPL_SEQ_ITP_Z3,
-        if (inProcess) timeoutOrNotSolvableError else anyError,
-      )
-    )
-    edges.add(
-      Edge(
-        config_NONLIN_INT_EXPL_NWT_IT_WP_mathsat,
-        config_NONLIN_INT_EXPL_SEQ_ITP_Z3,
-        if (inProcess) timeoutOrSolverError else anyError,
-      )
-    )
-    val config_NONLIN_INT_EXPL_SEQ_ITP_z3 =
-      ConfigNode(
-        "NONLIN_INT_EXPL_SEQ_ITP_z3:4.12.2-$inProcess",
-        baseConfig.adaptConfig(
-          inProcess = inProcess,
-          domain = EXPL,
-          abstractionSolver = "z3:4.12.2",
-          refinementSolver = "z3:4.12.2",
-          refinement = SEQ_ITP,
-          timeoutMs = 10000,
-        ),
-        ::checker,
-      )
-    edges.add(
-      Edge(config_NONLIN_INT_EXPL_SEQ_ITP_Z3, config_NONLIN_INT_EXPL_SEQ_ITP_z3, solverError)
-    )
-    val config_NONLIN_INT_EXPL_SEQ_ITP_mathsat =
-      ConfigNode(
-        "NONLIN_INT_EXPL_SEQ_ITP_mathsat:5.6.10-$inProcess",
-        baseConfig.adaptConfig(
-          inProcess = inProcess,
-          domain = EXPL,
-          abstractionSolver = "mathsat:5.6.10",
-          refinementSolver = "mathsat:5.6.10",
-          refinement = SEQ_ITP,
-          timeoutMs = 200000,
-        ),
-        ::checker,
-      )
-    edges.add(
-      Edge(
-        config_NONLIN_INT_EXPL_SEQ_ITP_Z3,
-        config_NONLIN_INT_EXPL_SEQ_ITP_mathsat,
-        if (inProcess) timeoutOrNotSolvableError else anyError,
-      )
-    )
-    edges.add(
-      Edge(
-        config_NONLIN_INT_EXPL_SEQ_ITP_z3,
-        config_NONLIN_INT_EXPL_SEQ_ITP_mathsat,
-        if (inProcess) timeoutOrSolverError else anyError,
-      )
-    )
-    val config_NONLIN_INT_PRED_CART_SEQ_ITP_mathsat =
-      ConfigNode(
-        "NONLIN_INT_PRED_CART_SEQ_ITP_mathsat:5.6.10-$inProcess",
+        "NONLIN_INT_PRED_CART_NWT_IT_WP_mathsat:5.6.10-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
           domain = PRED_CART,
           abstractionSolver = "mathsat:5.6.10",
           refinementSolver = "mathsat:5.6.10",
-          refinement = SEQ_ITP,
-          timeoutMs = 0,
+          refinement = NWT_IT_WP,
+          timeoutMs = 10000,
         ),
         ::checker,
       )
     edges.add(
       Edge(
-        config_NONLIN_INT_EXPL_SEQ_ITP_mathsat,
-        config_NONLIN_INT_PRED_CART_SEQ_ITP_mathsat,
-        if (inProcess) timeoutOrSolverError else anyError,
+        config_NONLIN_INT_PRED_CART_NWT_IT_WP_Z3,
+        config_NONLIN_INT_PRED_CART_NWT_IT_WP_mathsat,
+        solverError,
       )
     )
     val config_NONLIN_INT_PRED_CART_SEQ_ITP_Z3 =
@@ -828,6 +724,76 @@ fun complexPortfolio25(
           abstractionSolver = "Z3",
           refinementSolver = "Z3",
           refinement = SEQ_ITP,
+          timeoutMs = 10000,
+        ),
+        ::checker,
+      )
+    edges.add(
+      Edge(
+        config_NONLIN_INT_PRED_CART_NWT_IT_WP_Z3,
+        config_NONLIN_INT_PRED_CART_SEQ_ITP_Z3,
+        if (inProcess) timeoutOrNotSolvableError else anyError,
+      )
+    )
+    edges.add(
+      Edge(
+        config_NONLIN_INT_PRED_CART_NWT_IT_WP_mathsat,
+        config_NONLIN_INT_PRED_CART_SEQ_ITP_Z3,
+        if (inProcess) timeoutOrSolverError else anyError,
+      )
+    )
+    val config_NONLIN_INT_PRED_CART_SEQ_ITP_z3 =
+      ConfigNode(
+        "NONLIN_INT_PRED_CART_SEQ_ITP_z3:4.12.2-$inProcess",
+        baseConfig.adaptConfig(
+          inProcess = inProcess,
+          domain = PRED_CART,
+          abstractionSolver = "z3:4.12.2",
+          refinementSolver = "z3:4.12.2",
+          refinement = SEQ_ITP,
+          timeoutMs = 10000,
+        ),
+        ::checker,
+      )
+    edges.add(
+      Edge(config_NONLIN_INT_PRED_CART_SEQ_ITP_Z3, config_NONLIN_INT_PRED_CART_SEQ_ITP_z3, solverError)
+    )
+    val config_NONLIN_INT_PRED_CART_SEQ_ITP_mathsat =
+      ConfigNode(
+        "NONLIN_INT_PRED_CART_SEQ_ITP_mathsat:5.6.10-$inProcess",
+        baseConfig.adaptConfig(
+          inProcess = inProcess,
+          domain = PRED_CART,
+          abstractionSolver = "mathsat:5.6.10",
+          refinementSolver = "mathsat:5.6.10",
+          refinement = SEQ_ITP,
+          timeoutMs = 200000,
+        ),
+        ::checker,
+      )
+    edges.add(
+      Edge(
+        config_NONLIN_INT_PRED_CART_SEQ_ITP_Z3,
+        config_NONLIN_INT_PRED_CART_SEQ_ITP_mathsat,
+        if (inProcess) timeoutOrNotSolvableError else anyError,
+      )
+    )
+    edges.add(
+      Edge(
+        config_NONLIN_INT_PRED_CART_SEQ_ITP_z3,
+        config_NONLIN_INT_PRED_CART_SEQ_ITP_mathsat,
+        if (inProcess) timeoutOrSolverError else anyError,
+      )
+    )
+    val config_NONLIN_INT_PRED_CART_SEQ_ITP_mathsat2 =
+      ConfigNode(
+        "NONLIN_INT_PRED_CART_SEQ_ITP_mathsat:5.6.10-$inProcess-2",
+        baseConfig.adaptConfig(
+          inProcess = inProcess,
+          domain = PRED_CART,
+          abstractionSolver = "mathsat:5.6.10",
+          refinementSolver = "mathsat:5.6.10",
+          refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
         ::checker,
@@ -835,16 +801,36 @@ fun complexPortfolio25(
     edges.add(
       Edge(
         config_NONLIN_INT_PRED_CART_SEQ_ITP_mathsat,
-        config_NONLIN_INT_PRED_CART_SEQ_ITP_Z3,
+        config_NONLIN_INT_PRED_CART_SEQ_ITP_mathsat2,
+        if (inProcess) timeoutOrSolverError else anyError,
+      )
+    )
+    val config_NONLIN_INT_PRED_CART_SEQ_ITP_Z3_2 =
+      ConfigNode(
+        "NONLIN_INT_PRED_CART_SEQ_ITP_Z3-$inProcess-2",
+        baseConfig.adaptConfig(
+          inProcess = inProcess,
+          domain = PRED_CART,
+          abstractionSolver = "Z3",
+          refinementSolver = "Z3",
+          refinement = SEQ_ITP,
+          timeoutMs = 0,
+        ),
+        ::checker,
+      )
+    edges.add(
+      Edge(
+        config_NONLIN_INT_PRED_CART_SEQ_ITP_mathsat2,
+        config_NONLIN_INT_PRED_CART_SEQ_ITP_Z3_2,
         solverError,
       )
     )
-    val config_NONLIN_INT_EXPL_NWT_IT_WP_cvc5 =
+    val config_NONLIN_INT_PRED_CART_NWT_IT_WP_cvc5 =
       ConfigNode(
-        "NONLIN_INT_EXPL_NWT_IT_WP_cvc5:1.0.8-$inProcess",
+        "NONLIN_INT_PRED_CART_NWT_IT_WP_cvc5:1.0.8-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "cvc5:1.0.8",
           refinementSolver = "cvc5:1.0.8",
           refinement = NWT_IT_WP,
@@ -855,23 +841,23 @@ fun complexPortfolio25(
     edges.add(
       Edge(
         config_NONLIN_INT_PRED_CART_SEQ_ITP_mathsat,
-        config_NONLIN_INT_EXPL_NWT_IT_WP_cvc5,
+        config_NONLIN_INT_PRED_CART_NWT_IT_WP_cvc5,
         if (inProcess) timeoutOrNotSolvableError else anyError,
       )
     )
     edges.add(
       Edge(
-        config_NONLIN_INT_PRED_CART_SEQ_ITP_Z3,
-        config_NONLIN_INT_EXPL_NWT_IT_WP_cvc5,
+        config_NONLIN_INT_PRED_CART_SEQ_ITP_Z3_2,
+        config_NONLIN_INT_PRED_CART_NWT_IT_WP_cvc5,
         if (inProcess) timeoutOrSolverError else anyError,
       )
     )
-    val config_ARR_EXPL_NWT_IT_WP_cvc5 =
+    val config_ARR_PRED_CART_NWT_IT_WP_cvc5 =
       ConfigNode(
-        "ARR_EXPL_NWT_IT_WP_cvc5:1.0.8-$inProcess",
+        "ARR_PRED_CART_NWT_IT_WP_cvc5:1.0.8-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "cvc5:1.0.8",
           refinementSolver = "cvc5:1.0.8",
           refinement = NWT_IT_WP,
@@ -879,12 +865,12 @@ fun complexPortfolio25(
         ),
         ::checker,
       )
-    val config_ARR_EXPL_NWT_IT_WP_Z3 =
+    val config_ARR_PRED_CART_NWT_IT_WP_Z3 =
       ConfigNode(
-        "ARR_EXPL_NWT_IT_WP_Z3-$inProcess",
+        "ARR_PRED_CART_NWT_IT_WP_Z3-$inProcess",
         baseConfig.adaptConfig(
           inProcess = inProcess,
-          domain = EXPL,
+          domain = PRED_CART,
           abstractionSolver = "Z3",
           refinementSolver = "Z3",
           refinement = NWT_IT_WP,
@@ -892,7 +878,7 @@ fun complexPortfolio25(
         ),
         ::checker,
       )
-    edges.add(Edge(config_ARR_EXPL_NWT_IT_WP_cvc5, config_ARR_EXPL_NWT_IT_WP_Z3, solverError))
+    edges.add(Edge(config_ARR_PRED_CART_NWT_IT_WP_cvc5, config_ARR_PRED_CART_NWT_IT_WP_Z3, solverError))
     val config_ARR_PRED_CART_SEQ_ITP_Z3 =
       ConfigNode(
         "ARR_PRED_CART_SEQ_ITP_Z3-$inProcess",
@@ -908,14 +894,14 @@ fun complexPortfolio25(
       )
     edges.add(
       Edge(
-        config_ARR_EXPL_NWT_IT_WP_cvc5,
+        config_ARR_PRED_CART_NWT_IT_WP_cvc5,
         config_ARR_PRED_CART_SEQ_ITP_Z3,
         if (inProcess) timeoutOrNotSolvableError else anyError,
       )
     )
     edges.add(
       Edge(
-        config_ARR_EXPL_NWT_IT_WP_Z3,
+        config_ARR_PRED_CART_NWT_IT_WP_Z3,
         config_ARR_PRED_CART_SEQ_ITP_Z3,
         if (inProcess) timeoutOrSolverError else anyError,
       )
@@ -977,82 +963,6 @@ fun complexPortfolio25(
     edges.add(
       Edge(config_ARR_PRED_CART_SEQ_ITP_princess, config_ARR_PRED_CART_SEQ_ITP_cvc5, solverError)
     )
-    val config_MULTITHREAD_EXPL_SEQ_ITP_Z3 =
-      ConfigNode(
-        "MULTITHREAD_EXPL_SEQ_ITP_Z3-$inProcess",
-        baseConfig.adaptConfig(
-          inProcess = inProcess,
-          domain = EXPL,
-          abstractionSolver = "Z3",
-          refinementSolver = "Z3",
-          refinement = SEQ_ITP,
-          timeoutMs = 150000,
-        ),
-        ::checker,
-      )
-    val config_MULTITHREAD_EXPL_SEQ_ITP_mathsat =
-      ConfigNode(
-        "MULTITHREAD_EXPL_SEQ_ITP_mathsat:5.6.10-$inProcess",
-        baseConfig.adaptConfig(
-          inProcess = inProcess,
-          domain = EXPL,
-          abstractionSolver = "mathsat:5.6.10",
-          refinementSolver = "mathsat:5.6.10",
-          refinement = SEQ_ITP,
-          timeoutMs = 150000,
-        ),
-        ::checker,
-      )
-    edges.add(
-      Edge(config_MULTITHREAD_EXPL_SEQ_ITP_Z3, config_MULTITHREAD_EXPL_SEQ_ITP_mathsat, solverError)
-    )
-    val config_MULTITHREAD_EXPL_NWT_IT_WP_z3 =
-      ConfigNode(
-        "MULTITHREAD_EXPL_NWT_IT_WP_z3:4.12.2-$inProcess",
-        baseConfig.adaptConfig(
-          inProcess = inProcess,
-          domain = EXPL,
-          abstractionSolver = "z3:4.12.2",
-          refinementSolver = "z3:4.12.2",
-          refinement = NWT_IT_WP,
-          timeoutMs = 300000,
-        ),
-        ::checker,
-      )
-    edges.add(
-      Edge(
-        config_MULTITHREAD_EXPL_SEQ_ITP_Z3,
-        config_MULTITHREAD_EXPL_NWT_IT_WP_z3,
-        if (inProcess) timeoutOrNotSolvableError else anyError,
-      )
-    )
-    edges.add(
-      Edge(
-        config_MULTITHREAD_EXPL_SEQ_ITP_mathsat,
-        config_MULTITHREAD_EXPL_NWT_IT_WP_z3,
-        if (inProcess) timeoutOrSolverError else anyError,
-      )
-    )
-    val config_MULTITHREAD_EXPL_NWT_IT_WP_mathsat =
-      ConfigNode(
-        "MULTITHREAD_EXPL_NWT_IT_WP_mathsat:5.6.10-$inProcess",
-        baseConfig.adaptConfig(
-          inProcess = inProcess,
-          domain = EXPL,
-          abstractionSolver = "mathsat:5.6.10",
-          refinementSolver = "mathsat:5.6.10",
-          refinement = NWT_IT_WP,
-          timeoutMs = 300000,
-        ),
-        ::checker,
-      )
-    edges.add(
-      Edge(
-        config_MULTITHREAD_EXPL_NWT_IT_WP_z3,
-        config_MULTITHREAD_EXPL_NWT_IT_WP_mathsat,
-        solverError,
-      )
-    )
     val config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3 =
       ConfigNode(
         "MULTITHREAD_PRED_CART_SEQ_ITP_Z3-$inProcess",
@@ -1062,27 +972,103 @@ fun complexPortfolio25(
           abstractionSolver = "Z3",
           refinementSolver = "Z3",
           refinement = SEQ_ITP,
+          timeoutMs = 150000,
+        ),
+        ::checker,
+      )
+    val config_MULTITHREAD_PRED_CART_SEQ_ITP_mathsat =
+      ConfigNode(
+        "MULTITHREAD_PRED_CART_SEQ_ITP_mathsat:5.6.10-$inProcess",
+        baseConfig.adaptConfig(
+          inProcess = inProcess,
+          domain = PRED_CART,
+          abstractionSolver = "mathsat:5.6.10",
+          refinementSolver = "mathsat:5.6.10",
+          refinement = SEQ_ITP,
+          timeoutMs = 150000,
+        ),
+        ::checker,
+      )
+    edges.add(
+      Edge(config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3, config_MULTITHREAD_PRED_CART_SEQ_ITP_mathsat, solverError)
+    )
+    val config_MULTITHREAD_PRED_CART_NWT_IT_WP_z3 =
+      ConfigNode(
+        "MULTITHREAD_PRED_CART_NWT_IT_WP_z3:4.12.2-$inProcess",
+        baseConfig.adaptConfig(
+          inProcess = inProcess,
+          domain = PRED_CART,
+          abstractionSolver = "z3:4.12.2",
+          refinementSolver = "z3:4.12.2",
+          refinement = NWT_IT_WP,
+          timeoutMs = 300000,
+        ),
+        ::checker,
+      )
+    edges.add(
+      Edge(
+        config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3,
+        config_MULTITHREAD_PRED_CART_NWT_IT_WP_z3,
+        if (inProcess) timeoutOrNotSolvableError else anyError,
+      )
+    )
+    edges.add(
+      Edge(
+        config_MULTITHREAD_PRED_CART_SEQ_ITP_mathsat,
+        config_MULTITHREAD_PRED_CART_NWT_IT_WP_z3,
+        if (inProcess) timeoutOrSolverError else anyError,
+      )
+    )
+    val config_MULTITHREAD_PRED_CART_NWT_IT_WP_mathsat =
+      ConfigNode(
+        "MULTITHREAD_PRED_CART_NWT_IT_WP_mathsat:5.6.10-$inProcess",
+        baseConfig.adaptConfig(
+          inProcess = inProcess,
+          domain = PRED_CART,
+          abstractionSolver = "mathsat:5.6.10",
+          refinementSolver = "mathsat:5.6.10",
+          refinement = NWT_IT_WP,
+          timeoutMs = 300000,
+        ),
+        ::checker,
+      )
+    edges.add(
+      Edge(
+        config_MULTITHREAD_PRED_CART_NWT_IT_WP_z3,
+        config_MULTITHREAD_PRED_CART_NWT_IT_WP_mathsat,
+        solverError,
+      )
+    )
+    val config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3_2 =
+      ConfigNode(
+        "MULTITHREAD_PRED_CART_SEQ_ITP_Z3-$inProcess-2",
+        baseConfig.adaptConfig(
+          inProcess = inProcess,
+          domain = PRED_CART,
+          abstractionSolver = "Z3",
+          refinementSolver = "Z3",
+          refinement = SEQ_ITP,
           timeoutMs = 0,
         ),
         ::checker,
       )
     edges.add(
       Edge(
-        config_MULTITHREAD_EXPL_NWT_IT_WP_z3,
-        config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3,
+        config_MULTITHREAD_PRED_CART_NWT_IT_WP_z3,
+        config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3_2,
         if (inProcess) timeoutOrNotSolvableError else anyError,
       )
     )
     edges.add(
       Edge(
-        config_MULTITHREAD_EXPL_NWT_IT_WP_mathsat,
-        config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3,
+        config_MULTITHREAD_PRED_CART_NWT_IT_WP_mathsat,
+        config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3_2,
         if (inProcess) timeoutOrSolverError else anyError,
       )
     )
-    val config_MULTITHREAD_PRED_CART_SEQ_ITP_mathsat =
+    val config_MULTITHREAD_PRED_CART_SEQ_ITP_mathsat_2 =
       ConfigNode(
-        "MULTITHREAD_PRED_CART_SEQ_ITP_mathsat:5.6.10-$inProcess",
+        "MULTITHREAD_PRED_CART_SEQ_ITP_mathsat:5.6.10-$inProcess-2",
         baseConfig.adaptConfig(
           inProcess = inProcess,
           domain = PRED_CART,
@@ -1095,8 +1081,8 @@ fun complexPortfolio25(
       )
     edges.add(
       Edge(
-        config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3,
-        config_MULTITHREAD_PRED_CART_SEQ_ITP_mathsat,
+        config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3_2,
+        config_MULTITHREAD_PRED_CART_SEQ_ITP_mathsat_2,
         solverError,
       )
     )
@@ -1115,33 +1101,33 @@ fun complexPortfolio25(
       )
     edges.add(
       Edge(
-        config_MULTITHREAD_PRED_CART_SEQ_ITP_mathsat,
+        config_MULTITHREAD_PRED_CART_SEQ_ITP_mathsat_2,
         config_MULTITHREAD_PRED_CART_SEQ_ITP_z3,
         solverError,
       )
     )
     if (trait == BITWISE) {
-      return STM(config_BITWISE_EXPL_NWT_IT_WP_cvc5, edges)
+      return STM(config_BITWISE_PRED_CART_NWT_IT_WP_cvc5, edges)
     }
 
     if (trait == FLOAT) {
-      return STM(config_FLOAT_EXPL_NWT_IT_WP_cvc5, edges)
+      return STM(config_FLOAT_PRED_CART_NWT_IT_WP_cvc5, edges)
     }
 
     if (trait == LIN_INT) {
-      return STM(config_LIN_INT_EXPL_NWT_IT_WP_mathsat, edges)
+      return STM(config_LIN_INT_PRED_CART_NWT_IT_WP_mathsat, edges)
     }
 
     if (trait == NONLIN_INT) {
-      return STM(config_NONLIN_INT_EXPL_NWT_IT_WP_Z3, edges)
+      return STM(config_NONLIN_INT_PRED_CART_NWT_IT_WP_Z3, edges)
     }
 
     if (trait == ARR) {
-      return STM(config_ARR_EXPL_NWT_IT_WP_cvc5, edges)
+      return STM(config_ARR_PRED_CART_NWT_IT_WP_cvc5, edges)
     }
 
     if (trait == MULTITHREAD) {
-      return STM(config_MULTITHREAD_EXPL_SEQ_ITP_Z3, edges)
+      return STM(config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3, edges)
     }
 
     error("Unknown trait!")

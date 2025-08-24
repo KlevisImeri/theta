@@ -40,4 +40,8 @@ data class LocationInvariants(
 
     return "${this::class.simpleName?.substringBefore('@')?.substringAfterLast('.')}($formattedInvariants\n)"
   }
+  
+  // WARN: uninplemented
+  fun merge(other: LocationInvariants)  { }
+
 }

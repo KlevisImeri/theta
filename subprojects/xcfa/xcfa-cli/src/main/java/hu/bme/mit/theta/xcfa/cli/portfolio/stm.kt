@@ -153,13 +153,6 @@ ${edges.map { it.visualize() }.reduce { a, b -> "$a\n$b" }}
   fun execute(partialResult: LocationInvariants? = null): Pair<Any, SafetyResult<*, *>> {
     var currentNode: Node = initNode
     var currentPartialResult: LocationInvariants? = partialResult
-    // WARN: In the future we should merge locationInvarints properly
-    fun mergeLocatoinInvariants(
-      loc1: LocationInvariants?,
-      loc2: LocationInvariants,
-    ): LocationInvariants {
-      return loc2
-    }
     while (true) {
       try {
         val (x, res) = currentNode.execute(currentPartialResult)
@@ -170,7 +163,7 @@ ${edges.map { it.visualize() }.reduce { a, b -> "$a\n$b" }}
               "For the moment XCFA can only process LocationInvariants as partial results between analyses!"
             )
           } else {
-            currentPartialResult = mergeLocatoinInvariants(currentPartialResult, proof)
+            currentPartialResult.merge(proof)
             throw PartialResultException()
           }
         } else return Pair(x, res)

@@ -25,11 +25,12 @@ import hu.bme.mit.theta.core.model.Valuation;
 import hu.bme.mit.theta.core.type.Expr;
 import hu.bme.mit.theta.core.type.MultiaryExpr;
 import java.util.List;
+import hu.bme.mit.theta.core.CoreConfig;
 
 public final class AndExpr extends MultiaryExpr<BoolType, BoolType> {
 
     private static final int HASH_SEED = 41;
-    private static final String OPERATOR_LABEL = "∧";
+    private static final String OPERATOR_LABEL = CoreConfig.printBeautifulSymbols ? "∧" : "and";
 
     private AndExpr(final Iterable<? extends Expr<BoolType>> ops) {
         super(ops);

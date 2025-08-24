@@ -95,6 +95,11 @@ data class InputConfig(
   var propertyFile: File? = null,
   @Parameter(names = ["--property-value"], description = "Property")
   var property: ErrorDetection = ErrorDetection.ERROR_LOCATION,
+  @Parameter(
+    names = ["--partial-result"],
+    description = "Path of the partial result JSON",
+  )
+  var partialResult: File? = null,
 ) : Config {
 
   override fun toString(): String {
@@ -194,6 +199,7 @@ data class BackendConfig<T : SpecBackendConfig>(
     description = "Maximum memory to use when --in-process (in bytes, 0 for default)",
   )
   var memlimit: Long = 0L,
+  @Parameter(names = ["--disable-partial-result"]) var disablePartialResult: Boolean = false,
   override var specConfig: T? = null,
 ) : SpecializableConfig<T> {
 
@@ -545,6 +551,7 @@ data class WitnessConfig(
   )
   var validateConcretizerSolver: Boolean = false,
   @Parameter(names = ["--input-file-for-witness"]) var inputFileForWitness: File? = null,
+  @Parameter(names = ["--partial-result-to-file"]) var partialResultToFile: Boolean = false,
 ) : Config
 
 data class ArgConfig(

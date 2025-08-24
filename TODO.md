@@ -1,3 +1,4 @@
-- [ ] Look at Error(Verification stuck)
+- [ ] Use the LocationInvarions in the new XCFA
 - [ ] Stop by iteration count
+- [ ] Look at Error(Verification stuck)
 - [ ] Look how to stop by timuce

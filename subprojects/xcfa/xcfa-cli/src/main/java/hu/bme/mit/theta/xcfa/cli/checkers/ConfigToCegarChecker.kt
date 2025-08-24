@@ -221,8 +221,10 @@ fun getCegarChecker(
 
         return if (ret.isSafe) {
           SafetyResult.safe(LocationInvariants(locmap))
-        } else {
+        } else if (ret.isPartial){
           SafetyResult.partial(LocationInvariants(locmap))
+        } else {
+          error()
         }
       } else {
         return SafetyResult.unsafe(

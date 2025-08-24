@@ -56,6 +56,7 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
       arg.incompleteNodes.count(),
       arg.unsafeNodes.count(),
     )
+    logger.write(Logger.Level.SUBSTEP, "|  |  ${stopCriterion}...%n")
     logger.write(Logger.Level.SUBSTEP, "|  |  Building ARG...")
 
     val reachedSet: Partition<ArgNode<S, A>, *> =

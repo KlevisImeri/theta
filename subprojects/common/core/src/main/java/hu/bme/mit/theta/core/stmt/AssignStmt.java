@@ -22,6 +22,7 @@ import hu.bme.mit.theta.common.Utils;
 import hu.bme.mit.theta.core.decl.VarDecl;
 import hu.bme.mit.theta.core.type.Expr;
 import hu.bme.mit.theta.core.type.Type;
+import hu.bme.mit.theta.core.CoreConfig;
 
 /**
  * Assignment statement of the form VARIABLE := EXPRESSION. The statement updates the VARIABLE with
@@ -32,7 +33,7 @@ import hu.bme.mit.theta.core.type.Type;
 public final class AssignStmt<DeclType extends Type> implements Stmt {
 
     private static final int HASH_SEED = 409;
-    private static final String STMT_LABEL = ":=";
+    private static final String STMT_LABEL = CoreConfig.printBeautifulSymbols ? ":=" : "assign";
 
     private volatile int hashCode = 0;
 
@@ -97,7 +98,10 @@ public final class AssignStmt<DeclType extends Type> implements Stmt {
 
     @Override
     public String toString() {
-        // return Utils.lispStringBuilder(STMT_LABEL).add(varDecl.getName()).add(expr).toString();
-        return varDecl.getName() + " " + STMT_LABEL + " " + expr;
+        if(CoreConfig.printPrefixNotation) {
+          return Utils.lispStringBuilder(STMT_LABEL).add(varDecl.getName()).add(expr).toString();
+        } else {
+          return varDecl.getName() + " " + STMT_LABEL + " " + expr;
+        }
     }
 }

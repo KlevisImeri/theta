@@ -48,32 +48,37 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
     private final Logger logger;
     private final Pr proof;
     private final ProofVisualizer<? super Pr> proofVisualizer;
+    private final Boolean computePartialResult;
 
     private CegarChecker(
             final Abstractor<P, Pr> abstractor,
             final Refiner<P, Pr, C> refiner,
             final Logger logger,
-            final ProofVisualizer<? super Pr> proofVisualizer) {
+            final ProofVisualizer<? super Pr> proofVisualizer,
+            final Boolean computePartialResult) {
         this.abstractor = checkNotNull(abstractor);
         this.refiner = checkNotNull(refiner);
         this.logger = checkNotNull(logger);
         proof = abstractor.createProof();
         this.proofVisualizer = checkNotNull(proofVisualizer);
+        this.computePartialResult = checkNotNull(computePartialResult);
     }
 
     public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
             final Abstractor<P, Pr> abstractor,
             final Refiner<P, Pr, C> refiner,
-            final ProofVisualizer<Pr> proofVisualizer) {
-        return create(abstractor, refiner, NullLogger.getInstance(), proofVisualizer);
+            final ProofVisualizer<Pr> proofVisualizer,
+            final Boolean computePartialResult) {
+        return create(abstractor, refiner, NullLogger.getInstance(), proofVisualizer, computePartialResult);
     }
 
     public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
             final Abstractor<P, Pr> abstractor,
             final Refiner<P, Pr, C> refiner,
             final Logger logger,
-            final ProofVisualizer<? super Pr> proofVisualizer) {
-        return new CegarChecker<>(abstractor, refiner, logger, proofVisualizer);
+            final ProofVisualizer<? super Pr> proofVisualizer,
+            final Boolean computePartialResult) {
+        return new CegarChecker<>(abstractor, refiner, logger, proofVisualizer, computePartialResult);
     }
 
     public Pr getProof() {
@@ -127,9 +132,14 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
                 try {
                     MonitorCheckpoint.Checkpoints.execute("CegarChecker.unsafeARG");
                 } catch (NotSolvableException e) {
-                    System.out.println("----Infinit Loop Detected by CexMonitor----");
-                    abstractor.unroll(proof, prec);
-                    return SafetyResult.partial(proof, getStats.get());
+                    if(computePartialResult) {
+                      logger.write(Level.MAINSTEP, "----Infinit Loop Detected by CexMonitor----%n");
+                      abstractor.unroll(proof, prec);
+                      logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
+                      return SafetyResult.partial(proof, getStats.get());
+                    } else {
+                      throw e;
+                    }
                 }
 
                 P lastPrec = prec;
