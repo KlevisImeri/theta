@@ -75,6 +75,8 @@ fun runConfig(
   throwDontExit: Boolean,
   partialResult: LocationInvariants? = null,
 ): SafetyResult<*, *> {
+  println("RunConfig");
+  println(config)
   propagateInputOptions(config, logger, uniqueLogger)
 
   registerAllSolverManagers(config.backendConfig.solverHome, logger)
@@ -164,26 +166,38 @@ fun frontend(
   uniqueLogger: Logger,
   partialResult: LocationInvariants? = null,
 ): Triple<XCFA, MCM, ParseContext> {
-  val addPartialResultToXcfa = { xcfa: XCFA, parseContext: ParseContext, partialResult: LocationInvariants? ->
-    println("--------------XCFA------------------")
-    println(xcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
+  val addPartialResultToXcfa =
+    { xcfa: XCFA, parseContext: ParseContext, partialResult: LocationInvariants? ->
+      println("--------------XCFA------------------")
+      println(xcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
 
-    println("\n--------------PartialResult------------------")
-    println(partialResult)
+      println("\n--------------PartialResult------------------")
+      println(partialResult)
 
-    if (partialResult == null) {
-      xcfa
-    } else {
-      val updatedXcfa =
-        xcfa.optimizeFurther(ApplyLocationInvariantsPassManager(parseContext, partialResult))
-      println("\n--------------XCFA+PartialResult------------------")
-      println(updatedXcfa.toDot(MetadataLabelCustomizer))
-      updatedXcfa
+      if (partialResult == null) {
+        xcfa
+      } else {
+        val updatedXcfa =
+          xcfa.optimizeFurther(ApplyLocationInvariantsPassManager(parseContext, partialResult))
+        println("\n--------------XCFA+PartialResult------------------")
+        println(updatedXcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
+        updatedXcfa
+      }
     }
+
+  var currentPartialResult = partialResult
+  val loadPartialResultFromFileIfItExits = { xcfa: XCFA -> 
+    config.inputConfig.partialResult?.let { partialResultFile ->
+      LocationInvariants.fromFile(partialResultFile, getGson(xcfa), logger)?.let { loadedInvariants ->
+        currentPartialResult = loadedInvariants
+      }
+    } 
   }
+
   if (config.inputConfig.xcfaWCtx != null) {
     var (xcfa, mcm, parseContext) = config.inputConfig.xcfaWCtx!!
-    xcfa = addPartialResultToXcfa(xcfa, parseContext)
+    loadPartialResultFromFileIfItExits(xcfa);
+    xcfa = addPartialResultToXcfa(xcfa, parseContext, currentPartialResult)
     ConeOfInfluence =
       if (config.inputConfig.xcfaWCtx!!.third.multiThreading) {
         XcfaCoiMultiThread(xcfa)
@@ -209,14 +223,10 @@ fun frontend(
     parseContext.arithmetic = cConfig.arithmetic
     parseContext.architecture = cConfig.architecture
   }
-      
-  val xcfa = getXcfa(config, parseContext, logger, uniqueLogger);
 
-  if (config.inputConfig.partialResult != null and config.inputConfig.partialResult if this file exits {
-    partialResult = getGson(xcfa).fromJson(config.inputConfig.partialResult, LocationInvariants::class.java); 
-  }
-
-  xcfa = addPartialResultToXcfa(xcfa, parseContext, partialResult);
+  var xcfa = getXcfa(config, parseContext, logger, uniqueLogger)
+  loadPartialResultFromFileIfItExits(xcfa);
+  xcfa = addPartialResultToXcfa(xcfa, parseContext, currentPartialResult)
 
   val mcm =
     if (config.inputConfig.catFile != null) {
@@ -286,7 +296,7 @@ private fun backend(
         "Starting verification of ${if (xcfa?.name == "") "UnnamedXcfa" else (xcfa?.name ?: "DeferredXcfa")} using ${config.backendConfig.backend}\n${config}\n",
       )
 
-      val checker = getChecker(xcfa, mcm, config, parseContext, logger, uniqueLogger, partialResult)
+      val checker = getChecker(xcfa, mcm, config, parseContext, logger, uniqueLogger)
       val result =
         exitOnError(config.debugConfig.stacktrace, config.debugConfig.debug || throwDontExit) {
             checker.check()
@@ -442,24 +452,37 @@ private fun postVerificationLogging(
   logger: Logger,
   uniqueLogger: Logger,
 ) {
-  if(safetyResult.isPartial) {
+  if (safetyResult.isPartial) {
     val locInvNew = safetyResult.asPartial().proof
-    if (proof !is LocationInvariants) {
-      println(
-        "For the moment XCFA can only process LocationInvariants as partial results between analyses!"
+    if (locInvNew !is LocationInvariants) {
+      logger.write(
+        Logger.Level.INFO,
+        "For the moment thetas XCFA subproject can only process LocationInvariants as partial results between analyses!",
       )
-    } else if (!config.backendConfig.disablePartialResult && config.outputConfig.witnessConfig.partialResult != null)
-        var jsonfile = config.inputConfig.partialResult;
-        val gson = getGson(xcfa);
-        if jsonfile.exits {
-          val locInvOld = gson.fromJson(jsonfile, LocationInvariants::class.java);
-          locInvNew.merge(locInvOld); 
+    } else if (
+      !config.backendConfig.disablePartialResult &&
+        config.outputConfig.witnessConfig.partialResult != null
+    ) {
+      xcfa!!
+      val outputFile = config.outputConfig.witnessConfig.partialResult!!
+      val gson = getGson(xcfa)
+
+      val locInvOld =
+        config.inputConfig.partialResult?.let { inputFile ->
+          LocationInvariants.fromFile(inputFile, gson, logger)
         }
-        gson.toJson(config.outputConfig.witnessConfig.partialResult, locInvNew);
-      }
+
+      val finalInvariants =
+        if (locInvOld != null) {
+          logger.write(Logger.Level.INFO, "Merging new partial results with existing ones.")
+          locInvNew.merge(locInvOld)
+        } else {
+          locInvNew
+        }
+
+      finalInvariants.toJsonFile(outputFile, gson, logger)
     }
   }
-
 
   if (
     config.frontendConfig.inputType == InputType.CHC &&

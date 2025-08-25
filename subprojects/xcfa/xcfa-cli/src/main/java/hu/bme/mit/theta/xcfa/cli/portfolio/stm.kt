@@ -16,6 +16,7 @@
 package hu.bme.mit.theta.xcfa.cli.portfolio
 
 import hu.bme.mit.theta.analysis.algorithm.SafetyResult
+import hu.bme.mit.theta.common.exception.NotSolvableException
 import hu.bme.mit.theta.xcfa.cli.params.Backend
 import hu.bme.mit.theta.xcfa.cli.params.BoundedConfig
 import hu.bme.mit.theta.xcfa.cli.params.XcfaConfig
@@ -163,8 +164,13 @@ ${edges.map { it.visualize() }.reduce { a, b -> "$a\n$b" }}
               "For the moment XCFA can only process LocationInvariants as partial results between analyses!"
             )
           } else {
-            currentPartialResult.merge(proof)
-            throw PartialResultException()
+            currentPartialResult =
+              if (currentPartialResult != null) {
+                currentPartialResult.merge(proof)
+              } else {
+                proof
+              }
+            throw NotSolvableException()
           }
         } else return Pair(x, res)
       } catch (e: Throwable) {

@@ -15,9 +15,13 @@
  */
 package hu.bme.mit.theta.xcfa.cli.utils
 
+import com.google.gson.Gson
 import hu.bme.mit.theta.analysis.algorithm.PartitionedInvariantProof
 import hu.bme.mit.theta.analysis.expr.ExprState
+import hu.bme.mit.theta.common.logging.Logger
+import hu.bme.mit.theta.common.logging.Logger.Level.*
 import hu.bme.mit.theta.xcfa.model.XcfaLocation
+import java.io.File
 
 data class LocationInvariants(
   private val locationInvariants: Map<XcfaLocation, Collection<ExprState>>
@@ -40,8 +44,45 @@ data class LocationInvariants(
 
     return "${this::class.simpleName?.substringBefore('@')?.substringAfterLast('.')}($formattedInvariants\n)"
   }
-  
-  // WARN: uninplemented
-  fun merge(other: LocationInvariants)  { }
 
+  fun merge(other: LocationInvariants): LocationInvariants {
+    val mergedMap = this.locationInvariants + other.locationInvariants
+    return LocationInvariants(mergedMap)
+  }
+
+  fun toJsonFile(file: File, gson: Gson, logger: Logger) {
+    try {
+      val jsonString = gson.toJson(this)
+      file.writeText(jsonString)
+      logger.write(INFO, "Successfully wrote LocationInvariants to ${file.name}")
+    } catch (e: Exception) {
+      logger.write(
+        INFO,
+        "[Error] Could not write LocationInvariants to file '${file.name}'. Reason: ${e.message}",
+      )
+    }
+  }
+
+  companion object {
+    fun fromFile(file: File, gson: Gson, logger: Logger): LocationInvariants? {
+      if (!file.exists() || !file.isFile) {
+        return null
+      }
+
+      return try {
+        val invariants =
+          file.reader().use { fileReader ->
+            gson.fromJson(fileReader, LocationInvariants::class.java)
+          }
+        logger.write(INFO, "Successfully loaded LocationInvariants from ${file.name}\n")
+        invariants
+      } catch (e: Exception) {
+        logger.write(
+          INFO,
+          "[Error] Could not parse LocationInvariants file '${file.name}'. Reason: ${e.message}\n",
+        )
+        null
+      }
+    }
+  }
 }

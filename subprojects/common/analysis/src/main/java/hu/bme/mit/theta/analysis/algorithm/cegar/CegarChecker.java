@@ -69,7 +69,12 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             final Refiner<P, Pr, C> refiner,
             final ProofVisualizer<Pr> proofVisualizer,
             final Boolean computePartialResult) {
-        return create(abstractor, refiner, NullLogger.getInstance(), proofVisualizer, computePartialResult);
+        return create(
+                abstractor,
+                refiner,
+                NullLogger.getInstance(),
+                proofVisualizer,
+                computePartialResult);
     }
 
     public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
@@ -78,7 +83,8 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             final Logger logger,
             final ProofVisualizer<? super Pr> proofVisualizer,
             final Boolean computePartialResult) {
-        return new CegarChecker<>(abstractor, refiner, logger, proofVisualizer, computePartialResult);
+        return new CegarChecker<>(
+                abstractor, refiner, logger, proofVisualizer, computePartialResult);
     }
 
     public Pr getProof() {
@@ -109,6 +115,7 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
         AbstractorResult abstractorResult;
         P prec = initPrec;
         WebDebuggerLogger wdl = WebDebuggerLogger.getInstance();
+        try {
         do {
             statsHolder.iteration++;
 
@@ -132,13 +139,14 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
                 try {
                     MonitorCheckpoint.Checkpoints.execute("CegarChecker.unsafeARG");
                 } catch (NotSolvableException e) {
-                    if(computePartialResult) {
-                      logger.write(Level.MAINSTEP, "----Infinit Loop Detected by CexMonitor----%n");
-                      abstractor.unroll(proof, prec);
-                      logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
-                      return SafetyResult.partial(proof, getStats.get());
+                    if (computePartialResult) {
+                        logger.write(
+                                Level.MAINSTEP, "----Infinit Loop Detected by CexMonitor----%n");
+                        abstractor.unroll(proof, prec);
+                        logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
+                        return SafetyResult.partial(proof, getStats.get());
                     } else {
-                      throw e;
+                        throw e;
                     }
                 }
 
@@ -168,6 +176,17 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             }
 
         } while (!abstractorResult.isSafe() && !refinerResult.isUnsafe());
+        } catch (RuntimeException e) {
+           if (computePartialResult) {
+              logger.write(
+                      Level.MAINSTEP, "----Some Solver Error----%n");
+              abstractor.unroll(proof, prec);
+              logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
+              return SafetyResult.partial(proof, getStats.get());
+          } else {
+              throw e;
+          }
+        }
 
         SafetyResult<Pr, C> cegarResult = null;
         final CegarStatistics stats = getStats.get();

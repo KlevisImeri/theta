@@ -28,9 +28,9 @@ import hu.bme.mit.theta.xcfa.analysis.XcfaPrec
 import hu.bme.mit.theta.xcfa.cli.XcfaCli
 import hu.bme.mit.theta.xcfa.cli.params.*
 import hu.bme.mit.theta.xcfa.cli.utils.CachingFileSerializer
+import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 import hu.bme.mit.theta.xcfa.cli.utils.getGson
 import hu.bme.mit.theta.xcfa.model.XCFA
-import java.io.File
 import java.lang.System.err
 import java.nio.ByteBuffer
 import java.util.*
@@ -42,8 +42,14 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
   val config: XcfaConfig<F, B>,
   val parseContext: ParseContext?,
   val logger: Logger,
-  val partialResult: LocationInvariants? = null,
 ) : SafetyChecker<EmptyProof, EmptyCex, XcfaPrec<*>> {
+
+  private val placeholder = LocationInvariants()
+
+  private val partialResultJson =
+    CachingFileSerializer.serialize("partialResult.json", placeholder) {
+      getGson().toJson(placeholder)
+    }
 
   override fun check(prec: XcfaPrec<*>?): SafetyResult<EmptyProof, EmptyCex> {
     return check()
@@ -59,6 +65,8 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
           }
         }
       )
+    
+    println("PartialResultJson: ${partialResultJson}")
 
     val configJson =
       if (config.backendConfig.parseInProcess) {
@@ -66,29 +74,33 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
         val config =
           config.copy(
             inputConfig = config.inputConfig.copy(partialResult = partialResultJson),
-            outputConfig = config.outputConfig.copy(
-              resultFolder = tempDir.toFile()
-              witnessConfig = config.outputConfig.witnessConfig.copy(partialResult = partialResultJson);
-            ),
+            outputConfig =
+              config.outputConfig.copy(
+                resultFolder = tempDir.toFile(),
+                witnessConfig =
+                  config.outputConfig.witnessConfig.copy(partialResult = partialResultJson),
+              ),
             backendConfig = config.backendConfig.copy(inProcess = false, timeoutMs = 0),
           )
         CachingFileSerializer.serialize("config.json", config) { getGson().toJson(config) }
       } else {
         xcfa!!
         parseContext!!
-        partialResult!!
         val xcfaJson =
           CachingFileSerializer.serialize("xcfa.json", xcfa) { getGson(xcfa).toJson(xcfa) }
         val parseContextJson =
           CachingFileSerializer.serialize("parseContext.json", parseContext) {
             getGson(xcfa).toJson(parseContext)
           }
-        val partialResultJson = CachingFileSerializer.serialize("partialResult.json");
- 
 
         val config =
           config.copy(
-            inputConfig = config.inputConfig.copy(input = xcfaJson, parseCtx = parseContextJson, partialResult = partialResultJson),
+            inputConfig =
+              config.inputConfig.copy(
+                input = xcfaJson,
+                parseCtx = parseContextJson,
+                partialResult = partialResultJson,
+              ),
             frontendConfig = config.frontendConfig.copy(inputType = InputType.JSON),
             backendConfig = config.backendConfig.copy(inProcess = false, timeoutMs = 0),
             outputConfig =
@@ -97,8 +109,12 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
                 cOutputConfig = COutputConfig(disable = true),
                 xcfaOutputConfig = XcfaOutputConfig(disable = true),
                 chcOutputConfig = ChcOutputConfig(disable = true),
-                witnessConfig = config.outputConfig.witnessConfig.copy(partialResult = partialResultJson);
-                argConfig = config.outputConfig.argConfig.copy(disable = false), // we need the arg to be produced
+                witnessConfig =
+                  config.outputConfig.witnessConfig.copy(partialResult = partialResultJson),
+                argConfig =
+                  config.outputConfig.argConfig.copy(
+                    disable = false
+                  ), // we need the arg to be produced
               ),
           )
         CachingFileSerializer.serialize("config.json", config) { getGson(xcfa).toJson(config) }
@@ -161,7 +177,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
     return booleanSafetyResult as SafetyResult<EmptyProof, EmptyCex>
   }
 
-  private class ProcessHandler : NuAbstractProcessHandler() {
+  private inner class ProcessHandler : NuAbstractProcessHandler() {
 
     private val stdout = LinkedList<String>()
     private var stdoutRemainder = ""
@@ -187,22 +203,16 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
           safetyResult = SafetyResult.unknown<EmptyProof, EmptyCex>()
         }
         if (stdoutRemainder.contains("SafetyResult Partial")) {
-          safetyResult = SafetyResult.partial<EmptyProof, EmptyCex>(EmptyProof.getInstance())
-          // val partialResultFile = tempDir.resolve("partialResult.json")
-          // if (partialResultFile.exists() && partialResultFile.isFile) {
-          //   logger.write(Logger.Level.INFO, "Partial result detected, parsing from ${partialResultFile.absolutePath}\n")
-          //   try {
-          //     partialResultFile.reader().use { reader ->
-          //       val partialResult = getGson(xcfa).fromJson(reader, LocationInvariants::class.java)
-          //       safetyResult = SafetyResult.partial(partialResult)
-          //     }
-          //   } catch (e: Exception) {
-          //     logger.write(Logger.Level.INFO, "[ERROR] Could not parse partialResult.json. Details: ${e.message}")
-          //     safetyResult = SafetyResult.unknown<EmptyProof, EmptyCex>()
-          //   }
-          // } else {
-          //   logger.write(Logger.Level.INFO, "[ERROR] partialResult.json not found.")
-          // }
+          if (config.backendConfig.parseInProcess) {
+            safetyResult = SafetyResult.partial<EmptyProof, EmptyCex>(EmptyProof.getInstance())
+          }
+          xcfa!!
+          var tempLoc = LocationInvariants()
+          LocationInvariants.fromFile(partialResultJson, getGson(xcfa), logger)?.let {
+            loadedInvariants ->
+            tempLoc = loadedInvariants
+          }
+          safetyResult = SafetyResult.partial<LocationInvariants, EmptyCex>(tempLoc)
         }
 
         val newLines = stdoutRemainder.split("\n") // if ends with \n, last element will be ""

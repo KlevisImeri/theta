@@ -158,8 +158,15 @@ fun getCegarChecker(
         abstractor,
         AasporRefiner.create(refiner, cegarConfig.refinerConfig.pruneStrategy, ignoredVarRegistry),
         logger,
+        !config.backendConfig.disablePartialResult,
       )
-    else ArgCegarChecker.create(abstractor, refiner, logger)
+    else
+      ArgCegarChecker.create(
+        abstractor,
+        refiner,
+        logger,
+        !config.backendConfig.disablePartialResult,
+      )
 
   // initialize monitors
   MonitorCheckpoint.reset()
@@ -221,10 +228,10 @@ fun getCegarChecker(
 
         return if (ret.isSafe) {
           SafetyResult.safe(LocationInvariants(locmap))
-        } else if (ret.isPartial){
+        } else if (ret.isPartial) {
           SafetyResult.partial(LocationInvariants(locmap))
         } else {
-          error()
+          error("The SafetyResult type has changed during runtime")
         }
       } else {
         return SafetyResult.unsafe(

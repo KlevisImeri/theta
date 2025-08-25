@@ -83,6 +83,7 @@ sealed class StmtMultiConfigBuilder<
   val solverFactory: SolverFactory,
   val logger: Logger,
   val pruneStrategy: PruneStrategy = PruneStrategy.FULL,
+  val computePartialResult: Boolean = false,
 ) {
 
   abstract fun getTraceChecker(): ExprTraceChecker<R>
@@ -114,7 +115,7 @@ sealed class StmtMultiConfigBuilder<
       )
     val refiner = SingleExprTraceRefiner.create(traceChecker, precRefiner, pruneStrategy, logger)
     return MultiConfig(
-      ArgCegarChecker.create(abstractor, refiner),
+      ArgCegarChecker.create(abstractor, refiner, computePartialResult),
       MultiPrec(lInitPrec, rInitPrec, dInitPrec),
     )
   }

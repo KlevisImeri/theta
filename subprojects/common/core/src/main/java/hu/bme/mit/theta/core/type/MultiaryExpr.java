@@ -20,10 +20,10 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.collect.ImmutableList;
 import hu.bme.mit.theta.common.Utils;
+import hu.bme.mit.theta.core.CoreConfig;
 import hu.bme.mit.theta.core.utils.TypeUtils;
 import java.util.List;
 import java.util.stream.Collectors;
-import hu.bme.mit.theta.core.CoreConfig;
 
 public abstract class MultiaryExpr<OpType extends Type, ExprType extends Type>
         implements Expr<ExprType> {
@@ -73,13 +73,13 @@ public abstract class MultiaryExpr<OpType extends Type, ExprType extends Type>
 
     @Override
     public final String toString() {
-        if(CoreConfig.printPrefixNotation) {
-          return Utils.lispStringBuilder(getOperatorLabel()).body().addAll(ops).toString();
+        if (CoreConfig.printPrefixNotation) {
+            return Utils.lispStringBuilder(getOperatorLabel()).body().addAll(ops).toString();
         } else {
-          String opLabel = getOperatorLabel();
-          return ops.stream()
-                  .map(Object::toString)
-                  .collect(Collectors.joining(" " + opLabel + " ", "(", ")"));
+            String opLabel = getOperatorLabel();
+            return ops.stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(" " + opLabel + " ", "(", ")"));
         }
     }
 

@@ -23,6 +23,7 @@ import hu.bme.mit.theta.analysis.algorithm.SafetyResult
 import hu.bme.mit.theta.analysis.algorithm.arg.ARG
 import hu.bme.mit.theta.analysis.expl.ExplState
 import hu.bme.mit.theta.analysis.pred.PredState
+import hu.bme.mit.theta.analysis.expr.ExprState;
 import hu.bme.mit.theta.common.dsl.Env
 import hu.bme.mit.theta.common.dsl.SymbolTable
 import hu.bme.mit.theta.core.decl.VarDecl
@@ -140,6 +141,7 @@ private fun getGson(
     PredState::class.java,
     PredStateAdapter({ gson }, scope, env),
   )
+  gsonBuilder.registerTypeHierarchyAdapter(ExprState::class.java, ExprStateAdapter())
   gsonBuilder.registerTypeHierarchyAdapter(
     XcfaLabel::class.java,
     XcfaLabelAdapter(scope, env, { gson }),

@@ -3,7 +3,6 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
- *  You may in compliance with the License.
  *  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
@@ -291,7 +290,11 @@ fun complexPortfolio25PredOnly(
         ::checker,
       )
     edges.add(
-      Edge(config_BITWISE_PRED_CART_NWT_IT_WP_cvc5, config_BITWISE_PRED_CART_NWT_IT_WP_Z3, solverError)
+      Edge(
+        config_BITWISE_PRED_CART_NWT_IT_WP_cvc5,
+        config_BITWISE_PRED_CART_NWT_IT_WP_Z3,
+        solverError,
+      )
     )
     val config_BITWISE_PRED_CART_NWT_IT_WP_mathsat =
       ConfigNode(
@@ -307,7 +310,11 @@ fun complexPortfolio25PredOnly(
         ::checker,
       )
     edges.add(
-      Edge(config_BITWISE_PRED_CART_NWT_IT_WP_Z3, config_BITWISE_PRED_CART_NWT_IT_WP_mathsat, solverError)
+      Edge(
+        config_BITWISE_PRED_CART_NWT_IT_WP_Z3,
+        config_BITWISE_PRED_CART_NWT_IT_WP_mathsat,
+        solverError,
+      )
     )
     val config_BITWISE_PRED_CART_SEQ_ITP_mathsat =
       ConfigNode(
@@ -404,7 +411,11 @@ fun complexPortfolio25PredOnly(
         ::checker,
       )
     edges.add(
-      Edge(config_BITWISE_PRED_CART_SEQ_ITP_mathsat2, config_BITWISE_PRED_CART_SEQ_ITP_cvc5_2, solverError)
+      Edge(
+        config_BITWISE_PRED_CART_SEQ_ITP_mathsat2,
+        config_BITWISE_PRED_CART_SEQ_ITP_cvc5_2,
+        solverError,
+      )
     )
     val config_FLOAT_PRED_CART_NWT_IT_WP_cvc5 =
       ConfigNode(
@@ -432,7 +443,9 @@ fun complexPortfolio25PredOnly(
         ),
         ::checker,
       )
-    edges.add(Edge(config_FLOAT_PRED_CART_NWT_IT_WP_cvc5, config_FLOAT_PRED_CART_NWT_IT_WP_Z3, solverError))
+    edges.add(
+      Edge(config_FLOAT_PRED_CART_NWT_IT_WP_cvc5, config_FLOAT_PRED_CART_NWT_IT_WP_Z3, solverError)
+    )
     val config_FLOAT_PRED_CART_NWT_IT_WP_mathsat =
       ConfigNode(
         "FLOAT_PRED_CART_NWT_IT_WP_mathsat:5.6.10-$inProcess",
@@ -448,7 +461,11 @@ fun complexPortfolio25PredOnly(
         ::checker,
       )
     edges.add(
-      Edge(config_FLOAT_PRED_CART_NWT_IT_WP_Z3, config_FLOAT_PRED_CART_NWT_IT_WP_mathsat, solverError)
+      Edge(
+        config_FLOAT_PRED_CART_NWT_IT_WP_Z3,
+        config_FLOAT_PRED_CART_NWT_IT_WP_mathsat,
+        solverError,
+      )
     )
     val config_FLOAT_PRED_CART_SEQ_ITP_mathsat =
       ConfigNode(
@@ -542,7 +559,13 @@ fun complexPortfolio25PredOnly(
         ),
         ::checker,
       )
-    edges.add(Edge(config_FLOAT_PRED_CART_SEQ_ITP_mathsat2, config_FLOAT_PRED_CART_SEQ_ITP_cvc5_2, solverError))
+    edges.add(
+      Edge(
+        config_FLOAT_PRED_CART_SEQ_ITP_mathsat2,
+        config_FLOAT_PRED_CART_SEQ_ITP_cvc5_2,
+        solverError,
+      )
+    )
     val config_LIN_INT_PRED_CART_NWT_IT_WP_mathsat =
       ConfigNode(
         "LIN_INT_PRED_CART_NWT_IT_WP_mathsat:5.6.10-$inProcess",
@@ -570,7 +593,11 @@ fun complexPortfolio25PredOnly(
         ::checker,
       )
     edges.add(
-      Edge(config_LIN_INT_PRED_CART_NWT_IT_WP_mathsat, config_LIN_INT_PRED_CART_NWT_IT_WP_Z3, solverError)
+      Edge(
+        config_LIN_INT_PRED_CART_NWT_IT_WP_mathsat,
+        config_LIN_INT_PRED_CART_NWT_IT_WP_Z3,
+        solverError,
+      )
     )
     val config_LIN_INT_PRED_CART_SEQ_ITP_Z3 =
       ConfigNode(
@@ -613,7 +640,11 @@ fun complexPortfolio25PredOnly(
         ::checker,
       )
     edges.add(
-      Edge(config_LIN_INT_PRED_CART_SEQ_ITP_Z3, config_LIN_INT_PRED_CART_SEQ_ITP_mathsat, solverError)
+      Edge(
+        config_LIN_INT_PRED_CART_SEQ_ITP_Z3,
+        config_LIN_INT_PRED_CART_SEQ_ITP_mathsat,
+        solverError,
+      )
     )
     val config_LIN_INT_PRED_CART_SEQ_ITP_Z3_2 =
       ConfigNode(
@@ -756,7 +787,11 @@ fun complexPortfolio25PredOnly(
         ::checker,
       )
     edges.add(
-      Edge(config_NONLIN_INT_PRED_CART_SEQ_ITP_Z3, config_NONLIN_INT_PRED_CART_SEQ_ITP_z3, solverError)
+      Edge(
+        config_NONLIN_INT_PRED_CART_SEQ_ITP_Z3,
+        config_NONLIN_INT_PRED_CART_SEQ_ITP_z3,
+        solverError,
+      )
     )
     val config_NONLIN_INT_PRED_CART_SEQ_ITP_mathsat =
       ConfigNode(
@@ -878,7 +913,9 @@ fun complexPortfolio25PredOnly(
         ),
         ::checker,
       )
-    edges.add(Edge(config_ARR_PRED_CART_NWT_IT_WP_cvc5, config_ARR_PRED_CART_NWT_IT_WP_Z3, solverError))
+    edges.add(
+      Edge(config_ARR_PRED_CART_NWT_IT_WP_cvc5, config_ARR_PRED_CART_NWT_IT_WP_Z3, solverError)
+    )
     val config_ARR_PRED_CART_SEQ_ITP_Z3 =
       ConfigNode(
         "ARR_PRED_CART_SEQ_ITP_Z3-$inProcess",
@@ -990,7 +1027,11 @@ fun complexPortfolio25PredOnly(
         ::checker,
       )
     edges.add(
-      Edge(config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3, config_MULTITHREAD_PRED_CART_SEQ_ITP_mathsat, solverError)
+      Edge(
+        config_MULTITHREAD_PRED_CART_SEQ_ITP_Z3,
+        config_MULTITHREAD_PRED_CART_SEQ_ITP_mathsat,
+        solverError,
+      )
     )
     val config_MULTITHREAD_PRED_CART_NWT_IT_WP_z3 =
       ConfigNode(
@@ -1165,8 +1206,9 @@ fun complexPortfolio25PredOnly(
 
   val fallbackEdge = Edge(inProcess, notInProcess, ExceptionTrigger(label = "Anything"))
 
-  val stm = if (portfolioConfig.debugConfig.debug) getStm(mainTrait, false)
-            else STM(inProcess, setOf(fallbackEdge))
-  println(stm.visualize());
-  return stm;
+  val stm =
+    if (portfolioConfig.debugConfig.debug) getStm(mainTrait, false)
+    else STM(inProcess, setOf(fallbackEdge))
+  println(stm.visualize())
+  return stm
 }

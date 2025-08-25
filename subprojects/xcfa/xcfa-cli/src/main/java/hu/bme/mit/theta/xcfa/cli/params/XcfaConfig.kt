@@ -95,16 +95,13 @@ data class InputConfig(
   var propertyFile: File? = null,
   @Parameter(names = ["--property-value"], description = "Property")
   var property: ErrorDetection = ErrorDetection.ERROR_LOCATION,
-  @Parameter(
-    names = ["--partial-result"],
-    description = "Path of the partial result JSON",
-  )
+  @Parameter(names = ["--partial-result"], description = "Path of the partial result JSON")
   var partialResult: File? = null,
 ) : Config {
 
   override fun toString(): String {
     return "InputConfig(inputFile=${input}, catFile=${catFile}, parseCtx=${parseCtx}, " +
-      "xcfaWCtx=${xcfaWCtx?.let { "present" } ?: "missing"}, propertyFile=${propertyFile}, property=${property}"
+      "xcfaWCtx=${xcfaWCtx?.let { "present" } ?: "missing"}, propertyFile=${propertyFile}, property=${property}, partialResult=${partialResult}"
   }
 }
 
@@ -551,7 +548,8 @@ data class WitnessConfig(
   )
   var validateConcretizerSolver: Boolean = false,
   @Parameter(names = ["--input-file-for-witness"]) var inputFileForWitness: File? = null,
-  @Parameter(names = ["--partial-result-to-file"]) var partialResultToFile: Boolean = false,
+  @Parameter(names = ["--partial-result"], description = "Output path of the partial result JSON")
+  var partialResult: File? = null,
 ) : Config
 
 data class ArgConfig(

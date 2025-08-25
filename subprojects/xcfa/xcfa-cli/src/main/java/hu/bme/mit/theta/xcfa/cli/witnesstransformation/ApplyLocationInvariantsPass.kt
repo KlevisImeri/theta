@@ -15,14 +15,14 @@
  */
 package hu.bme.mit.theta.xcfa.cli.witnesstransformation
 
+import hu.bme.mit.theta.core.stmt.Stmts
 import hu.bme.mit.theta.frontend.ParseContext
 import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
-import hu.bme.mit.theta.xcfa.model.XcfaProcedureBuilder
-import hu.bme.mit.theta.xcfa.model.StmtLabel
 import hu.bme.mit.theta.xcfa.model.SequenceLabel
+import hu.bme.mit.theta.xcfa.model.StmtLabel
+import hu.bme.mit.theta.xcfa.model.XcfaProcedureBuilder
 import hu.bme.mit.theta.xcfa.passes.ProcedurePass
 import hu.bme.mit.theta.xcfa.witnesses.*
-import hu.bme.mit.theta.core.stmt.Stmts;
 
 class ApplyLocationInvariantsPass(parseContext: ParseContext, val witness: LocationInvariants) :
   ProcedurePass {
@@ -30,25 +30,20 @@ class ApplyLocationInvariantsPass(parseContext: ParseContext, val witness: Locat
     val invariantMap = witness.getPartitions()
 
     for (loc in builder.getLocs()) {
-      if (!invariantMap.containsKey(loc)) continue; 
+      if (!invariantMap.containsKey(loc)) continue
       val invariants = invariantMap[loc]!!
-      if (invariants.isEmpty()) continue;
+      if (invariants.isEmpty()) continue
 
-      val stmtXcfaLabels = invariants.map { 
-        expr -> StmtLabel(Stmts.Assume(expr.toExpr())) 
-      }
+      val stmtXcfaLabels = invariants.map { expr -> StmtLabel(Stmts.Assume(expr.toExpr())) }
 
-      for (edge in loc.incomingEdges) {
+      for (edge in loc.incomingEdges.toList()) {
         val currentLabels = (edge.label as? SequenceLabel)?.labels ?: listOf(edge.label)
-        val newEdge = edge.withLabel(SequenceLabel(
-           currentLabels + stmtXcfaLabels
-        ));
+        val newEdge = edge.withLabel(SequenceLabel(currentLabels + stmtXcfaLabels))
         builder.removeEdge(edge)
         builder.addEdge(newEdge)
       }
     }
 
-    return builder 
+    return builder
   }
-
 }

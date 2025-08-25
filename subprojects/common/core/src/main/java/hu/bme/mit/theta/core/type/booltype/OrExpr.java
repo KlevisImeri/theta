@@ -21,11 +21,11 @@ import static hu.bme.mit.theta.core.type.booltype.BoolExprs.False;
 import static hu.bme.mit.theta.core.type.booltype.BoolExprs.True;
 import static hu.bme.mit.theta.core.utils.TypeUtils.cast;
 
+import hu.bme.mit.theta.core.CoreConfig;
 import hu.bme.mit.theta.core.model.Valuation;
 import hu.bme.mit.theta.core.type.Expr;
 import hu.bme.mit.theta.core.type.MultiaryExpr;
 import java.util.List;
-import hu.bme.mit.theta.core.CoreConfig;
 
 public final class OrExpr extends MultiaryExpr<BoolType, BoolType> {
 

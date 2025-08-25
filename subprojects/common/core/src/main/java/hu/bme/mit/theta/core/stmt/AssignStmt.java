@@ -19,10 +19,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static hu.bme.mit.theta.core.utils.TypeUtils.cast;
 
 import hu.bme.mit.theta.common.Utils;
+import hu.bme.mit.theta.core.CoreConfig;
 import hu.bme.mit.theta.core.decl.VarDecl;
 import hu.bme.mit.theta.core.type.Expr;
 import hu.bme.mit.theta.core.type.Type;
-import hu.bme.mit.theta.core.CoreConfig;
 
 /**
  * Assignment statement of the form VARIABLE := EXPRESSION. The statement updates the VARIABLE with
@@ -98,10 +98,10 @@ public final class AssignStmt<DeclType extends Type> implements Stmt {
 
     @Override
     public String toString() {
-        if(CoreConfig.printPrefixNotation) {
-          return Utils.lispStringBuilder(STMT_LABEL).add(varDecl.getName()).add(expr).toString();
+        if (CoreConfig.printPrefixNotation) {
+            return Utils.lispStringBuilder(STMT_LABEL).add(varDecl.getName()).add(expr).toString();
         } else {
-          return varDecl.getName() + " " + STMT_LABEL + " " + expr;
+            return varDecl.getName() + " " + STMT_LABEL + " " + expr;
         }
     }
 }

@@ -219,7 +219,6 @@ constructor(val labels: List<XcfaLabel>, override val metadata: MetaData = Empty
     return SequenceStmt(labels.map { it.toStmt() })
   }
 
-
   override fun toString(): String =
     "${this::class.simpleName?.substringBefore('@')?.substringAfterLast('.')}[${labels.joinToString(",\n")}]"
 }

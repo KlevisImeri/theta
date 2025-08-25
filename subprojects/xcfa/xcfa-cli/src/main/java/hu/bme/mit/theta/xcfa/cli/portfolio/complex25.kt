@@ -1179,8 +1179,9 @@ fun complexPortfolio25(
 
   val fallbackEdge = Edge(inProcess, notInProcess, ExceptionTrigger(label = "Anything"))
 
-  val stm = if (portfolioConfig.debugConfig.debug) getStm(mainTrait, false)
-            else STM(inProcess, setOf(fallbackEdge))
-  println(stm.visualize());
-  return stm;
+  val stm =
+    if (portfolioConfig.debugConfig.debug) getStm(mainTrait, false)
+    else STM(inProcess, setOf(fallbackEdge))
+  println(stm.visualize())
+  return stm
 }

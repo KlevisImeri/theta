@@ -37,10 +37,9 @@ fun getChecker(
   parseContext: ParseContext?,
   logger: Logger,
   uniqueLogger: Logger,
-  partialResult: LocationInvariants? = null,
 ): SafetyChecker<*, *, *> =
   if (config.backendConfig.inProcess) {
-    InProcessChecker(xcfa, config, parseContext, logger, partialResult)
+    InProcessChecker(xcfa, config, parseContext, logger)
   } else {
     xcfa!!
     mcm!!

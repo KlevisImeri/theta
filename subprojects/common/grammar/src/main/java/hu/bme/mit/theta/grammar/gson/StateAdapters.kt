@@ -16,11 +16,13 @@
 package hu.bme.mit.theta.grammar.gson
 
 import com.google.gson.Gson
+import com.google.gson.JsonElement
 import com.google.gson.TypeAdapter
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import hu.bme.mit.theta.analysis.expr.ExprState
 import hu.bme.mit.theta.analysis.expl.ExplState
 import hu.bme.mit.theta.analysis.pred.PredState
 import hu.bme.mit.theta.common.dsl.Env
@@ -31,6 +33,9 @@ import hu.bme.mit.theta.core.type.Expr
 import hu.bme.mit.theta.core.type.LitExpr
 import hu.bme.mit.theta.core.type.booltype.BoolType
 import hu.bme.mit.theta.grammar.dsl.expr.ExpressionWrapper
+import java.io.IOException
+import com.google.gson.*
+import java.lang.reflect.Type
 
 class ExplStateAdapter(val scope: Scope, val env: Env) : TypeAdapter<ExplState>() {
 
@@ -98,4 +103,33 @@ class PredStateAdapter(val gsonSupplier: () -> Gson, val scope: Scope, val env: 
   private fun initGson() {
     if (!this::gson.isInitialized) gson = gsonSupplier()
   }
+}
+
+class ExprStateAdapter : JsonSerializer<ExprState>, JsonDeserializer<ExprState> {
+
+    companion object {
+        private const val TYPE_FIELD = "type"
+    }
+
+    override fun serialize(src: ExprState, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
+        val element = context.serialize(src, src.javaClass)
+        element.asJsonObject.addProperty(TYPE_FIELD, src.javaClass.canonicalName)
+        return element
+    }
+
+    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): ExprState {
+        val jsonObject = json.asJsonObject
+        val typeElement = jsonObject.get(TYPE_FIELD)
+            ?: throw JsonParseException("Missing type discriminator field: $TYPE_FIELD")
+
+        val actualType = try {
+            Class.forName(typeElement.asString)
+        } catch (e: ClassNotFoundException) {
+            throw JsonParseException("Cannot find class for type: ${typeElement.asString}", e)
+        }
+        
+        jsonObject.remove(TYPE_FIELD)
+
+        return context.deserialize(jsonObject, actualType)
+    }
 }
