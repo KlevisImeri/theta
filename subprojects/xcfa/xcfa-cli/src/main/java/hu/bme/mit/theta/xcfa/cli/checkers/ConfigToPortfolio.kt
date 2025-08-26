@@ -87,6 +87,10 @@ fun getPortfolioChecker(
       "CHC",
       "HORN",
       "HORN25" -> hornPortfolio25(xcfa, mcm, parseContext, config, logger, uniqueLogger)
+      
+      "PredCartDefault->PredCartConjuncts", -> predCartDefaultToPredCartConjuncts(xcfa, mcm, parseContext, config, logger, uniqueLogger)
+      "PredBoolDefault->PredBoolConjuncts", -> predBoolDefaultToPredBoolConjuncts(xcfa, mcm, parseContext, config, logger, uniqueLogger)
+
 
       else -> {
         if (File(portfolioName).exists()) {

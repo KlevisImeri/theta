@@ -162,13 +162,13 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/8.9/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 3s
+BUILD SUCCESSFUL in 6s
 93 actionable tasks: 17 executed, 76 up-to-date
 Initialized native services in: /home/klevis/.gradle/native
 Initialized jansi services in: /home/klevis/.gradle/native
 Received JVM installation metadata from '/opt/jdk-17': {JAVA_HOME=/opt/jdk-17, JAVA_VERSION=17, JAVA_VENDOR=Oracle Corporation, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=17+35-2724, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=17+35-2724, VM_VENDOR=Oracle Corporation, OS_ARCH=amd64}
-The client will now receive all logging from the daemon (pid: 11214). The daemon log file: /home/klevis/.gradle/daemon/8.9/daemon-11214.out.log
-Starting 49th build in daemon [uptime: 2 hrs 30 mins 57.976 secs, performance: 99%, GC rate: 0.00/s, heap usage: 0% of 512 MiB, non-heap usage: 30% of 384 MiB]
+The client will now receive all logging from the daemon (pid: 2021). The daemon log file: /home/klevis/.gradle/daemon/8.9/daemon-2021.out.log
+Starting 4th build in daemon [uptime: 10 mins 23.721 secs, performance: 100%, GC rate: 0.00/s, heap usage: 0% of 512 MiB, non-heap usage: 25% of 384 MiB]
 Using 4 worker leases.
 Now considering [/home/klevis/Projects/theta, /home/klevis/Projects/theta/buildSrc] as hierarchies to watch
 Now considering [/home/klevis/Projects/theta/buildSrc, /home/klevis/Projects/theta] as hierarchies to watch
@@ -222,85 +222,85 @@ Transforming kotlin-stdlib-1.9.23.jar (org.jetbrains.kotlin:kotlin-stdlib:1.9.23
 Transforming kotlin-sam-with-receiver-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-sam-with-receiver:1.9.23) with InstrumentationAnalysisTransform
 Transforming kotlin-sam-with-receiver-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-sam-with-receiver:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-assignment-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-assignment:1.9.23) with InstrumentationAnalysisTransform
-Transforming annotations-13.0.jar (org.jetbrains:annotations:13.0) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-sam-with-receiver-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-sam-with-receiver:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-assignment-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-assignment:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-model-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.9.23) with InstrumentationAnalysisTransform
-Transforming kotlin-assignment-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-assignment:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-gradle-plugin-model-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.9.23) with MergeInstrumentationAnalysisTransform
-Transforming kotlin-gradle-plugin-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.23) with InstrumentationAnalysisTransform
+Transforming kotlin-sam-with-receiver-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-sam-with-receiver:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming annotations-13.0.jar (org.jetbrains:annotations:13.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-assignment-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-assignment:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-gradle-plugin-model-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.23) with InstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-api-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.23) with InstrumentationAnalysisTransform
-Transforming kotlin-gradle-plugin-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-gradle-plugin-api-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23) with InstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23) with MergeInstrumentationAnalysisTransform
+Transforming kotlin-gradle-plugin-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-gradle-plugin-api-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-gradle-plugin-idea-proto-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto:1.9.23) with InstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-idea-proto-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto:1.9.23) with MergeInstrumentationAnalysisTransform
-Transforming kotlin-gradle-plugin-idea-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.9.23) with InstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-1.9.23-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-idea-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.9.23) with InstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-idea-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-klib-commonizer-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.9.23) with InstrumentationAnalysisTransform
-Transforming kotlin-gradle-plugin-idea-proto-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-klib-commonizer-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.9.23) with MergeInstrumentationAnalysisTransform
-Transforming kotlin-gradle-plugin-idea-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-native-utils-1.9.23.jar (org.jetbrains.kotlin:kotlin-native-utils:1.9.23) with InstrumentationAnalysisTransform
-Transforming kotlin-klib-commonizer-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-native-utils-1.9.23.jar (org.jetbrains.kotlin:kotlin-native-utils:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-util-klib-1.9.23.jar (org.jetbrains.kotlin:kotlin-util-klib:1.9.23) with InstrumentationAnalysisTransform
 Transforming kotlin-util-klib-1.9.23.jar (org.jetbrains.kotlin:kotlin-util-klib:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-build-tools-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-build-tools-api:1.9.23) with InstrumentationAnalysisTransform
+Transforming kotlin-klib-commonizer-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-idea-proto-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-native-utils-1.9.23.jar (org.jetbrains.kotlin:kotlin-native-utils:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-build-tools-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-build-tools-api:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-util-klib-1.9.23.jar (org.jetbrains.kotlin:kotlin-util-klib:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-build-tools-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-build-tools-api:1.9.23) with MergeInstrumentationAnalysisTransform
+Transforming kotlin-gradle-plugin-idea-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-android-extensions-1.9.23.jar (org.jetbrains.kotlin:kotlin-android-extensions:1.9.23) with InstrumentationAnalysisTransform
-Transforming kotlin-build-tools-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-build-tools-api:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-android-extensions-1.9.23.jar (org.jetbrains.kotlin:kotlin-android-extensions:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-compiler-runner-1.9.23.jar (org.jetbrains.kotlin:kotlin-compiler-runner:1.9.23) with InstrumentationAnalysisTransform
 Transforming kotlin-compiler-runner-1.9.23.jar (org.jetbrains.kotlin:kotlin-compiler-runner:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-compiler-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.23) with InstrumentationAnalysisTransform
 Transforming kotlin-android-extensions-1.9.23.jar (org.jetbrains.kotlin:kotlin-android-extensions:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-compiler-runner-1.9.23.jar (org.jetbrains.kotlin:kotlin-compiler-runner:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-compiler-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-scripting-compiler-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.9.23) with InstrumentationAnalysisTransform
-Transforming kotlin-compiler-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-scripting-compiler-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-scripting-compiler-impl-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.9.23) with InstrumentationAnalysisTransform
+Transforming kotlin-compiler-runner-1.9.23.jar (org.jetbrains.kotlin:kotlin-compiler-runner:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-compiler-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-compiler-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-build-tools-api-1.9.23.jar (org.jetbrains.kotlin:kotlin-build-tools-api:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-scripting-compiler-impl-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-annotations-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-annotations:1.9.23) with InstrumentationAnalysisTransform
-Transforming kotlin-scripting-compiler-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-gradle-plugin-annotations-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-annotations:1.9.23) with MergeInstrumentationAnalysisTransform
-Transforming kotlin-scripting-compiler-impl-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-project-model-1.9.23.jar (org.jetbrains.kotlin:kotlin-project-model:1.9.23) with InstrumentationAnalysisTransform
-Transforming kotlin-gradle-plugin-annotations-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-annotations:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-compiler-impl-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-project-model-1.9.23.jar (org.jetbrains.kotlin:kotlin-project-model:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-tooling-core-1.9.23.jar (org.jetbrains.kotlin:kotlin-tooling-core:1.9.23) with InstrumentationAnalysisTransform
 Transforming kotlin-tooling-core-1.9.23.jar (org.jetbrains.kotlin:kotlin-tooling-core:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-util-io-1.9.23.jar (org.jetbrains.kotlin:kotlin-util-io:1.9.23) with InstrumentationAnalysisTransform
-Transforming kotlin-project-model-1.9.23.jar (org.jetbrains.kotlin:kotlin-project-model:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-annotations-1.9.23.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-annotations:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-util-io-1.9.23.jar (org.jetbrains.kotlin:kotlin-util-io:1.9.23) with MergeInstrumentationAnalysisTransform
-Transforming kotlin-tooling-core-1.9.23.jar (org.jetbrains.kotlin:kotlin-tooling-core:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-daemon-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-daemon-embeddable:1.9.23) with InstrumentationAnalysisTransform
-Transforming kotlin-util-io-1.9.23.jar (org.jetbrains.kotlin:kotlin-util-io:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-daemon-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-daemon-embeddable:1.9.23) with MergeInstrumentationAnalysisTransform
+Transforming kotlin-project-model-1.9.23.jar (org.jetbrains.kotlin:kotlin-project-model:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-daemon-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-daemon-embeddable:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming trove4j-1.0.20200330.jar (org.jetbrains.intellij.deps:trove4j:1.0.20200330) with InstrumentationAnalysisTransform
 Transforming trove4j-1.0.20200330.jar (org.jetbrains.intellij.deps:trove4j:1.0.20200330) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-daemon-client-1.9.23.jar (org.jetbrains.kotlin:kotlin-daemon-client:1.9.23) with InstrumentationAnalysisTransform
-Transforming kotlin-daemon-embeddable-1.9.23.jar (org.jetbrains.kotlin:kotlin-daemon-embeddable:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-daemon-client-1.9.23.jar (org.jetbrains.kotlin:kotlin-daemon-client:1.9.23) with MergeInstrumentationAnalysisTransform
-Transforming trove4j-1.0.20200330.jar (org.jetbrains.intellij.deps:trove4j:1.0.20200330) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlinx-coroutines-core-jvm-1.5.0.jar (org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.0) with InstrumentationAnalysisTransform
-Transforming kotlin-daemon-client-1.9.23.jar (org.jetbrains.kotlin:kotlin-daemon-client:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-util-io-1.9.23.jar (org.jetbrains.kotlin:kotlin-util-io:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlinx-coroutines-core-jvm-1.5.0.jar (org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.0) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-scripting-jvm-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-jvm:1.9.23) with InstrumentationAnalysisTransform
 Transforming kotlin-scripting-jvm-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-jvm:1.9.23) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-scripting-common-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-common:1.9.23) with InstrumentationAnalysisTransform
-Transforming kotlinx-coroutines-core-jvm-1.5.0.jar (org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming trove4j-1.0.20200330.jar (org.jetbrains.intellij.deps:trove4j:1.0.20200330) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-scripting-common-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-common:1.9.23) with MergeInstrumentationAnalysisTransform
+Transforming kotlin-daemon-client-1.9.23.jar (org.jetbrains.kotlin:kotlin-daemon-client:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-scripting-jvm-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-jvm:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-scripting-common-1.9.23.jar (org.jetbrains.kotlin:kotlin-scripting-common:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-tooling-core-1.9.23.jar (org.jetbrains.kotlin:kotlin-tooling-core:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlinx-coroutines-core-jvm-1.5.0.jar (org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.0) with ExternalDependencyInstrumentingArtifactTransform
 Using Kotlin Gradle Plugin gradle82 variant
 kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
 kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
@@ -334,22 +334,22 @@ Resolve mutations for :buildSrc:compilePluginsBlocks (Thread[Execution worker,5,
 Caching disabled for task ':buildSrc:compilePluginsBlocks' because:
   Build cache is disabled
 Skipping task ':buildSrc:compilePluginsBlocks' as it is up-to-date.
-Resolve mutations for :buildSrc:generatePrecompiledScriptPluginAccessors (Thread[Execution worker,5,main]) started.
-:buildSrc:generatePrecompiledScriptPluginAccessors (Thread[Execution worker,5,main]) started.
+Resolve mutations for :buildSrc:generatePrecompiledScriptPluginAccessors (Thread[included builds,5,main]) started.
+:buildSrc:generatePrecompiledScriptPluginAccessors (Thread[included builds,5,main]) started.
 
 > Task :buildSrc:generatePrecompiledScriptPluginAccessors UP-TO-DATE
 Caching disabled for task ':buildSrc:generatePrecompiledScriptPluginAccessors' because:
   Build cache is disabled
 Skipping task ':buildSrc:generatePrecompiledScriptPluginAccessors' as it is up-to-date.
-Resolve mutations for :buildSrc:generateScriptPluginAdapters (Thread[Execution worker,5,main]) started.
-:buildSrc:generateScriptPluginAdapters (Thread[Execution worker,5,main]) started.
+Resolve mutations for :buildSrc:generateScriptPluginAdapters (Thread[included builds,5,main]) started.
+:buildSrc:generateScriptPluginAdapters (Thread[included builds,5,main]) started.
 
 > Task :buildSrc:generateScriptPluginAdapters UP-TO-DATE
 Caching disabled for task ':buildSrc:generateScriptPluginAdapters' because:
   Build cache is disabled
 Skipping task ':buildSrc:generateScriptPluginAdapters' as it is up-to-date.
-Resolve mutations for :buildSrc:generateVersions (Thread[Execution worker,5,main]) started.
-:buildSrc:generateVersions (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :buildSrc:generateVersions (Thread[included builds,5,main]) started.
+:buildSrc:generateVersions (Thread[included builds,5,main]) started.
 
 > Task :buildSrc:generateVersions UP-TO-DATE
 Custom actions are attached to task ':buildSrc:generateVersions'.
@@ -357,8 +357,8 @@ Caching disabled for task ':buildSrc:generateVersions' because:
   Build cache is disabled
   Gradle would require more information to cache this task
 Skipping task ':buildSrc:generateVersions' as it is up-to-date.
-Resolve mutations for :buildSrc:compileKotlin (Thread[Execution worker Thread 3,5,main]) started.
-:buildSrc:compileKotlin (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :buildSrc:compileKotlin (Thread[included builds,5,main]) started.
+:buildSrc:compileKotlin (Thread[included builds,5,main]) started.
 
 > Task :buildSrc:compileKotlin UP-TO-DATE
 Transforming gradle-api-8.9.jar with ClasspathEntrySnapshotTransform
@@ -405,17 +405,17 @@ Custom actions are attached to task ':buildSrc:compileKotlin'.
 Caching disabled for task ':buildSrc:compileKotlin' because:
   Build cache is disabled
 Skipping task ':buildSrc:compileKotlin' as it is up-to-date.
-Resolve mutations for :buildSrc:compileJava (Thread[Execution worker Thread 2,5,main]) started.
-:buildSrc:compileJava (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :buildSrc:compileJava (Thread[included builds,5,main]) started.
+:buildSrc:compileJava (Thread[included builds,5,main]) started.
 
 > Task :buildSrc:compileJava NO-SOURCE
 Skipping task ':buildSrc:compileJava' as it has no source files and no previous output files.
-Resolve mutations for :buildSrc:compileGroovy (Thread[Execution worker Thread 2,5,main]) started.
-:buildSrc:compileGroovy (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :buildSrc:compileGroovy (Thread[included builds,5,main]) started.
+:buildSrc:compileGroovy (Thread[included builds,5,main]) started.
 
 > Task :buildSrc:compileGroovy NO-SOURCE
 Skipping task ':buildSrc:compileGroovy' as it has no source files and no previous output files.
-Resolve mutations for :buildSrc:pluginDescriptors (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :buildSrc:pluginDescriptors (Thread[included builds,5,main]) started.
 :buildSrc:pluginDescriptors (Thread[included builds,5,main]) started.
 
 > Task :buildSrc:pluginDescriptors UP-TO-DATE
@@ -431,13 +431,13 @@ Caching disabled for task ':buildSrc:processResources' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':buildSrc:processResources' as it is up-to-date.
-Resolve mutations for :buildSrc:classes (Thread[Execution worker Thread 2,5,main]) started.
-:buildSrc:classes (Thread[Execution worker,5,main]) started.
+Resolve mutations for :buildSrc:classes (Thread[included builds,5,main]) started.
+:buildSrc:classes (Thread[included builds,5,main]) started.
 
 > Task :buildSrc:classes UP-TO-DATE
 Skipping task ':buildSrc:classes' as it has no actions.
-Resolve mutations for :buildSrc:jar (Thread[Execution worker,5,main]) started.
-:buildSrc:jar (Thread[Execution worker,5,main]) started.
+Resolve mutations for :buildSrc:jar (Thread[included builds,5,main]) started.
+:buildSrc:jar (Thread[included builds,5,main]) started.
 
 > Task :buildSrc:jar UP-TO-DATE
 Caching disabled for task ':buildSrc:jar' because:
@@ -512,11 +512,9 @@ Transforming shadow-7.1.2.jar (gradle.plugin.com.github.johnrengelman:shadow:7.1
 Transforming shadow-7.1.2.jar (gradle.plugin.com.github.johnrengelman:shadow:7.1.2) with MergeInstrumentationAnalysisTransform
 Transforming log4j-core-2.17.1.jar (org.apache.logging.log4j:log4j-core:2.17.1) with InstrumentationAnalysisTransform
 Transforming log4j-core-2.17.1.jar (org.apache.logging.log4j:log4j-core:2.17.1) with MergeInstrumentationAnalysisTransform
-Transforming shadow-7.1.2.jar (gradle.plugin.com.github.johnrengelman:shadow:7.1.2) with ExternalDependencyInstrumentingArtifactTransform
-Transforming log4j-core-2.17.1.jar (org.apache.logging.log4j:log4j-core:2.17.1) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-serialization-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-serialization:1.9.25) with InstrumentationAnalysisTransform
 Transforming kotlin-serialization-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-serialization:1.9.25) with MergeInstrumentationAnalysisTransform
-Transforming kotlin-serialization-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-serialization:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming shadow-7.1.2.jar (gradle.plugin.com.github.johnrengelman:shadow:7.1.2) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-gradle-plugin-model-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.9.25) with InstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-model-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.9.25) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.25) with InstrumentationAnalysisTransform
@@ -525,10 +523,18 @@ Transforming kotlin-gradle-plugin-api-1.9.25-gradle82.jar (org.jetbrains.kotlin:
 Transforming kotlin-gradle-plugin-api-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.25) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25) with InstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25) with MergeInstrumentationAnalysisTransform
+Transforming kotlin-serialization-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-serialization:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-gradle-plugin-idea-proto-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto:1.9.25) with InstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-idea-proto-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto:1.9.25) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-idea-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.9.25) with InstrumentationAnalysisTransform
 Transforming kotlin-gradle-plugin-idea-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.9.25) with MergeInstrumentationAnalysisTransform
+Transforming kotlin-gradle-plugin-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-model-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-api-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-idea-proto-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-idea-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming log4j-core-2.17.1.jar (org.apache.logging.log4j:log4j-core:2.17.1) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-klib-commonizer-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.9.25) with InstrumentationAnalysisTransform
 Transforming kotlin-klib-commonizer-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.9.25) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-native-utils-1.9.25.jar (org.jetbrains.kotlin:kotlin-native-utils:1.9.25) with InstrumentationAnalysisTransform
@@ -569,10 +575,32 @@ Transforming kotlin-scripting-jvm-1.9.25.jar (org.jetbrains.kotlin:kotlin-script
 Transforming kotlin-scripting-jvm-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-jvm:1.9.25) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-scripting-common-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-common:1.9.25) with InstrumentationAnalysisTransform
 Transforming kotlin-scripting-common-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-common:1.9.25) with MergeInstrumentationAnalysisTransform
+Transforming kotlin-native-utils-1.9.25.jar (org.jetbrains.kotlin:kotlin-native-utils:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-util-klib-1.9.25.jar (org.jetbrains.kotlin:kotlin-util-klib:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-build-tools-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-build-tools-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-compiler-runner-1.9.25.jar (org.jetbrains.kotlin:kotlin-compiler-runner:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-android-extensions-1.9.25.jar (org.jetbrains.kotlin:kotlin-android-extensions:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-compiler-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-compiler-impl-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming spotless-plugin-gradle-6.25.0.jar (com.diffplug.spotless:spotless-plugin-gradle:6.25.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-klib-commonizer-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-annotations-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-annotations:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-compiler-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-project-model-1.9.25.jar (org.jetbrains.kotlin:kotlin-project-model:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-util-io-1.9.25.jar (org.jetbrains.kotlin:kotlin-util-io:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-daemon-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-daemon-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming trove4j-1.0.20200330.jar (org.jetbrains.intellij.deps:trove4j:1.0.20200330) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlinx-coroutines-core-jvm-1.5.0.jar (org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-jvm-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-jvm:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-common-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-common:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-daemon-client-1.9.25.jar (org.jetbrains.kotlin:kotlin-daemon-client:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
 Transforming jdom2-2.0.6.jar (org.jdom:jdom2:2.0.6) with InstrumentationAnalysisTransform
 Transforming jdom2-2.0.6.jar (org.jdom:jdom2:2.0.6) with MergeInstrumentationAnalysisTransform
 Transforming asm-commons-9.2.jar (org.ow2.asm:asm-commons:9.2) with InstrumentationAnalysisTransform
 Transforming asm-commons-9.2.jar (org.ow2.asm:asm-commons:9.2) with MergeInstrumentationAnalysisTransform
+Transforming kotlin-tooling-core-1.9.25.jar (org.jetbrains.kotlin:kotlin-tooling-core:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jdom2-2.0.6.jar (org.jdom:jdom2:2.0.6) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-commons-9.2.jar (org.ow2.asm:asm-commons:9.2) with ExternalDependencyInstrumentingArtifactTransform
 Transforming asm-analysis-9.2.jar (org.ow2.asm:asm-analysis:9.2) with InstrumentationAnalysisTransform
 Transforming asm-analysis-9.2.jar (org.ow2.asm:asm-analysis:9.2) with MergeInstrumentationAnalysisTransform
 Transforming asm-tree-9.2.jar (org.ow2.asm:asm-tree:9.2) with InstrumentationAnalysisTransform
@@ -583,45 +611,15 @@ Transforming commons-io-2.11.0.jar (commons-io:commons-io:2.11.0) with Instrumen
 Transforming commons-io-2.11.0.jar (commons-io:commons-io:2.11.0) with MergeInstrumentationAnalysisTransform
 Transforming ant-1.10.11.jar (org.apache.ant:ant:1.10.11) with InstrumentationAnalysisTransform
 Transforming ant-1.10.11.jar (org.apache.ant:ant:1.10.11) with MergeInstrumentationAnalysisTransform
+Transforming asm-analysis-9.2.jar (org.ow2.asm:asm-analysis:9.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-tree-9.2.jar (org.ow2.asm:asm-tree:9.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-io-2.11.0.jar (commons-io:commons-io:2.11.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming ant-1.10.11.jar (org.apache.ant:ant:1.10.11) with ExternalDependencyInstrumentingArtifactTransform
 Transforming plexus-utils-3.4.1.jar (org.codehaus.plexus:plexus-utils:3.4.1) with InstrumentationAnalysisTransform
 Transforming plexus-utils-3.4.1.jar (org.codehaus.plexus:plexus-utils:3.4.1) with MergeInstrumentationAnalysisTransform
 Transforming jdependency-2.7.0.jar (org.vafer:jdependency:2.7.0) with InstrumentationAnalysisTransform
 Transforming jdependency-2.7.0.jar (org.vafer:jdependency:2.7.0) with MergeInstrumentationAnalysisTransform
 Transforming durian-io-1.2.0.jar (com.diffplug.durian:durian-io:1.2.0) with InstrumentationAnalysisTransform
-Transforming kotlin-gradle-plugin-api-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-gradle-plugin-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-gradle-plugin-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-gradle-plugin-idea-proto-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-gradle-plugin-idea-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-klib-commonizer-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-native-utils-1.9.25.jar (org.jetbrains.kotlin:kotlin-native-utils:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-util-klib-1.9.25.jar (org.jetbrains.kotlin:kotlin-util-klib:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-build-tools-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-build-tools-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-android-extensions-1.9.25.jar (org.jetbrains.kotlin:kotlin-android-extensions:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-compiler-runner-1.9.25.jar (org.jetbrains.kotlin:kotlin-compiler-runner:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-compiler-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-scripting-compiler-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-scripting-compiler-impl-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming spotless-plugin-gradle-6.25.0.jar (com.diffplug.spotless:spotless-plugin-gradle:6.25.0) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-gradle-plugin-annotations-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-annotations:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-project-model-1.9.25.jar (org.jetbrains.kotlin:kotlin-project-model:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-tooling-core-1.9.25.jar (org.jetbrains.kotlin:kotlin-tooling-core:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-util-io-1.9.25.jar (org.jetbrains.kotlin:kotlin-util-io:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-daemon-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-daemon-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-gradle-plugin-model-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-daemon-client-1.9.25.jar (org.jetbrains.kotlin:kotlin-daemon-client:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlinx-coroutines-core-jvm-1.5.0.jar (org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.0) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-scripting-jvm-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-jvm:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-scripting-common-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-common:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
-Transforming jdom2-2.0.6.jar (org.jdom:jdom2:2.0.6) with ExternalDependencyInstrumentingArtifactTransform
-Transforming asm-commons-9.2.jar (org.ow2.asm:asm-commons:9.2) with ExternalDependencyInstrumentingArtifactTransform
-Transforming asm-analysis-9.2.jar (org.ow2.asm:asm-analysis:9.2) with ExternalDependencyInstrumentingArtifactTransform
-Transforming asm-tree-9.2.jar (org.ow2.asm:asm-tree:9.2) with ExternalDependencyInstrumentingArtifactTransform
-Transforming asm-9.2.jar (org.ow2.asm:asm:9.2) with ExternalDependencyInstrumentingArtifactTransform
-Transforming commons-io-2.11.0.jar (commons-io:commons-io:2.11.0) with ExternalDependencyInstrumentingArtifactTransform
-Transforming ant-1.10.11.jar (org.apache.ant:ant:1.10.11) with ExternalDependencyInstrumentingArtifactTransform
-Transforming plexus-utils-3.4.1.jar (org.codehaus.plexus:plexus-utils:3.4.1) with ExternalDependencyInstrumentingArtifactTransform
-Transforming jdependency-2.7.0.jar (org.vafer:jdependency:2.7.0) with ExternalDependencyInstrumentingArtifactTransform
 Transforming durian-io-1.2.0.jar (com.diffplug.durian:durian-io:1.2.0) with MergeInstrumentationAnalysisTransform
 Transforming spotless-lib-extra-2.45.0.jar (com.diffplug.spotless:spotless-lib-extra:2.45.0) with InstrumentationAnalysisTransform
 Transforming spotless-lib-extra-2.45.0.jar (com.diffplug.spotless:spotless-lib-extra:2.45.0) with MergeInstrumentationAnalysisTransform
@@ -659,19 +657,21 @@ Transforming okio-jvm-3.6.0.jar (com.squareup.okio:okio-jvm:3.6.0) with Instrume
 Transforming okio-jvm-3.6.0.jar (com.squareup.okio:okio-jvm:3.6.0) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-stdlib-jdk8-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10) with InstrumentationAnalysisTransform
 Transforming kotlin-stdlib-jdk8-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10) with MergeInstrumentationAnalysisTransform
+Transforming asm-9.2.jar (org.ow2.asm:asm:9.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming durian-io-1.2.0.jar (com.diffplug.durian:durian-io:1.2.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming spotless-lib-extra-2.45.0.jar (com.diffplug.spotless:spotless-lib-extra:2.45.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming durian-collect-1.2.0.jar (com.diffplug.durian:durian-collect:1.2.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming durian-core-1.2.0.jar (com.diffplug.durian:durian-core:1.2.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming org.eclipse.jgit-6.7.0.202309050840-r.jar (org.eclipse.jgit:org.eclipse.jgit:6.7.0.202309050840-r) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-stdlib-jdk7-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10) with InstrumentationAnalysisTransform
+Transforming spotless-lib-2.45.0.jar (com.diffplug.spotless:spotless-lib:2.45.0) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-stdlib-jdk7-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-stdlib-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib:1.9.10) with InstrumentationAnalysisTransform
 Transforming kotlin-stdlib-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib:1.9.10) with MergeInstrumentationAnalysisTransform
 Transforming kotlin-stdlib-common-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10) with InstrumentationAnalysisTransform
 Transforming kotlin-stdlib-common-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10) with MergeInstrumentationAnalysisTransform
 Transforming annotations-13.0.jar (org.jetbrains:annotations:13.0) with InstrumentationAnalysisTransform
-Transforming trove4j-1.0.20200330.jar (org.jetbrains.intellij.deps:trove4j:1.0.20200330) with ExternalDependencyInstrumentingArtifactTransform
-Transforming durian-collect-1.2.0.jar (com.diffplug.durian:durian-collect:1.2.0) with ExternalDependencyInstrumentingArtifactTransform
-Transforming durian-core-1.2.0.jar (com.diffplug.durian:durian-core:1.2.0) with ExternalDependencyInstrumentingArtifactTransform
-Transforming org.eclipse.jgit-6.7.0.202309050840-r.jar (org.eclipse.jgit:org.eclipse.jgit:6.7.0.202309050840-r) with ExternalDependencyInstrumentingArtifactTransform
-Transforming spotless-lib-2.45.0.jar (com.diffplug.spotless:spotless-lib:2.45.0) with ExternalDependencyInstrumentingArtifactTransform
-Transforming ant-launcher-1.10.11.jar (org.apache.ant:ant-launcher:1.10.11) with ExternalDependencyInstrumentingArtifactTransform
+Transforming annotations-13.0.jar (org.jetbrains:annotations:13.0) with MergeInstrumentationAnalysisTransform
 Transforming log4j-api-2.17.1.jar (org.apache.logging.log4j:log4j-api:2.17.1) with ExternalDependencyInstrumentingArtifactTransform
 Transforming JavaEWAH-1.2.3.jar (com.googlecode.javaewah:JavaEWAH:1.2.3) with ExternalDependencyInstrumentingArtifactTransform
 Transforming solstice-1.7.5.jar (dev.equo.ide:solstice:1.7.5) with ExternalDependencyInstrumentingArtifactTransform
@@ -679,18 +679,18 @@ Transforming slf4j-api-1.7.36.jar (org.slf4j:slf4j-api:1.7.36) with ExternalDepe
 Transforming commons-codec-1.16.0.jar (commons-codec:commons-codec:1.16.0) with ExternalDependencyInstrumentingArtifactTransform
 Transforming concurrent-trees-2.6.1.jar (com.googlecode.concurrent-trees:concurrent-trees:2.6.1) with ExternalDependencyInstrumentingArtifactTransform
 Transforming xz-1.9.jar (org.tukaani:xz:1.9) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jdependency-2.7.0.jar (org.vafer:jdependency:2.7.0) with ExternalDependencyInstrumentingArtifactTransform
 Transforming okhttp-4.12.0.jar (com.squareup.okhttp3:okhttp:4.12.0) with ExternalDependencyInstrumentingArtifactTransform
 Transforming durian-swt.os-4.2.2.jar (com.diffplug.durian:durian-swt.os:4.2.2) with ExternalDependencyInstrumentingArtifactTransform
-Transforming spotless-lib-extra-2.45.0.jar (com.diffplug.spotless:spotless-lib-extra:2.45.0) with ExternalDependencyInstrumentingArtifactTransform
 Transforming org.eclipse.osgi-3.18.300.jar (org.eclipse.platform:org.eclipse.osgi:3.18.300) with ExternalDependencyInstrumentingArtifactTransform
 Transforming okio-jvm-3.6.0.jar (com.squareup.okio:okio-jvm:3.6.0) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-stdlib-jdk8-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-stdlib-jdk7-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-stdlib-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib:1.9.10) with ExternalDependencyInstrumentingArtifactTransform
-Transforming kotlin-stdlib-common-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10) with ExternalDependencyInstrumentingArtifactTransform
-Transforming durian-io-1.2.0.jar (com.diffplug.durian:durian-io:1.2.0) with ExternalDependencyInstrumentingArtifactTransform
-Transforming annotations-13.0.jar (org.jetbrains:annotations:13.0) with MergeInstrumentationAnalysisTransform
+Transforming plexus-utils-3.4.1.jar (org.codehaus.plexus:plexus-utils:3.4.1) with ExternalDependencyInstrumentingArtifactTransform
 Transforming annotations-13.0.jar (org.jetbrains:annotations:13.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming ant-launcher-1.10.11.jar (org.apache.ant:ant-launcher:1.10.11) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-stdlib-common-1.9.10.jar (org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10) with ExternalDependencyInstrumentingArtifactTransform
 Transforming buildSrc.jar (project :buildSrc) with ProjectDependencyInstrumentingArtifactTransform
 
 > Configure project :theta-analysis
@@ -882,21 +882,6 @@ Using Kotlin Gradle Plugin gradle82 variant
 kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
 kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
 
-> Configure project :theta-xsts-cli
-Evaluating project ':theta-xsts-cli' using build file '/home/klevis/Projects/theta/subprojects/xsts/xsts-cli/build.gradle.kts'.
-Using Kotlin Gradle Plugin gradle82 variant
-kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
-kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
-
-> Configure project :theta-xta
-Evaluating project ':theta-xta' using build file '/home/klevis/Projects/theta/subprojects/xta/xta/build.gradle.kts'.
-
-> Configure project :theta-xta-analysis
-Evaluating project ':theta-xta-analysis' using build file '/home/klevis/Projects/theta/subprojects/xta/xta-analysis/build.gradle.kts'.
-
-> Configure project :theta-xta-cli
-Evaluating project ':theta-xta-cli' using build file '/home/klevis/Projects/theta/subprojects/xta/xta-cli/build.gradle.kts'.
-
 > Configure project :
 Evaluating root project 'theta' using build file '/home/klevis/Projects/theta/build.gradle.kts'.
 Transforming gradle-nexus-staging-plugin-0.30.0.jar (io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0) with InstrumentationAnalysisTransform
@@ -915,11 +900,10 @@ Transforming gradle-nexus-staging-plugin-0.30.0.jar (io.codearte.gradle.nexus:gr
 Transforming gradle-nexus-staging-plugin-0.30.0.jar (io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0) with MergeInstrumentationAnalysisTransform
 Transforming maven-plugin-5.2.jar (io.freefair.gradle:maven-plugin:5.2) with InstrumentationAnalysisTransform
 Transforming maven-plugin-5.2.jar (io.freefair.gradle:maven-plugin:5.2) with MergeInstrumentationAnalysisTransform
-Transforming gradle-nexus-staging-plugin-0.30.0.jar (io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0) with ExternalDependencyInstrumentingArtifactTransform
-Transforming maven-plugin-5.2.jar (io.freefair.gradle:maven-plugin:5.2) with ExternalDependencyInstrumentingArtifactTransform
 Transforming okhttp-plugin-5.2.jar (io.freefair.gradle:okhttp-plugin:5.2) with InstrumentationAnalysisTransform
 Transforming okhttp-plugin-5.2.jar (io.freefair.gradle:okhttp-plugin:5.2) with MergeInstrumentationAnalysisTransform
-Transforming okhttp-plugin-5.2.jar (io.freefair.gradle:okhttp-plugin:5.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming maven-plugin-5.2.jar (io.freefair.gradle:maven-plugin:5.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming gradle-nexus-staging-plugin-0.30.0.jar (io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0) with ExternalDependencyInstrumentingArtifactTransform
 Transforming logging-interceptor-4.8.1.jar (com.squareup.okhttp3:logging-interceptor:4.8.1) with InstrumentationAnalysisTransform
 Transforming logging-interceptor-4.8.1.jar (com.squareup.okhttp3:logging-interceptor:4.8.1) with MergeInstrumentationAnalysisTransform
 Transforming okhttp-4.9.1.jar (com.squareup.okhttp3:okhttp:4.9.1) with InstrumentationAnalysisTransform
@@ -938,15 +922,31 @@ Transforming sonar-scanner-api-2.16.2.588.jar (org.sonarsource.scanner.api:sonar
 Transforming sonar-scanner-api-2.16.2.588.jar (org.sonarsource.scanner.api:sonar-scanner-api:2.16.2.588) with MergeInstrumentationAnalysisTransform
 Transforming plexus-utils-3.2.1.jar (org.codehaus.plexus:plexus-utils:3.2.1) with InstrumentationAnalysisTransform
 Transforming plexus-utils-3.2.1.jar (org.codehaus.plexus:plexus-utils:3.2.1) with MergeInstrumentationAnalysisTransform
+Transforming okhttp-plugin-5.2.jar (io.freefair.gradle:okhttp-plugin:5.2) with ExternalDependencyInstrumentingArtifactTransform
 Transforming logging-interceptor-4.8.1.jar (com.squareup.okhttp3:logging-interceptor:4.8.1) with ExternalDependencyInstrumentingArtifactTransform
 Transforming okhttp-4.9.1.jar (com.squareup.okhttp3:okhttp:4.9.1) with ExternalDependencyInstrumentingArtifactTransform
 Transforming okio-jvm-2.8.0.jar (com.squareup.okio:okio:2.8.0) with ExternalDependencyInstrumentingArtifactTransform
 Transforming kotlin-stdlib-1.9.23.jar (org.jetbrains.kotlin:kotlin-stdlib:1.9.23) with ExternalDependencyInstrumentingArtifactTransform
 Transforming annotations-13.0.jar (org.jetbrains:annotations:13.0) with ExternalDependencyInstrumentingArtifactTransform
 Transforming sonarqube-gradle-plugin-4.2.1.3168.jar (org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:4.2.1.3168) with ExternalDependencyInstrumentingArtifactTransform
-Transforming maven-model-3.6.3.jar (org.apache.maven:maven-model:3.6.3) with ExternalDependencyInstrumentingArtifactTransform
 Transforming sonar-scanner-api-2.16.2.588.jar (org.sonarsource.scanner.api:sonar-scanner-api:2.16.2.588) with ExternalDependencyInstrumentingArtifactTransform
 Transforming plexus-utils-3.2.1.jar (org.codehaus.plexus:plexus-utils:3.2.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming maven-model-3.6.3.jar (org.apache.maven:maven-model:3.6.3) with ExternalDependencyInstrumentingArtifactTransform
+
+> Configure project :theta-xsts-cli
+Evaluating project ':theta-xsts-cli' using build file '/home/klevis/Projects/theta/subprojects/xsts/xsts-cli/build.gradle.kts'.
+Using Kotlin Gradle Plugin gradle82 variant
+kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
+kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
+
+> Configure project :theta-xta
+Evaluating project ':theta-xta' using build file '/home/klevis/Projects/theta/subprojects/xta/xta/build.gradle.kts'.
+
+> Configure project :theta-xta-analysis
+Evaluating project ':theta-xta-analysis' using build file '/home/klevis/Projects/theta/subprojects/xta/xta-analysis/build.gradle.kts'.
+
+> Configure project :theta-xta-cli
+Evaluating project ':theta-xta-cli' using build file '/home/klevis/Projects/theta/subprojects/xta/xta-cli/build.gradle.kts'.
 All projects evaluated.
 Task path ':theta-xcfa-cli:cleanTest' matched project ':theta-xcfa-cli'
 Task name matched 'cleanTest'
@@ -956,33 +956,33 @@ Selected primary task 'cleanTest' from project :theta-xcfa-cli
 Selected primary task 'test' from project :theta-xcfa-cli
 Tasks to be executed: [task ':theta-xcfa-cli:cleanTest', task ':theta-analysis:checkKotlinGradlePluginConfigurationErrors', task ':theta-common:checkKotlinGradlePluginConfigurationErrors', task ':theta-common:compileKotlin', task ':theta-common:compileJava', task ':theta-core:checkKotlinGradlePluginConfigurationErrors', task ':theta-core:generateGrammarSource', task ':theta-core:compileKotlin', task ':theta-core:compileJava', task ':theta-graph-solver:checkKotlinGradlePluginConfigurationErrors', task ':theta-solver:compileJava', task ':theta-graph-solver:compileKotlin', task ':theta-graph-solver:compileJava', task ':theta-solver-javasmt:compileJava', task ':theta-solver-z3-legacy:compileJava', task ':theta-analysis:compileKotlin', task ':theta-analysis:compileJava', task ':theta-analysis:processResources', task ':theta-analysis:classes', task ':theta-analysis:jar', task ':theta-c-frontend:checkKotlinGradlePluginConfigurationErrors', task ':theta-c-frontend:generateGrammarSource', task ':theta-grammar:checkKotlinGradlePluginConfigurationErrors', task ':theta-grammar:generateGrammarSource', task ':theta-grammar:compileKotlin', task ':theta-grammar:compileJava', task ':theta-c-frontend:compileKotlin', task ':theta-c-frontend:compileJava', task ':theta-c-frontend:processResources', task ':theta-c-frontend:classes', task ':theta-c-frontend:jar', task ':theta-c2xcfa:checkKotlinGradlePluginConfigurationErrors', task ':theta-solver-smtlib:checkKotlinGradlePluginConfigurationErrors', task ':theta-solver-smtlib:generateGrammarSource', task ':theta-solver-smtlib:compileKotlin', task ':theta-solver-smtlib:compileJava', task ':theta-solver-z3:checkKotlinGradlePluginConfigurationErrors', task ':theta-solver-z3:compileKotlin', task ':theta-solver-z3:compileJava', task ':theta-xcfa:checkKotlinGradlePluginConfigurationErrors', task ':theta-xcfa:compileKotlin', task ':theta-xcfa:compileJava', task ':theta-c2xcfa:compileKotlin', task ':theta-c2xcfa:compileJava', task ':theta-c2xcfa:processResources', task ':theta-c2xcfa:classes', task ':theta-c2xcfa:jar', task ':theta-cat:checkKotlinGradlePluginConfigurationErrors', task ':theta-cat:generateGrammarSource', task ':theta-cat:compileKotlin', task ':theta-cat:compileJava', task ':theta-cat:processResources', task ':theta-cat:classes', task ':theta-cat:jar', task ':theta-cfa:checkKotlinGradlePluginConfigurationErrors', task ':theta-cfa:generateGrammarSource', task ':theta-cfa:compileKotlin', task ':theta-cfa:compileJava', task ':theta-cfa:processResources', task ':theta-cfa:classes', task ':theta-cfa:jar', task ':theta-chc-frontend:generateGrammarSource', task ':theta-chc-frontend:compileJava', task ':theta-chc-frontend:processResources', task ':theta-chc-frontend:classes', task ':theta-chc-frontend:jar', task ':theta-common:processResources', task ':theta-common:classes', task ':theta-common:jar', task ':theta-core:processResources', task ':theta-core:classes', task ':theta-core:jar', task ':theta-grammar:processResources', task ':theta-grammar:classes', task ':theta-grammar:jar', task ':theta-graph-solver:processResources', task ':theta-graph-solver:classes', task ':theta-graph-solver:jar', task ':theta-litmus2xcfa:generateGrammarSource', task ':theta-litmus2xcfa:compileJava', task ':theta-litmus2xcfa:processResources', task ':theta-litmus2xcfa:classes', task ':theta-litmus2xcfa:jar', task ':theta-llvm2xcfa:checkKotlinGradlePluginConfigurationErrors', task ':theta-llvm2xcfa:compileKotlin', task ':theta-llvm2xcfa:compileJava', task ':theta-llvm2xcfa:processResources', task ':theta-llvm2xcfa:classes', task ':theta-llvm2xcfa:jar', task ':theta-solver:processResources', task ':theta-solver:classes', task ':theta-solver:jar', task ':theta-solver-javasmt:processResources', task ':theta-solver-javasmt:classes', task ':theta-solver-javasmt:jar', task ':theta-solver-smtlib:processResources', task ':theta-solver-smtlib:classes', task ':theta-solver-smtlib:jar', task ':theta-solver-z3:processResources', task ':theta-solver-z3:classes', task ':theta-solver-z3:jar', task ':theta-solver-z3-legacy:processResources', task ':theta-solver-z3-legacy:classes', task ':theta-solver-z3-legacy:jar', task ':theta-xcfa:processResources', task ':theta-xcfa:classes', task ':theta-xcfa:jar', task ':theta-xcfa-analysis:checkKotlinGradlePluginConfigurationErrors', task ':theta-xcfa-analysis:compileKotlin', task ':theta-xcfa-analysis:compileJava', task ':theta-xcfa-analysis:processResources', task ':theta-xcfa-analysis:classes', task ':theta-xcfa-analysis:jar', task ':theta-xcfa-cli:checkKotlinGradlePluginConfigurationErrors', task ':theta-xcfa2chc:checkKotlinGradlePluginConfigurationErrors', task ':theta-xcfa2chc:compileKotlin', task ':theta-xcfa2chc:compileJava', task ':theta-xcfa-cli:compileKotlin', task ':theta-xcfa-cli:compileJava', task ':theta-xcfa-cli:processResources', task ':theta-xcfa-cli:classes', task ':theta-xcfa-cli:compileTestKotlin', task ':theta-xcfa-cli:compileTestJava', task ':theta-xcfa-cli:processTestResources', task ':theta-xcfa-cli:testClasses', task ':theta-xcfa2chc:processResources', task ':theta-xcfa2chc:classes', task ':theta-xcfa2chc:jar', task ':theta-xcfa-cli:test']
 Tasks that were excluded: []
-Resolve mutations for :theta-xcfa-cli:cleanTest (Thread[Execution worker,5,main]) started.
-:theta-xcfa-cli:cleanTest (Thread[Execution worker,5,main]) started.
-destroyer locations for task group 0 (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-xcfa-cli:cleanTest (Thread[included builds,5,main]) started.
+:theta-xcfa-cli:cleanTest (Thread[included builds,5,main]) started.
+destroyer locations for task group 0 (Thread[Execution worker Thread 2,5,main]) started.
 
 > Task :theta-xcfa-cli:cleanTest
 Caching disabled for task ':theta-xcfa-cli:cleanTest' because:
   Build cache is disabled
 Task ':theta-xcfa-cli:cleanTest' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
-Resolve mutations for :theta-analysis:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
-:theta-analysis:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-analysis:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
+:theta-analysis:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
 
 > Task :theta-analysis:checkKotlinGradlePluginConfigurationErrors
 Caching disabled for task ':theta-analysis:checkKotlinGradlePluginConfigurationErrors' because:
   Build cache is disabled
 Task ':theta-analysis:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
-Resolve mutations for :theta-common:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
-:theta-common:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-common:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
+:theta-common:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
 
 > Task :theta-common:checkKotlinGradlePluginConfigurationErrors
 Caching disabled for task ':theta-common:checkKotlinGradlePluginConfigurationErrors' because:
   Build cache is disabled
 Task ':theta-common:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
-Resolve mutations for :theta-common:compileKotlin (Thread[Execution worker,5,main]) started.
-:theta-common:compileKotlin (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-common:compileKotlin (Thread[included builds,5,main]) started.
+:theta-common:compileKotlin (Thread[included builds,5,main]) started.
 
 > Task :theta-common:compileKotlin UP-TO-DATE
 Transforming com.microsoft.z3.jar with ClasspathEntrySnapshotTransform
@@ -1018,7 +1018,7 @@ Transforming byte-buddy-agent-1.14.15.jar with ClasspathEntrySnapshotTransform
 Caching disabled for task ':theta-common:compileKotlin' because:
   Build cache is disabled
 Skipping task ':theta-common:compileKotlin' as it is up-to-date.
-work action resolve main (project :theta-common) (Thread[Execution worker,5,main]) started.
+work action resolve main (project :theta-common) (Thread[included builds,5,main]) started.
 Resolve mutations for :theta-common:compileJava (Thread[included builds,5,main]) started.
 :theta-common:compileJava (Thread[included builds,5,main]) started.
 
@@ -1039,15 +1039,15 @@ Caching disabled for task ':theta-core:checkKotlinGradlePluginConfigurationError
   Build cache is disabled
 Task ':theta-core:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
-Resolve mutations for :theta-core:generateGrammarSource (Thread[Execution worker,5,main]) started.
-:theta-core:generateGrammarSource (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :theta-core:generateGrammarSource (Thread[included builds,5,main]) started.
+:theta-core:generateGrammarSource (Thread[included builds,5,main]) started.
 
 > Task :theta-core:generateGrammarSource UP-TO-DATE
 Caching disabled for task ':theta-core:generateGrammarSource' because:
   Build cache is disabled
 Skipping task ':theta-core:generateGrammarSource' as it is up-to-date.
-Resolve mutations for :theta-core:compileKotlin (Thread[Execution worker,5,main]) started.
-:theta-core:compileKotlin (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-core:compileKotlin (Thread[included builds,5,main]) started.
+:theta-core:compileKotlin (Thread[included builds,5,main]) started.
 
 > Task :theta-core:compileKotlin UP-TO-DATE
 Transforming com.microsoft.z3.jar with ClasspathEntrySnapshotTransform
@@ -1089,9 +1089,9 @@ Transforming byte-buddy-agent-1.14.15.jar with ClasspathEntrySnapshotTransform
 Caching disabled for task ':theta-core:compileKotlin' because:
   Build cache is disabled
 Skipping task ':theta-core:compileKotlin' as it is up-to-date.
-work action resolve main (project :theta-core) (Thread[Execution worker,5,main]) started.
-Resolve mutations for :theta-core:compileJava (Thread[Execution worker,5,main]) started.
-:theta-core:compileJava (Thread[Execution worker,5,main]) started.
+work action resolve main (project :theta-core) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-core:compileJava (Thread[included builds,5,main]) started.
+:theta-core:compileJava (Thread[included builds,5,main]) started.
 
 > Task :theta-core:compileJava UP-TO-DATE
 Caching disabled for task ':theta-core:compileJava' because:
@@ -1100,18 +1100,18 @@ Skipping task ':theta-core:compileJava' as it is up-to-date.
 No compile result for :theta-core:compileJava
 No compile result for :theta-core:compileJava
 No compile result for :theta-core:compileJava
-work action resolve main (project :theta-core) (Thread[Execution worker,5,main]) started.
-work action resolve main (project :theta-core) (Thread[Execution worker,5,main]) started.
-Resolve mutations for :theta-graph-solver:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
-:theta-graph-solver:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
+work action resolve main (project :theta-core) (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-core) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-graph-solver:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
+:theta-graph-solver:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
 
 > Task :theta-graph-solver:checkKotlinGradlePluginConfigurationErrors
 Caching disabled for task ':theta-graph-solver:checkKotlinGradlePluginConfigurationErrors' because:
   Build cache is disabled
 Task ':theta-graph-solver:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
-Resolve mutations for :theta-solver:compileJava (Thread[Execution worker,5,main]) started.
-:theta-solver:compileJava (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-solver:compileJava (Thread[included builds,5,main]) started.
+:theta-solver:compileJava (Thread[included builds,5,main]) started.
 
 > Task :theta-solver:compileJava UP-TO-DATE
 Caching disabled for task ':theta-solver:compileJava' because:
@@ -1120,9 +1120,9 @@ Skipping task ':theta-solver:compileJava' as it is up-to-date.
 No compile result for :theta-solver:compileJava
 No compile result for :theta-solver:compileJava
 No compile result for :theta-solver:compileJava
-work action resolve main (project :theta-solver) (Thread[Execution worker,5,main]) started.
-Resolve mutations for :theta-graph-solver:compileKotlin (Thread[Execution worker,5,main]) started.
-:theta-graph-solver:compileKotlin (Thread[Execution worker,5,main]) started.
+work action resolve main (project :theta-solver) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-graph-solver:compileKotlin (Thread[included builds,5,main]) started.
+:theta-graph-solver:compileKotlin (Thread[included builds,5,main]) started.
 
 > Task :theta-graph-solver:compileKotlin UP-TO-DATE
 Transforming com.microsoft.z3.jar with ClasspathEntrySnapshotTransform
@@ -1167,16 +1167,16 @@ Transforming icu4j-71.1.jar with ClasspathEntrySnapshotTransform
 Caching disabled for task ':theta-graph-solver:compileKotlin' because:
   Build cache is disabled
 Skipping task ':theta-graph-solver:compileKotlin' as it is up-to-date.
-work action resolve main (project :theta-graph-solver) (Thread[Execution worker,5,main]) started.
-Resolve mutations for :theta-graph-solver:compileJava (Thread[Execution worker,5,main]) started.
-:theta-graph-solver:compileJava (Thread[Execution worker,5,main]) started.
+work action resolve main (project :theta-graph-solver) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-graph-solver:compileJava (Thread[included builds,5,main]) started.
+:theta-graph-solver:compileJava (Thread[included builds,5,main]) started.
 
 > Task :theta-graph-solver:compileJava NO-SOURCE
 Skipping task ':theta-graph-solver:compileJava' as it has no source files and no previous output files.
-work action resolve main (project :theta-graph-solver) (Thread[Execution worker,5,main]) started.
-work action resolve main (project :theta-graph-solver) (Thread[Execution worker,5,main]) started.
-Resolve mutations for :theta-solver-javasmt:compileJava (Thread[Execution worker,5,main]) started.
-:theta-solver-javasmt:compileJava (Thread[Execution worker,5,main]) started.
+work action resolve main (project :theta-graph-solver) (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-graph-solver) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-solver-javasmt:compileJava (Thread[included builds,5,main]) started.
+:theta-solver-javasmt:compileJava (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-javasmt:compileJava UP-TO-DATE
 Caching disabled for task ':theta-solver-javasmt:compileJava' because:
@@ -1185,9 +1185,9 @@ Skipping task ':theta-solver-javasmt:compileJava' as it is up-to-date.
 No compile result for :theta-solver-javasmt:compileJava
 No compile result for :theta-solver-javasmt:compileJava
 No compile result for :theta-solver-javasmt:compileJava
-work action resolve main (project :theta-solver-javasmt) (Thread[Execution worker,5,main]) started.
-Resolve mutations for :theta-solver-z3-legacy:compileJava (Thread[included builds,5,main]) started.
-:theta-solver-z3-legacy:compileJava (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-solver-javasmt) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-solver-z3-legacy:compileJava (Thread[Execution worker Thread 2,5,main]) started.
+:theta-solver-z3-legacy:compileJava (Thread[Execution worker Thread 2,5,main]) started.
 
 > Task :theta-solver-z3-legacy:compileJava UP-TO-DATE
 Caching disabled for task ':theta-solver-z3-legacy:compileJava' because:
@@ -1273,9 +1273,9 @@ Transforming fastdoubleparser-0.8.0.jar with ClasspathEntrySnapshotTransform
 Caching disabled for task ':theta-analysis:compileKotlin' because:
   Build cache is disabled
 Skipping task ':theta-analysis:compileKotlin' as it is up-to-date.
-work action resolve main (project :theta-analysis) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-analysis:compileJava (Thread[Execution worker Thread 2,5,main]) started.
-:theta-analysis:compileJava (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve main (project :theta-analysis) (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-analysis:compileJava (Thread[Execution worker,5,main]) started.
+:theta-analysis:compileJava (Thread[Execution worker,5,main]) started.
 
 > Task :theta-analysis:compileJava UP-TO-DATE
 Caching disabled for task ':theta-analysis:compileJava' because:
@@ -1284,7 +1284,7 @@ Skipping task ':theta-analysis:compileJava' as it is up-to-date.
 No compile result for :theta-analysis:compileJava
 No compile result for :theta-analysis:compileJava
 No compile result for :theta-analysis:compileJava
-work action resolve main (project :theta-analysis) (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve main (project :theta-analysis) (Thread[Execution worker,5,main]) started.
 work action resolve main (project :theta-analysis) (Thread[Execution worker Thread 2,5,main]) started.
 Resolve mutations for :theta-analysis:processResources (Thread[Execution worker Thread 2,5,main]) started.
 :theta-analysis:processResources (Thread[Execution worker Thread 2,5,main]) started.
@@ -1296,47 +1296,47 @@ Resolve mutations for :theta-analysis:classes (Thread[Execution worker Thread 2,
 
 > Task :theta-analysis:classes UP-TO-DATE
 Skipping task ':theta-analysis:classes' as it has no actions.
-Resolve mutations for :theta-analysis:jar (Thread[Execution worker Thread 2,5,main]) started.
-:theta-analysis:jar (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-analysis:jar (Thread[included builds,5,main]) started.
+:theta-analysis:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-analysis:jar UP-TO-DATE
 Caching disabled for task ':theta-analysis:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-analysis:jar' as it is up-to-date.
-work action resolve theta-analysis-6.17.6.jar (project :theta-analysis) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-c-frontend:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 2,5,main]) started.
-:theta-c-frontend:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve theta-analysis-6.17.6.jar (project :theta-analysis) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-c-frontend:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
+:theta-c-frontend:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
 
 > Task :theta-c-frontend:checkKotlinGradlePluginConfigurationErrors
 Caching disabled for task ':theta-c-frontend:checkKotlinGradlePluginConfigurationErrors' because:
   Build cache is disabled
 Task ':theta-c-frontend:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
-Resolve mutations for :theta-c-frontend:generateGrammarSource (Thread[Execution worker Thread 2,5,main]) started.
-:theta-c-frontend:generateGrammarSource (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-c-frontend:generateGrammarSource (Thread[included builds,5,main]) started.
+:theta-c-frontend:generateGrammarSource (Thread[included builds,5,main]) started.
 
 > Task :theta-c-frontend:generateGrammarSource UP-TO-DATE
 Caching disabled for task ':theta-c-frontend:generateGrammarSource' because:
   Build cache is disabled
 Skipping task ':theta-c-frontend:generateGrammarSource' as it is up-to-date.
-Resolve mutations for :theta-grammar:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 2,5,main]) started.
-:theta-grammar:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-grammar:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
+:theta-grammar:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
 
 > Task :theta-grammar:checkKotlinGradlePluginConfigurationErrors
 Caching disabled for task ':theta-grammar:checkKotlinGradlePluginConfigurationErrors' because:
   Build cache is disabled
 Task ':theta-grammar:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
-Resolve mutations for :theta-grammar:generateGrammarSource (Thread[Execution worker Thread 2,5,main]) started.
-:theta-grammar:generateGrammarSource (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-grammar:generateGrammarSource (Thread[included builds,5,main]) started.
+:theta-grammar:generateGrammarSource (Thread[included builds,5,main]) started.
 
 > Task :theta-grammar:generateGrammarSource UP-TO-DATE
 Caching disabled for task ':theta-grammar:generateGrammarSource' because:
   Build cache is disabled
 Skipping task ':theta-grammar:generateGrammarSource' as it is up-to-date.
-Resolve mutations for :theta-grammar:compileKotlin (Thread[Execution worker Thread 2,5,main]) started.
-:theta-grammar:compileKotlin (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-grammar:compileKotlin (Thread[included builds,5,main]) started.
+:theta-grammar:compileKotlin (Thread[included builds,5,main]) started.
 
 > Task :theta-grammar:compileKotlin UP-TO-DATE
 Transforming com.microsoft.z3.jar with ClasspathEntrySnapshotTransform
@@ -1382,9 +1382,9 @@ Transforming byte-buddy-agent-1.14.15.jar with ClasspathEntrySnapshotTransform
 Caching disabled for task ':theta-grammar:compileKotlin' because:
   Build cache is disabled
 Skipping task ':theta-grammar:compileKotlin' as it is up-to-date.
-work action resolve main (project :theta-grammar) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-grammar:compileJava (Thread[Execution worker Thread 2,5,main]) started.
-:theta-grammar:compileJava (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve main (project :theta-grammar) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-grammar:compileJava (Thread[included builds,5,main]) started.
+:theta-grammar:compileJava (Thread[included builds,5,main]) started.
 
 > Task :theta-grammar:compileJava UP-TO-DATE
 Caching disabled for task ':theta-grammar:compileJava' because:
@@ -1453,10 +1453,10 @@ Skipping task ':theta-c-frontend:compileJava' as it is up-to-date.
 No compile result for :theta-c-frontend:compileJava
 No compile result for :theta-c-frontend:compileJava
 No compile result for :theta-c-frontend:compileJava
-work action resolve main (project :theta-c-frontend) (Thread[Execution worker Thread 2,5,main]) started.
-work action resolve main (project :theta-c-frontend) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-c-frontend:processResources (Thread[Execution worker Thread 2,5,main]) started.
-:theta-c-frontend:processResources (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve main (project :theta-c-frontend) (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-c-frontend) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-c-frontend:processResources (Thread[included builds,5,main]) started.
+:theta-c-frontend:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-c-frontend:processResources NO-SOURCE
 Skipping task ':theta-c-frontend:processResources' as it has no source files and no previous output files.
@@ -1465,17 +1465,17 @@ Resolve mutations for :theta-c-frontend:classes (Thread[Execution worker Thread 
 
 > Task :theta-c-frontend:classes UP-TO-DATE
 Skipping task ':theta-c-frontend:classes' as it has no actions.
-Resolve mutations for :theta-c-frontend:jar (Thread[Execution worker Thread 2,5,main]) started.
-:theta-c-frontend:jar (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-c-frontend:jar (Thread[included builds,5,main]) started.
+:theta-c-frontend:jar (Thread[Execution worker Thread 3,5,main]) started.
 
 > Task :theta-c-frontend:jar UP-TO-DATE
 Caching disabled for task ':theta-c-frontend:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-c-frontend:jar' as it is up-to-date.
-work action resolve theta-c-frontend-6.17.6.jar (project :theta-c-frontend) (Thread[Execution worker Thread 3,5,main]) started.
-Resolve mutations for :theta-c2xcfa:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 3,5,main]) started.
-:theta-c2xcfa:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 3,5,main]) started.
+work action resolve theta-c-frontend-6.17.6.jar (project :theta-c-frontend) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-c2xcfa:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
+:theta-c2xcfa:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
 
 > Task :theta-c2xcfa:checkKotlinGradlePluginConfigurationErrors
 Caching disabled for task ':theta-c2xcfa:checkKotlinGradlePluginConfigurationErrors' because:
@@ -1483,28 +1483,28 @@ Caching disabled for task ':theta-c2xcfa:checkKotlinGradlePluginConfigurationErr
 Task ':theta-c2xcfa:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
 Resolve mutations for :theta-solver-smtlib:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 3,5,main]) started.
-:theta-solver-smtlib:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 3,5,main]) started.
+:theta-solver-smtlib:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 2,5,main]) started.
 
 > Task :theta-solver-smtlib:checkKotlinGradlePluginConfigurationErrors
 Caching disabled for task ':theta-solver-smtlib:checkKotlinGradlePluginConfigurationErrors' because:
   Build cache is disabled
 Task ':theta-solver-smtlib:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
-Resolve mutations for :theta-solver-smtlib:generateGrammarSource (Thread[Execution worker Thread 3,5,main]) started.
-:theta-solver-smtlib:generateGrammarSource (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :theta-solver-smtlib:generateGrammarSource (Thread[Execution worker Thread 2,5,main]) started.
+:theta-solver-smtlib:generateGrammarSource (Thread[Execution worker Thread 2,5,main]) started.
 
 > Task :theta-solver-smtlib:generateGrammarSource UP-TO-DATE
 Caching disabled for task ':theta-solver-smtlib:generateGrammarSource' because:
   Build cache is disabled
 Skipping task ':theta-solver-smtlib:generateGrammarSource' as it is up-to-date.
 Resolve mutations for :theta-solver-smtlib:compileKotlin (Thread[Execution worker Thread 2,5,main]) started.
-:theta-solver-smtlib:compileKotlin (Thread[Execution worker Thread 2,5,main]) started.
+:theta-solver-smtlib:compileKotlin (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-smtlib:compileKotlin NO-SOURCE
 Skipping task ':theta-solver-smtlib:compileKotlin' as it has no source files and no previous output files.
 work action resolve main (project :theta-solver-smtlib) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-solver-smtlib:compileJava (Thread[included builds,5,main]) started.
-:theta-solver-smtlib:compileJava (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-solver-smtlib:compileJava (Thread[Execution worker Thread 2,5,main]) started.
+:theta-solver-smtlib:compileJava (Thread[Execution worker Thread 2,5,main]) started.
 
 > Task :theta-solver-smtlib:compileJava UP-TO-DATE
 Caching disabled for task ':theta-solver-smtlib:compileJava' because:
@@ -1529,8 +1529,8 @@ Resolve mutations for :theta-solver-z3:compileKotlin (Thread[included builds,5,m
 > Task :theta-solver-z3:compileKotlin NO-SOURCE
 Skipping task ':theta-solver-z3:compileKotlin' as it has no source files and no previous output files.
 work action resolve main (project :theta-solver-z3) (Thread[included builds,5,main]) started.
-Resolve mutations for :theta-solver-z3:compileJava (Thread[included builds,5,main]) started.
-:theta-solver-z3:compileJava (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-solver-z3:compileJava (Thread[Execution worker,5,main]) started.
+:theta-solver-z3:compileJava (Thread[Execution worker,5,main]) started.
 
 > Task :theta-solver-z3:compileJava UP-TO-DATE
 Caching disabled for task ':theta-solver-z3:compileJava' because:
@@ -1539,17 +1539,17 @@ Skipping task ':theta-solver-z3:compileJava' as it is up-to-date.
 No compile result for :theta-solver-z3:compileJava
 No compile result for :theta-solver-z3:compileJava
 No compile result for :theta-solver-z3:compileJava
-work action resolve main (project :theta-solver-z3) (Thread[included builds,5,main]) started.
-work action resolve main (project :theta-solver-z3) (Thread[included builds,5,main]) started.
-Resolve mutations for :theta-xcfa:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
-:theta-xcfa:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-solver-z3) (Thread[Execution worker,5,main]) started.
+work action resolve main (project :theta-solver-z3) (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-xcfa:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
+:theta-xcfa:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
 
 > Task :theta-xcfa:checkKotlinGradlePluginConfigurationErrors
 Caching disabled for task ':theta-xcfa:checkKotlinGradlePluginConfigurationErrors' because:
   Build cache is disabled
 Task ':theta-xcfa:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
-Resolve mutations for :theta-xcfa:compileKotlin (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-xcfa:compileKotlin (Thread[Execution worker,5,main]) started.
 :theta-xcfa:compileKotlin (Thread[included builds,5,main]) started.
 
 > Task :theta-xcfa:compileKotlin UP-TO-DATE
@@ -1611,9 +1611,9 @@ Resolve mutations for :theta-xcfa:compileJava (Thread[included builds,5,main]) s
 > Task :theta-xcfa:compileJava NO-SOURCE
 Skipping task ':theta-xcfa:compileJava' as it has no source files and no previous output files.
 work action resolve main (project :theta-xcfa) (Thread[included builds,5,main]) started.
-work action resolve main (project :theta-xcfa) (Thread[included builds,5,main]) started.
-Resolve mutations for :theta-c2xcfa:compileKotlin (Thread[included builds,5,main]) started.
-:theta-c2xcfa:compileKotlin (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-xcfa) (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-c2xcfa:compileKotlin (Thread[Execution worker,5,main]) started.
+:theta-c2xcfa:compileKotlin (Thread[Execution worker,5,main]) started.
 
 > Task :theta-c2xcfa:compileKotlin UP-TO-DATE
 Transforming com.microsoft.z3.jar with ClasspathEntrySnapshotTransform
@@ -1660,14 +1660,14 @@ Transforming icu4j-71.1.jar with ClasspathEntrySnapshotTransform
 Caching disabled for task ':theta-c2xcfa:compileKotlin' because:
   Build cache is disabled
 Skipping task ':theta-c2xcfa:compileKotlin' as it is up-to-date.
-work action resolve main (project :theta-c2xcfa) (Thread[included builds,5,main]) started.
-Resolve mutations for :theta-c2xcfa:compileJava (Thread[included builds,5,main]) started.
-:theta-c2xcfa:compileJava (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-c2xcfa) (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-c2xcfa:compileJava (Thread[Execution worker,5,main]) started.
+:theta-c2xcfa:compileJava (Thread[Execution worker,5,main]) started.
 
 > Task :theta-c2xcfa:compileJava NO-SOURCE
 Skipping task ':theta-c2xcfa:compileJava' as it has no source files and no previous output files.
-work action resolve main (project :theta-c2xcfa) (Thread[included builds,5,main]) started.
-work action resolve main (project :theta-c2xcfa) (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-c2xcfa) (Thread[Execution worker,5,main]) started.
+work action resolve main (project :theta-c2xcfa) (Thread[Execution worker,5,main]) started.
 Resolve mutations for :theta-c2xcfa:processResources (Thread[included builds,5,main]) started.
 :theta-c2xcfa:processResources (Thread[included builds,5,main]) started.
 
@@ -1764,29 +1764,29 @@ Skipping task ':theta-cat:compileJava' as it is up-to-date.
 No compile result for :theta-cat:compileJava
 No compile result for :theta-cat:compileJava
 No compile result for :theta-cat:compileJava
-work action resolve main (project :theta-cat) (Thread[Execution worker,5,main]) started.
-work action resolve main (project :theta-cat) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-cat:processResources (Thread[Execution worker Thread 2,5,main]) started.
-:theta-cat:processResources (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve main (project :theta-cat) (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-cat) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-cat:processResources (Thread[included builds,5,main]) started.
+:theta-cat:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-cat:processResources NO-SOURCE
 Skipping task ':theta-cat:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-cat:classes (Thread[Execution worker Thread 2,5,main]) started.
-:theta-cat:classes (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-cat:classes (Thread[included builds,5,main]) started.
+:theta-cat:classes (Thread[included builds,5,main]) started.
 
 > Task :theta-cat:classes UP-TO-DATE
 Skipping task ':theta-cat:classes' as it has no actions.
-Resolve mutations for :theta-cat:jar (Thread[Execution worker Thread 2,5,main]) started.
-:theta-cat:jar (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-cat:jar (Thread[included builds,5,main]) started.
+:theta-cat:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-cat:jar UP-TO-DATE
 Caching disabled for task ':theta-cat:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-cat:jar' as it is up-to-date.
-work action resolve theta-cat-6.17.6.jar (project :theta-cat) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-cfa:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 2,5,main]) started.
-:theta-cfa:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve theta-cat-6.17.6.jar (project :theta-cat) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-cfa:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
+:theta-cfa:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
 
 > Task :theta-cfa:checkKotlinGradlePluginConfigurationErrors
 Caching disabled for task ':theta-cfa:checkKotlinGradlePluginConfigurationErrors' because:
@@ -1794,7 +1794,7 @@ Caching disabled for task ':theta-cfa:checkKotlinGradlePluginConfigurationErrors
 Task ':theta-cfa:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
 Resolve mutations for :theta-cfa:generateGrammarSource (Thread[included builds,5,main]) started.
-:theta-cfa:generateGrammarSource (Thread[Execution worker Thread 2,5,main]) started.
+:theta-cfa:generateGrammarSource (Thread[included builds,5,main]) started.
 
 > Task :theta-cfa:generateGrammarSource UP-TO-DATE
 Caching disabled for task ':theta-cfa:generateGrammarSource' because:
@@ -1856,36 +1856,36 @@ Skipping task ':theta-cfa:compileJava' as it is up-to-date.
 No compile result for :theta-cfa:compileJava
 No compile result for :theta-cfa:compileJava
 No compile result for :theta-cfa:compileJava
-work action resolve main (project :theta-cfa) (Thread[Execution worker Thread 2,5,main]) started.
-work action resolve main (project :theta-cfa) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-cfa:processResources (Thread[Execution worker Thread 2,5,main]) started.
-:theta-cfa:processResources (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve main (project :theta-cfa) (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-cfa) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-cfa:processResources (Thread[included builds,5,main]) started.
+:theta-cfa:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-cfa:processResources NO-SOURCE
 Skipping task ':theta-cfa:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-cfa:classes (Thread[Execution worker,5,main]) started.
-:theta-cfa:classes (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-cfa:classes (Thread[included builds,5,main]) started.
+:theta-cfa:classes (Thread[included builds,5,main]) started.
 
 > Task :theta-cfa:classes UP-TO-DATE
 Skipping task ':theta-cfa:classes' as it has no actions.
-Resolve mutations for :theta-cfa:jar (Thread[Execution worker,5,main]) started.
-:theta-cfa:jar (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-cfa:jar (Thread[included builds,5,main]) started.
+:theta-cfa:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-cfa:jar UP-TO-DATE
 Caching disabled for task ':theta-cfa:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-cfa:jar' as it is up-to-date.
-work action resolve theta-cfa-6.17.6.jar (project :theta-cfa) (Thread[Execution worker,5,main]) started.
-Resolve mutations for :theta-chc-frontend:generateGrammarSource (Thread[Execution worker,5,main]) started.
-:theta-chc-frontend:generateGrammarSource (Thread[Execution worker,5,main]) started.
+work action resolve theta-cfa-6.17.6.jar (project :theta-cfa) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-chc-frontend:generateGrammarSource (Thread[included builds,5,main]) started.
+:theta-chc-frontend:generateGrammarSource (Thread[included builds,5,main]) started.
 
 > Task :theta-chc-frontend:generateGrammarSource UP-TO-DATE
 Caching disabled for task ':theta-chc-frontend:generateGrammarSource' because:
   Build cache is disabled
 Skipping task ':theta-chc-frontend:generateGrammarSource' as it is up-to-date.
 Resolve mutations for :theta-chc-frontend:compileJava (Thread[included builds,5,main]) started.
-:theta-chc-frontend:compileJava (Thread[Execution worker Thread 3,5,main]) started.
+:theta-chc-frontend:compileJava (Thread[included builds,5,main]) started.
 
 > Task :theta-chc-frontend:compileJava UP-TO-DATE
 Caching disabled for task ':theta-chc-frontend:compileJava' because:
@@ -1894,37 +1894,37 @@ Skipping task ':theta-chc-frontend:compileJava' as it is up-to-date.
 No compile result for :theta-chc-frontend:compileJava
 No compile result for :theta-chc-frontend:compileJava
 No compile result for :theta-chc-frontend:compileJava
-work action resolve main (project :theta-chc-frontend) (Thread[Execution worker,5,main]) started.
-Resolve mutations for :theta-chc-frontend:processResources (Thread[Execution worker Thread 2,5,main]) started.
-:theta-chc-frontend:processResources (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve main (project :theta-chc-frontend) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-chc-frontend:processResources (Thread[included builds,5,main]) started.
+:theta-chc-frontend:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-chc-frontend:processResources NO-SOURCE
 Skipping task ':theta-chc-frontend:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-chc-frontend:classes (Thread[Execution worker Thread 2,5,main]) started.
-:theta-chc-frontend:classes (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-chc-frontend:classes (Thread[included builds,5,main]) started.
+:theta-chc-frontend:classes (Thread[included builds,5,main]) started.
 
 > Task :theta-chc-frontend:classes UP-TO-DATE
 Skipping task ':theta-chc-frontend:classes' as it has no actions.
-Resolve mutations for :theta-chc-frontend:jar (Thread[Execution worker Thread 2,5,main]) started.
-:theta-chc-frontend:jar (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-chc-frontend:jar (Thread[included builds,5,main]) started.
+:theta-chc-frontend:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-chc-frontend:jar UP-TO-DATE
 Caching disabled for task ':theta-chc-frontend:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-chc-frontend:jar' as it is up-to-date.
-work action resolve theta-chc-frontend-6.17.6.jar (project :theta-chc-frontend) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-common:processResources (Thread[Execution worker Thread 2,5,main]) started.
-:theta-common:processResources (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve theta-chc-frontend-6.17.6.jar (project :theta-chc-frontend) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-common:processResources (Thread[included builds,5,main]) started.
+:theta-common:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-common:processResources NO-SOURCE
 Skipping task ':theta-common:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-common:classes (Thread[Execution worker Thread 2,5,main]) started.
-:theta-common:classes (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-common:classes (Thread[included builds,5,main]) started.
+:theta-common:classes (Thread[included builds,5,main]) started.
 
 > Task :theta-common:classes UP-TO-DATE
 Skipping task ':theta-common:classes' as it has no actions.
-Resolve mutations for :theta-common:jar (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-common:jar (Thread[included builds,5,main]) started.
 :theta-common:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-common:jar UP-TO-DATE
@@ -1938,8 +1938,8 @@ Resolve mutations for :theta-core:processResources (Thread[included builds,5,mai
 
 > Task :theta-core:processResources NO-SOURCE
 Skipping task ':theta-core:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-core:classes (Thread[included builds,5,main]) started.
-:theta-core:classes (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-core:classes (Thread[Execution worker,5,main]) started.
+:theta-core:classes (Thread[Execution worker,5,main]) started.
 
 > Task :theta-core:classes UP-TO-DATE
 Skipping task ':theta-core:classes' as it has no actions.
@@ -1997,8 +1997,8 @@ Resolve mutations for :theta-litmus2xcfa:generateGrammarSource (Thread[Execution
 Caching disabled for task ':theta-litmus2xcfa:generateGrammarSource' because:
   Build cache is disabled
 Skipping task ':theta-litmus2xcfa:generateGrammarSource' as it is up-to-date.
-Resolve mutations for :theta-litmus2xcfa:compileJava (Thread[Execution worker,5,main]) started.
-:theta-litmus2xcfa:compileJava (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-litmus2xcfa:compileJava (Thread[included builds,5,main]) started.
+:theta-litmus2xcfa:compileJava (Thread[included builds,5,main]) started.
 
 > Task :theta-litmus2xcfa:compileJava UP-TO-DATE
 Caching disabled for task ':theta-litmus2xcfa:compileJava' because:
@@ -2007,42 +2007,42 @@ Skipping task ':theta-litmus2xcfa:compileJava' as it is up-to-date.
 No compile result for :theta-litmus2xcfa:compileJava
 No compile result for :theta-litmus2xcfa:compileJava
 No compile result for :theta-litmus2xcfa:compileJava
-work action resolve main (project :theta-litmus2xcfa) (Thread[Execution worker,5,main]) started.
-Resolve mutations for :theta-litmus2xcfa:processResources (Thread[Execution worker,5,main]) started.
-:theta-litmus2xcfa:processResources (Thread[Execution worker,5,main]) started.
+work action resolve main (project :theta-litmus2xcfa) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-litmus2xcfa:processResources (Thread[included builds,5,main]) started.
+:theta-litmus2xcfa:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-litmus2xcfa:processResources NO-SOURCE
 Skipping task ':theta-litmus2xcfa:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-litmus2xcfa:classes (Thread[Execution worker,5,main]) started.
-:theta-litmus2xcfa:classes (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-litmus2xcfa:classes (Thread[included builds,5,main]) started.
+:theta-litmus2xcfa:classes (Thread[included builds,5,main]) started.
 
 > Task :theta-litmus2xcfa:classes UP-TO-DATE
 Skipping task ':theta-litmus2xcfa:classes' as it has no actions.
-Resolve mutations for :theta-litmus2xcfa:jar (Thread[Execution worker,5,main]) started.
-:theta-litmus2xcfa:jar (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-litmus2xcfa:jar (Thread[included builds,5,main]) started.
+:theta-litmus2xcfa:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-litmus2xcfa:jar UP-TO-DATE
 Caching disabled for task ':theta-litmus2xcfa:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-litmus2xcfa:jar' as it is up-to-date.
-work action resolve theta-litmus2xcfa-6.17.6.jar (project :theta-litmus2xcfa) (Thread[Execution worker,5,main]) started.
-Resolve mutations for :theta-llvm2xcfa:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
-:theta-llvm2xcfa:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
+work action resolve theta-litmus2xcfa-6.17.6.jar (project :theta-litmus2xcfa) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-llvm2xcfa:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
+:theta-llvm2xcfa:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
 
 > Task :theta-llvm2xcfa:checkKotlinGradlePluginConfigurationErrors
 Caching disabled for task ':theta-llvm2xcfa:checkKotlinGradlePluginConfigurationErrors' because:
   Build cache is disabled
 Task ':theta-llvm2xcfa:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
-Resolve mutations for :theta-llvm2xcfa:compileKotlin (Thread[Execution worker,5,main]) started.
-:theta-llvm2xcfa:compileKotlin (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-llvm2xcfa:compileKotlin (Thread[included builds,5,main]) started.
+:theta-llvm2xcfa:compileKotlin (Thread[included builds,5,main]) started.
 
 > Task :theta-llvm2xcfa:compileKotlin NO-SOURCE
 Skipping task ':theta-llvm2xcfa:compileKotlin' as it has no source files and no previous output files.
-work action resolve main (project :theta-llvm2xcfa) (Thread[Execution worker,5,main]) started.
-Resolve mutations for :theta-llvm2xcfa:compileJava (Thread[Execution worker,5,main]) started.
-:theta-llvm2xcfa:compileJava (Thread[Execution worker,5,main]) started.
+work action resolve main (project :theta-llvm2xcfa) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-llvm2xcfa:compileJava (Thread[included builds,5,main]) started.
+:theta-llvm2xcfa:compileJava (Thread[included builds,5,main]) started.
 
 > Task :theta-llvm2xcfa:compileJava UP-TO-DATE
 Caching disabled for task ':theta-llvm2xcfa:compileJava' because:
@@ -2051,151 +2051,151 @@ Skipping task ':theta-llvm2xcfa:compileJava' as it is up-to-date.
 No compile result for :theta-llvm2xcfa:compileJava
 No compile result for :theta-llvm2xcfa:compileJava
 No compile result for :theta-llvm2xcfa:compileJava
-work action resolve main (project :theta-llvm2xcfa) (Thread[Execution worker,5,main]) started.
-work action resolve main (project :theta-llvm2xcfa) (Thread[Execution worker,5,main]) started.
-Resolve mutations for :theta-llvm2xcfa:processResources (Thread[Execution worker,5,main]) started.
-:theta-llvm2xcfa:processResources (Thread[Execution worker,5,main]) started.
+work action resolve main (project :theta-llvm2xcfa) (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-llvm2xcfa) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-llvm2xcfa:processResources (Thread[included builds,5,main]) started.
+:theta-llvm2xcfa:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-llvm2xcfa:processResources NO-SOURCE
 Skipping task ':theta-llvm2xcfa:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-llvm2xcfa:classes (Thread[Execution worker,5,main]) started.
-:theta-llvm2xcfa:classes (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :theta-llvm2xcfa:classes (Thread[included builds,5,main]) started.
+:theta-llvm2xcfa:classes (Thread[included builds,5,main]) started.
 
 > Task :theta-llvm2xcfa:classes UP-TO-DATE
 Skipping task ':theta-llvm2xcfa:classes' as it has no actions.
-Resolve mutations for :theta-llvm2xcfa:jar (Thread[Execution worker Thread 3,5,main]) started.
-:theta-llvm2xcfa:jar (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :theta-llvm2xcfa:jar (Thread[included builds,5,main]) started.
+:theta-llvm2xcfa:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-llvm2xcfa:jar UP-TO-DATE
 Caching disabled for task ':theta-llvm2xcfa:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-llvm2xcfa:jar' as it is up-to-date.
-work action resolve theta-llvm2xcfa-6.17.6.jar (project :theta-llvm2xcfa) (Thread[Execution worker Thread 3,5,main]) started.
-Resolve mutations for :theta-solver:processResources (Thread[Execution worker Thread 3,5,main]) started.
-:theta-solver:processResources (Thread[Execution worker Thread 3,5,main]) started.
+work action resolve theta-llvm2xcfa-6.17.6.jar (project :theta-llvm2xcfa) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-solver:processResources (Thread[included builds,5,main]) started.
+:theta-solver:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-solver:processResources NO-SOURCE
 Skipping task ':theta-solver:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-solver:classes (Thread[Execution worker Thread 3,5,main]) started.
-:theta-solver:classes (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :theta-solver:classes (Thread[included builds,5,main]) started.
+:theta-solver:classes (Thread[included builds,5,main]) started.
 
 > Task :theta-solver:classes UP-TO-DATE
 Skipping task ':theta-solver:classes' as it has no actions.
-Resolve mutations for :theta-solver:jar (Thread[Execution worker Thread 3,5,main]) started.
-:theta-solver:jar (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :theta-solver:jar (Thread[included builds,5,main]) started.
+:theta-solver:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-solver:jar UP-TO-DATE
 Caching disabled for task ':theta-solver:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-solver:jar' as it is up-to-date.
-work action resolve theta-solver-6.17.6.jar (project :theta-solver) (Thread[Execution worker Thread 3,5,main]) started.
-Resolve mutations for :theta-solver-javasmt:processResources (Thread[Execution worker Thread 3,5,main]) started.
-:theta-solver-javasmt:processResources (Thread[Execution worker Thread 3,5,main]) started.
+work action resolve theta-solver-6.17.6.jar (project :theta-solver) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-solver-javasmt:processResources (Thread[included builds,5,main]) started.
+:theta-solver-javasmt:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-javasmt:processResources NO-SOURCE
 Skipping task ':theta-solver-javasmt:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-solver-javasmt:classes (Thread[Execution worker Thread 3,5,main]) started.
-:theta-solver-javasmt:classes (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :theta-solver-javasmt:classes (Thread[included builds,5,main]) started.
+:theta-solver-javasmt:classes (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-javasmt:classes UP-TO-DATE
 Skipping task ':theta-solver-javasmt:classes' as it has no actions.
-Resolve mutations for :theta-solver-javasmt:jar (Thread[Execution worker Thread 3,5,main]) started.
-:theta-solver-javasmt:jar (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :theta-solver-javasmt:jar (Thread[included builds,5,main]) started.
+:theta-solver-javasmt:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-javasmt:jar UP-TO-DATE
 Caching disabled for task ':theta-solver-javasmt:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-solver-javasmt:jar' as it is up-to-date.
-work action resolve theta-solver-javasmt-6.17.6.jar (project :theta-solver-javasmt) (Thread[Execution worker Thread 3,5,main]) started.
-Resolve mutations for :theta-solver-smtlib:processResources (Thread[Execution worker Thread 3,5,main]) started.
-:theta-solver-smtlib:processResources (Thread[Execution worker Thread 3,5,main]) started.
+work action resolve theta-solver-javasmt-6.17.6.jar (project :theta-solver-javasmt) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-solver-smtlib:processResources (Thread[included builds,5,main]) started.
+:theta-solver-smtlib:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-smtlib:processResources NO-SOURCE
 Skipping task ':theta-solver-smtlib:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-solver-smtlib:classes (Thread[Execution worker Thread 3,5,main]) started.
-:theta-solver-smtlib:classes (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-solver-smtlib:classes (Thread[included builds,5,main]) started.
+:theta-solver-smtlib:classes (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-smtlib:classes UP-TO-DATE
 Skipping task ':theta-solver-smtlib:classes' as it has no actions.
-Resolve mutations for :theta-solver-smtlib:jar (Thread[Execution worker Thread 2,5,main]) started.
-:theta-solver-smtlib:jar (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-solver-smtlib:jar (Thread[included builds,5,main]) started.
+:theta-solver-smtlib:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-smtlib:jar UP-TO-DATE
 Caching disabled for task ':theta-solver-smtlib:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-solver-smtlib:jar' as it is up-to-date.
-work action resolve theta-solver-smtlib-6.17.6.jar (project :theta-solver-smtlib) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-solver-z3:processResources (Thread[Execution worker Thread 2,5,main]) started.
-:theta-solver-z3:processResources (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve theta-solver-smtlib-6.17.6.jar (project :theta-solver-smtlib) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-solver-z3:processResources (Thread[included builds,5,main]) started.
+:theta-solver-z3:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-z3:processResources NO-SOURCE
 Skipping task ':theta-solver-z3:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-solver-z3:classes (Thread[Execution worker Thread 2,5,main]) started.
-:theta-solver-z3:classes (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-solver-z3:classes (Thread[included builds,5,main]) started.
+:theta-solver-z3:classes (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-z3:classes UP-TO-DATE
 Skipping task ':theta-solver-z3:classes' as it has no actions.
-Resolve mutations for :theta-solver-z3:jar (Thread[Execution worker Thread 2,5,main]) started.
-:theta-solver-z3:jar (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-solver-z3:jar (Thread[included builds,5,main]) started.
+:theta-solver-z3:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-z3:jar UP-TO-DATE
 Caching disabled for task ':theta-solver-z3:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-solver-z3:jar' as it is up-to-date.
-work action resolve theta-solver-z3-6.17.6.jar (project :theta-solver-z3) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-solver-z3-legacy:processResources (Thread[Execution worker Thread 2,5,main]) started.
-:theta-solver-z3-legacy:processResources (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve theta-solver-z3-6.17.6.jar (project :theta-solver-z3) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-solver-z3-legacy:processResources (Thread[included builds,5,main]) started.
+:theta-solver-z3-legacy:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-z3-legacy:processResources NO-SOURCE
 Skipping task ':theta-solver-z3-legacy:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-solver-z3-legacy:classes (Thread[Execution worker Thread 2,5,main]) started.
-:theta-solver-z3-legacy:classes (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-solver-z3-legacy:classes (Thread[included builds,5,main]) started.
+:theta-solver-z3-legacy:classes (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-z3-legacy:classes UP-TO-DATE
 Skipping task ':theta-solver-z3-legacy:classes' as it has no actions.
-Resolve mutations for :theta-solver-z3-legacy:jar (Thread[Execution worker Thread 2,5,main]) started.
-:theta-solver-z3-legacy:jar (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-solver-z3-legacy:jar (Thread[included builds,5,main]) started.
+:theta-solver-z3-legacy:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-solver-z3-legacy:jar UP-TO-DATE
 Caching disabled for task ':theta-solver-z3-legacy:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-solver-z3-legacy:jar' as it is up-to-date.
-work action resolve theta-solver-z3-legacy-6.17.6.jar (project :theta-solver-z3-legacy) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-xcfa:processResources (Thread[Execution worker Thread 2,5,main]) started.
-:theta-xcfa:processResources (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve theta-solver-z3-legacy-6.17.6.jar (project :theta-solver-z3-legacy) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-xcfa:processResources (Thread[included builds,5,main]) started.
+:theta-xcfa:processResources (Thread[included builds,5,main]) started.
 
 > Task :theta-xcfa:processResources NO-SOURCE
 Skipping task ':theta-xcfa:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-xcfa:classes (Thread[Execution worker Thread 2,5,main]) started.
-:theta-xcfa:classes (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-xcfa:classes (Thread[included builds,5,main]) started.
+:theta-xcfa:classes (Thread[included builds,5,main]) started.
 
 > Task :theta-xcfa:classes UP-TO-DATE
 Skipping task ':theta-xcfa:classes' as it has no actions.
-Resolve mutations for :theta-xcfa:jar (Thread[Execution worker Thread 2,5,main]) started.
-:theta-xcfa:jar (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-xcfa:jar (Thread[included builds,5,main]) started.
+:theta-xcfa:jar (Thread[included builds,5,main]) started.
 
 > Task :theta-xcfa:jar UP-TO-DATE
 Caching disabled for task ':theta-xcfa:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-xcfa:jar' as it is up-to-date.
-work action resolve theta-xcfa-6.17.6.jar (project :theta-xcfa) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-xcfa-analysis:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 2,5,main]) started.
-:theta-xcfa-analysis:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve theta-xcfa-6.17.6.jar (project :theta-xcfa) (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-xcfa-analysis:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
+:theta-xcfa-analysis:checkKotlinGradlePluginConfigurationErrors (Thread[included builds,5,main]) started.
 
 > Task :theta-xcfa-analysis:checkKotlinGradlePluginConfigurationErrors
 Caching disabled for task ':theta-xcfa-analysis:checkKotlinGradlePluginConfigurationErrors' because:
   Build cache is disabled
 Task ':theta-xcfa-analysis:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
-Resolve mutations for :theta-xcfa-analysis:compileKotlin (Thread[Execution worker Thread 2,5,main]) started.
-:theta-xcfa-analysis:compileKotlin (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-xcfa-analysis:compileKotlin (Thread[included builds,5,main]) started.
+:theta-xcfa-analysis:compileKotlin (Thread[included builds,5,main]) started.
 
 > Task :theta-xcfa-analysis:compileKotlin UP-TO-DATE
 Transforming com.microsoft.z3.jar with ClasspathEntrySnapshotTransform
@@ -2247,9 +2247,9 @@ Transforming icu4j-71.1.jar with ClasspathEntrySnapshotTransform
 Caching disabled for task ':theta-xcfa-analysis:compileKotlin' because:
   Build cache is disabled
 Skipping task ':theta-xcfa-analysis:compileKotlin' as it is up-to-date.
-work action resolve main (project :theta-xcfa-analysis) (Thread[Execution worker Thread 2,5,main]) started.
-Resolve mutations for :theta-xcfa-analysis:compileJava (Thread[Execution worker Thread 2,5,main]) started.
-:theta-xcfa-analysis:compileJava (Thread[Execution worker Thread 2,5,main]) started.
+work action resolve main (project :theta-xcfa-analysis) (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-xcfa-analysis:compileJava (Thread[Execution worker,5,main]) started.
+:theta-xcfa-analysis:compileJava (Thread[Execution worker,5,main]) started.
 
 > Task :theta-xcfa-analysis:compileJava UP-TO-DATE
 Caching disabled for task ':theta-xcfa-analysis:compileJava' because:
@@ -2258,27 +2258,27 @@ Skipping task ':theta-xcfa-analysis:compileJava' as it is up-to-date.
 No compile result for :theta-xcfa-analysis:compileJava
 No compile result for :theta-xcfa-analysis:compileJava
 No compile result for :theta-xcfa-analysis:compileJava
-work action resolve main (project :theta-xcfa-analysis) (Thread[included builds,5,main]) started.
-work action resolve main (project :theta-xcfa-analysis) (Thread[included builds,5,main]) started.
-Resolve mutations for :theta-xcfa-analysis:processResources (Thread[included builds,5,main]) started.
-:theta-xcfa-analysis:processResources (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-xcfa-analysis) (Thread[Execution worker,5,main]) started.
+work action resolve main (project :theta-xcfa-analysis) (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-xcfa-analysis:processResources (Thread[Execution worker,5,main]) started.
+:theta-xcfa-analysis:processResources (Thread[Execution worker,5,main]) started.
 
 > Task :theta-xcfa-analysis:processResources NO-SOURCE
 Skipping task ':theta-xcfa-analysis:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-xcfa-analysis:classes (Thread[Execution worker Thread 2,5,main]) started.
-:theta-xcfa-analysis:classes (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-xcfa-analysis:classes (Thread[Execution worker,5,main]) started.
+:theta-xcfa-analysis:classes (Thread[Execution worker,5,main]) started.
 
 > Task :theta-xcfa-analysis:classes UP-TO-DATE
 Skipping task ':theta-xcfa-analysis:classes' as it has no actions.
-Resolve mutations for :theta-xcfa-analysis:jar (Thread[Execution worker Thread 2,5,main]) started.
-:theta-xcfa-analysis:jar (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-xcfa-analysis:jar (Thread[Execution worker,5,main]) started.
+:theta-xcfa-analysis:jar (Thread[Execution worker,5,main]) started.
 
 > Task :theta-xcfa-analysis:jar UP-TO-DATE
 Caching disabled for task ':theta-xcfa-analysis:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-xcfa-analysis:jar' as it is up-to-date.
-work action resolve theta-xcfa-analysis-6.17.6.jar (project :theta-xcfa-analysis) (Thread[included builds,5,main]) started.
+work action resolve theta-xcfa-analysis-6.17.6.jar (project :theta-xcfa-analysis) (Thread[Execution worker,5,main]) started.
 Resolve mutations for :theta-xcfa-cli:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
 :theta-xcfa-cli:checkKotlinGradlePluginConfigurationErrors (Thread[Execution worker,5,main]) started.
 
@@ -2296,7 +2296,7 @@ Caching disabled for task ':theta-xcfa2chc:checkKotlinGradlePluginConfigurationE
 Task ':theta-xcfa2chc:checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
   Task has not declared any outputs despite executing actions.
 Resolve mutations for :theta-xcfa2chc:compileKotlin (Thread[included builds,5,main]) started.
-:theta-xcfa2chc:compileKotlin (Thread[included builds,5,main]) started.
+:theta-xcfa2chc:compileKotlin (Thread[Execution worker Thread 3,5,main]) started.
 
 > Task :theta-xcfa2chc:compileKotlin UP-TO-DATE
 Transforming com.microsoft.z3.jar with ClasspathEntrySnapshotTransform
@@ -2342,16 +2342,16 @@ Transforming icu4j-71.1.jar with ClasspathEntrySnapshotTransform
 Caching disabled for task ':theta-xcfa2chc:compileKotlin' because:
   Build cache is disabled
 Skipping task ':theta-xcfa2chc:compileKotlin' as it is up-to-date.
-work action resolve main (project :theta-xcfa2chc) (Thread[included builds,5,main]) started.
-Resolve mutations for :theta-xcfa2chc:compileJava (Thread[included builds,5,main]) started.
-:theta-xcfa2chc:compileJava (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-xcfa2chc) (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :theta-xcfa2chc:compileJava (Thread[Execution worker Thread 3,5,main]) started.
+:theta-xcfa2chc:compileJava (Thread[Execution worker Thread 3,5,main]) started.
 
 > Task :theta-xcfa2chc:compileJava NO-SOURCE
 Skipping task ':theta-xcfa2chc:compileJava' as it has no source files and no previous output files.
-work action resolve main (project :theta-xcfa2chc) (Thread[included builds,5,main]) started.
-work action resolve main (project :theta-xcfa2chc) (Thread[included builds,5,main]) started.
-Resolve mutations for :theta-xcfa-cli:compileKotlin (Thread[included builds,5,main]) started.
-:theta-xcfa-cli:compileKotlin (Thread[included builds,5,main]) started.
+work action resolve main (project :theta-xcfa2chc) (Thread[Execution worker Thread 3,5,main]) started.
+work action resolve main (project :theta-xcfa2chc) (Thread[Execution worker Thread 3,5,main]) started.
+Resolve mutations for :theta-xcfa-cli:compileKotlin (Thread[Execution worker Thread 3,5,main]) started.
+:theta-xcfa-cli:compileKotlin (Thread[Execution worker Thread 3,5,main]) started.
 
 > Task :theta-xcfa-cli:compileKotlin UP-TO-DATE
 Transforming com.microsoft.z3.jar with ClasspathEntrySnapshotTransform
@@ -2428,8 +2428,8 @@ Transforming icu4j-71.1.jar with ClasspathEntrySnapshotTransform
 Caching disabled for task ':theta-xcfa-cli:compileKotlin' because:
   Build cache is disabled
 Skipping task ':theta-xcfa-cli:compileKotlin' as it is up-to-date.
-Resolve mutations for :theta-xcfa-cli:compileJava (Thread[included builds,5,main]) started.
-:theta-xcfa-cli:compileJava (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-xcfa-cli:compileJava (Thread[Execution worker Thread 3,5,main]) started.
+:theta-xcfa-cli:compileJava (Thread[Execution worker Thread 3,5,main]) started.
 
 > Task :theta-xcfa-cli:compileJava UP-TO-DATE
 Caching disabled for task ':theta-xcfa-cli:compileJava' because:
@@ -2438,46 +2438,46 @@ Skipping task ':theta-xcfa-cli:compileJava' as it is up-to-date.
 No compile result for :theta-xcfa-cli:compileJava
 No compile result for :theta-xcfa-cli:compileJava
 No compile result for :theta-xcfa-cli:compileJava
-Resolve mutations for :theta-xcfa-cli:processResources (Thread[included builds,5,main]) started.
-:theta-xcfa-cli:processResources (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-xcfa-cli:processResources (Thread[Execution worker,5,main]) started.
+:theta-xcfa-cli:processResources (Thread[Execution worker,5,main]) started.
 
 > Task :theta-xcfa-cli:processResources NO-SOURCE
 Skipping task ':theta-xcfa-cli:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-xcfa-cli:classes (Thread[included builds,5,main]) started.
-:theta-xcfa-cli:classes (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-xcfa-cli:classes (Thread[Execution worker,5,main]) started.
+:theta-xcfa-cli:classes (Thread[Execution worker,5,main]) started.
 
 > Task :theta-xcfa-cli:classes UP-TO-DATE
 Skipping task ':theta-xcfa-cli:classes' as it has no actions.
-Resolve mutations for :theta-xcfa-cli:compileTestKotlin (Thread[included builds,5,main]) started.
-:theta-xcfa-cli:compileTestKotlin (Thread[included builds,5,main]) started.
-Resolve mutations for :theta-xcfa-cli:processTestResources (Thread[Execution worker,5,main]) started.
-:theta-xcfa-cli:processTestResources (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :theta-xcfa-cli:compileTestKotlin (Thread[Execution worker,5,main]) started.
+:theta-xcfa-cli:compileTestKotlin (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-xcfa-cli:processTestResources (Thread[included builds,5,main]) started.
+:theta-xcfa-cli:processTestResources (Thread[included builds,5,main]) started.
 
 > Task :theta-xcfa-cli:processTestResources
 Caching disabled for task ':theta-xcfa-cli:processTestResources' because:
   Build cache is disabled
   Not worth caching
 Task ':theta-xcfa-cli:processTestResources' is not up-to-date because:
-  Input property 'rootSpec$1' file /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/src/test/resources/c/partialResultTest/cohendiv-ll_valuebound5.c has been added.
-Resolve mutations for :theta-xcfa2chc:processResources (Thread[Execution worker,5,main]) started.
-:theta-xcfa2chc:processResources (Thread[Execution worker,5,main]) started.
+  Input property 'rootSpec$1' file /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/src/test/resources/c/partialResultTest/cohendiv-ll_valuebound10.c has been added.
+Resolve mutations for :theta-xcfa2chc:processResources (Thread[Execution worker Thread 2,5,main]) started.
+:theta-xcfa2chc:processResources (Thread[Execution worker Thread 2,5,main]) started.
 
 > Task :theta-xcfa2chc:processResources NO-SOURCE
 Skipping task ':theta-xcfa2chc:processResources' as it has no source files and no previous output files.
-Resolve mutations for :theta-xcfa2chc:classes (Thread[Execution worker,5,main]) started.
-:theta-xcfa2chc:classes (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-xcfa2chc:classes (Thread[Execution worker Thread 2,5,main]) started.
+:theta-xcfa2chc:classes (Thread[Execution worker Thread 2,5,main]) started.
 
 > Task :theta-xcfa2chc:classes UP-TO-DATE
 Skipping task ':theta-xcfa2chc:classes' as it has no actions.
-Resolve mutations for :theta-xcfa2chc:jar (Thread[Execution worker,5,main]) started.
-:theta-xcfa2chc:jar (Thread[Execution worker,5,main]) started.
+Resolve mutations for :theta-xcfa2chc:jar (Thread[included builds,5,main]) started.
+:theta-xcfa2chc:jar (Thread[Execution worker Thread 3,5,main]) started.
 
 > Task :theta-xcfa2chc:jar UP-TO-DATE
 Caching disabled for task ':theta-xcfa2chc:jar' because:
   Build cache is disabled
   Not worth caching
 Skipping task ':theta-xcfa2chc:jar' as it is up-to-date.
-work action resolve theta-xcfa2chc-6.17.6.jar (project :theta-xcfa2chc) (Thread[Execution worker,5,main]) started.
+work action resolve theta-xcfa2chc-6.17.6.jar (project :theta-xcfa2chc) (Thread[Execution worker Thread 3,5,main]) started.
 
 > Task :theta-xcfa-cli:compileTestKotlin
 Transforming main with ClasspathEntrySnapshotTransform
@@ -2579,45 +2579,41 @@ Script source files:
 Script file extensions: 
 Using Kotlin/JVM incremental compilation
 [KOTLIN] Kotlin compilation 'jdkHome' argument: /opt/jdk-17
-i: found daemon on port 17306 (8511975 ms old), trying to connect
+i: found daemon on port 17092 (591121 ms old), trying to connect
 i: connected to the daemon
 Options for KOTLIN DAEMON: IncrementalCompilationOptions(super=CompilationOptions(compilerMode=INCREMENTAL_COMPILER, targetPlatform=JVM, reportCategories=[0, 3], reportSeverity=2, requestedCompilationResults=[0], kotlinScriptExtensions=[]), areFileChangesKnown=true, modifiedFiles=[/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/src/test/java/hu/bme/mit/theta/xcfa/cli/ReusePartialResultsTest.kt], deletedFiles=[], classpathChanges=NoChanges, workingDir=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/kotlin/compileTestKotlin/cacheable, multiModuleICSettings=MultiModuleICSettings(buildHistoryFile=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/kotlin/compileTestKotlin/local-state/build-history.bin, useModuleDetection=false), usePreciseJavaTracking=true, outputFiles=[/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/classes/kotlin/test, /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/kotlin/compileTestKotlin/cacheable, /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/kotlin/compileTestKotlin/local-state])
-Resolve mutations for :theta-xcfa-cli:compileTestJava (Thread[included builds,5,main]) started.
-:theta-xcfa-cli:compileTestJava (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-xcfa-cli:compileTestJava (Thread[Execution worker Thread 3,5,main]) started.
+:theta-xcfa-cli:compileTestJava (Thread[Execution worker Thread 3,5,main]) started.
 
 > Task :theta-xcfa-cli:compileTestJava NO-SOURCE
 Skipping task ':theta-xcfa-cli:compileTestJava' as it has no source files and no previous output files.
-Resolve mutations for :theta-xcfa-cli:testClasses (Thread[included builds,5,main]) started.
-:theta-xcfa-cli:testClasses (Thread[included builds,5,main]) started.
+Resolve mutations for :theta-xcfa-cli:testClasses (Thread[Execution worker Thread 3,5,main]) started.
+:theta-xcfa-cli:testClasses (Thread[Execution worker Thread 3,5,main]) started.
 
 > Task :theta-xcfa-cli:testClasses
 Skipping task ':theta-xcfa-cli:testClasses' as it has no actions.
-Resolve mutations for :theta-xcfa-cli:test (Thread[Execution worker,5,main]) started.
-:theta-xcfa-cli:test (Thread[Execution worker,5,main]) started.
-Gradle Test Executor 22 started executing tests.
+Resolve mutations for :theta-xcfa-cli:test (Thread[Execution worker Thread 3,5,main]) started.
+:theta-xcfa-cli:test (Thread[Execution worker Thread 3,5,main]) started.
+Gradle Test Executor 2 started executing tests.
 
 > Task :theta-xcfa-cli:test
 Custom actions are attached to task ':theta-xcfa-cli:test'.
 Caching disabled for task ':theta-xcfa-cli:test' because:
   Build cache is disabled
 Task ':theta-xcfa-cli:test' is not up-to-date because:
-  Output property 'binaryResultsDirectory' file /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/test-results/test/binary has been removed.
-  Output property 'binaryResultsDirectory' file /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/test-results/test/binary/output.bin has been removed.
-  Output property 'binaryResultsDirectory' file /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/test-results/test/binary/output.bin.idx has been removed.
-  Output property 'binaryResultsDirectory' file /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/test-results/test/binary/results.bin has been removed.
-  Output property 'jvmArgumentProviders.jacocoAgent$0.jacoco.destinationFile' file /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/jacoco/test.exec has been removed.
+  Task has failed previously.
 file or directory '/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/classes/java/test', not found
-Starting process 'Gradle Test Executor 22'. Working directory: /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli Command: /opt/jdk-17/bin/java -Dorg.gradle.internal.worker.tmpdir=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/tmp/test/work -Xss5m -javaagent:/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/tmp/.cache/expanded/zip_a33b649e552c51298e5a242c2f0d0e3c/jacocoagent.jar=destfile=build/jacoco/test.exec,append=true,inclnolocationclasses=false,dumponexit=true,output=file,jmx=false @/home/klevis/.gradle/.tmp/gradle-worker-classpath4873574598878915569txt -Xms512m -Xmx1g -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 22'
-Successfully started process 'Gradle Test Executor 22'
+Starting process 'Gradle Test Executor 2'. Working directory: /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli Command: /opt/jdk-17/bin/java -Dorg.gradle.internal.worker.tmpdir=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/tmp/test/work -Xss5m -javaagent:/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/tmp/.cache/expanded/zip_a33b649e552c51298e5a242c2f0d0e3c/jacocoagent.jar=destfile=build/jacoco/test.exec,append=true,inclnolocationclasses=false,dumponexit=true,output=file,jmx=false @/home/klevis/.gradle/.tmp/gradle-worker-classpath2269612814572903917txt -Xms512m -Xmx1g -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 2'
+Successfully started process 'Gradle Test Executor 2'
 
-ReusePartialResultsTest > testPartialResultsForPortfolio(String, String) > [1] /c/partialResultTest/cohendiv-ll_valuebound5.c, PredBoolDefault->PredBoolConjuncts STANDARD_OUT
+ReusePartialResultsTest > testPartialResultsForPortfolio(String, String) > [1] /c/partialResultTest/cohendiv-ll_valuebound10.c, PredBoolDefault->PredBoolConjuncts STANDARD_OUT
     RunConfig
-    XcfaConfig(inputConfig=InputConfig(inputFile=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound5.c, catFile=null, parseCtx=null, xcfaWCtx=missing, propertyFile=null, property=ERROR_LOCATION, partialResult=null, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=C, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=PORTFOLIO, solverHome=/home/klevis/.theta, timeoutMs=0, inProcess=false, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=PortfolioConfig(portfolio=PredBoolDefault->PredBoolConjuncts)), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=., acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=false, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=false), chcOutputConfig=ChcOutputConfig(disable=false), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=null, partialResult=null), argConfig=ArgConfig(disable=false)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
+    XcfaConfig(inputConfig=InputConfig(inputFile=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound10.c, catFile=null, parseCtx=null, xcfaWCtx=missing, propertyFile=null, property=ERROR_LOCATION, partialResult=null, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=C, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=PORTFOLIO, solverHome=/home/klevis/.theta, timeoutMs=0, inProcess=false, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=PortfolioConfig(portfolio=PredBoolDefault->PredBoolConjuncts)), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=., acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=false, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=false), chcOutputConfig=ChcOutputConfig(disable=false), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=null, partialResult=null), argConfig=ArgConfig(disable=false)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
     Registered Legacy-Z3 SolverManager
     Registered Z3 SolverManager
     Registered JavaSMT SolverManager
     Registered SMT-LIB SolverManager
-    Parsing the input /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound5.c as C
+    Parsing the input /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound10.c as C
     WARNING: signedness of the type char is implementation specific. Right now it is interpreted as a signed char.
     WARNING: using int(1) as a string constant
     Arithmetic: [NONLIN_INT]
@@ -2685,23 +2681,24 @@ ReusePartialResultsTest > testPartialResultsForPortfolio(String, String) > [1] /
     __loc_258 -> __loc_50346 [label="SequenceLabel[((assume (not (>= r (* 2 b)))))[choiceType=MAIN_PATH],\n(assign r (+ r (- b))),\n(assign q (+ q a)),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
     __loc_193 -> __loc_50364 [label="SequenceLabel[((assume (>= r y)))[choiceType=ALTERNATIVE_PATH],\n(assign a 1),\n(assign b y),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
     __loc_50391 -> __loc_50364 [label="SequenceLabel[((assume (not (= __VERIFIER_assert::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign __VERIFIER_assert_ret 0),\n(assign a (* 2 a)),\n(assign b (* 2 b)),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
-    main_init -> __loc_50346 [label="SequenceLabel[(assume (and (>= x -2147483648) (<= x 2147483647))),\n(assume (and (>= y -2147483648) (<= y 2147483647))),\n(assume (and (>= q -9223372036854775808) (<= q 9223372036854775807))),\n(assume (and (>= r -9223372036854775808) (<= r 9223372036854775807))),\n(assume (and (>= a -9223372036854775808) (<= a 9223372036854775807))),\n(assume (and (>= b -9223372036854775808) (<= b 9223372036854775807))),\n(havoc x),\n(assume (and (>= x -9223372036854775808) (<= x 9223372036854775807))),\n(assign assume_abort_if_not::cond (+ (ite (and (/= 0 (ite (>= (+ x) (+ 0)) 1 0)) (/= 0 (ite (<= (+ x) (+ 5)) 1 0))) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(havoc y),\n(assume (and (>= y -9223372036854775808) (<= y 9223372036854775807))),\n(assign assume_abort_if_not::cond (+ (ite (and (/= 0 (ite (>= (+ y) (+ 0)) 1 0)) (/= 0 (ite (<= (+ y) (+ 5)) 1 0))) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign assume_abort_if_not::cond (+ (ite (>= (+ y) (+ 1)) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign q 0),\n(assign r x),\n(assign a 0),\n(assign b 0),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
+    main_init -> __loc_50346 [label="SequenceLabel[(assume (and (>= x -2147483648) (<= x 2147483647))),\n(assume (and (>= y -2147483648) (<= y 2147483647))),\n(assume (and (>= q -9223372036854775808) (<= q 9223372036854775807))),\n(assume (and (>= r -9223372036854775808) (<= r 9223372036854775807))),\n(assume (and (>= a -9223372036854775808) (<= a 9223372036854775807))),\n(assume (and (>= b -9223372036854775808) (<= b 9223372036854775807))),\n(havoc x),\n(assume (and (>= x -9223372036854775808) (<= x 9223372036854775807))),\n(assign assume_abort_if_not::cond (+ (ite (and (/= 0 (ite (>= (+ x) (+ 0)) 1 0)) (/= 0 (ite (<= (+ x) (+ 10)) 1 0))) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(havoc y),\n(assume (and (>= y -9223372036854775808) (<= y 9223372036854775807))),\n(assign assume_abort_if_not::cond (+ (ite (and (/= 0 (ite (>= (+ y) (+ 0)) 1 0)) (/= 0 (ite (<= (+ y) (+ 10)) 1 0))) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign assume_abort_if_not::cond (+ (ite (>= (+ y) (+ 1)) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign q 0),\n(assign r x),\n(assign a 0),\n(assign b 0),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
 
     }
     }
 
-    Frontend finished:   (in 2102 ms)
+    Frontend finished:   (in 2118 ms)
     ParsingResult Success
     Alias graph size: 0 -> []
     Starting verification of UnnamedXcfa using PORTFOLIO
-    XcfaConfig(inputConfig=InputConfig(inputFile=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound5.c, catFile=null, parseCtx=null, xcfaWCtx=missing, propertyFile=null, property=ERROR_LOCATION, partialResult=null, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=C, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=PORTFOLIO, solverHome=/home/klevis/.theta, timeoutMs=0, inProcess=false, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=PortfolioConfig(portfolio=PredBoolDefault->PredBoolConjuncts)), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=., acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=false, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=false), chcOutputConfig=ChcOutputConfig(disable=false), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=null, partialResult=null), argConfig=ArgConfig(disable=false)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
+    XcfaConfig(inputConfig=InputConfig(inputFile=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound10.c, catFile=null, parseCtx=null, xcfaWCtx=missing, propertyFile=null, property=ERROR_LOCATION, partialResult=null, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=C, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=PORTFOLIO, solverHome=/home/klevis/.theta, timeoutMs=0, inProcess=false, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=PortfolioConfig(portfolio=PredBoolDefault->PredBoolConjuncts)), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=., acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=false, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=false), chcOutputConfig=ChcOutputConfig(disable=false), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=null, partialResult=null), argConfig=ArgConfig(disable=false)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
+    state StartNode(PRED_BOOL,WHOLE): 
     state EndNode(PRED_BOOL,CONJUNCTS): 
 
-    [*] --> EndNode(PRED_BOOL,CONJUNCTS)
+    [*] --> StartNode(PRED_BOOL,WHOLE)
     StartNode(PRED_BOOL,WHOLE) --> EndNode(PRED_BOOL,CONJUNCTS) : TimeoutOrNotSolvableError 
-    Current configuration: XcfaConfig(inputConfig=InputConfig(inputFile=null, catFile=null, parseCtx=null, xcfaWCtx=present, propertyFile=null, property=ERROR_LOCATION, partialResult=null, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=C, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=CEGAR, solverHome=/home/klevis/.theta, timeoutMs=300000, inProcess=true, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=CegarConfig(initPrec=EMPTY, porLevel=NOPOR, porRandomSeed=0, coi=NO_COI, cexMonitor=CHECK, abstractorConfig=CegarAbstractorConfig(abstractionSolver=Z3, validateAbstractionSolver=false, domain=PRED_BOOL, maxEnum=2, search=ERR, havocMemory=false), refinerConfig=CegarRefinerConfig(refinementSolver=Z3, validateRefinementSolver=false, refinement=SEQ_ITP, exprSplitter=CONJUNCTS, pruneStrategy=LAZY))), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=., acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=true, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=true), chcOutputConfig=ChcOutputConfig(disable=true), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound5.c, partialResult=null), argConfig=ArgConfig(disable=true)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
+    Current configuration: XcfaConfig(inputConfig=InputConfig(inputFile=null, catFile=null, parseCtx=null, xcfaWCtx=present, propertyFile=null, property=ERROR_LOCATION, partialResult=null, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=C, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=CEGAR, solverHome=/home/klevis/.theta, timeoutMs=300000, inProcess=true, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=CegarConfig(initPrec=EMPTY, porLevel=NOPOR, porRandomSeed=0, coi=NO_COI, cexMonitor=CHECK, abstractorConfig=CegarAbstractorConfig(abstractionSolver=Z3, validateAbstractionSolver=false, domain=PRED_BOOL, maxEnum=2, search=ERR, havocMemory=false), refinerConfig=CegarRefinerConfig(refinementSolver=Z3, validateRefinementSolver=false, refinement=SEQ_ITP, exprSplitter=WHOLE, pruneStrategy=LAZY))), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=., acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=true, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=true), chcOutputConfig=ChcOutputConfig(disable=true), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound10.c, partialResult=null), argConfig=ArgConfig(disable=true)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
     RunConfig
-    XcfaConfig(inputConfig=InputConfig(inputFile=null, catFile=null, parseCtx=null, xcfaWCtx=present, propertyFile=null, property=ERROR_LOCATION, partialResult=null, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=C, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=CEGAR, solverHome=/home/klevis/.theta, timeoutMs=300000, inProcess=true, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=CegarConfig(initPrec=EMPTY, porLevel=NOPOR, porRandomSeed=0, coi=NO_COI, cexMonitor=CHECK, abstractorConfig=CegarAbstractorConfig(abstractionSolver=Z3, validateAbstractionSolver=false, domain=PRED_BOOL, maxEnum=2, search=ERR, havocMemory=false), refinerConfig=CegarRefinerConfig(refinementSolver=Z3, validateRefinementSolver=false, refinement=SEQ_ITP, exprSplitter=CONJUNCTS, pruneStrategy=LAZY))), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=., acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=true, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=true), chcOutputConfig=ChcOutputConfig(disable=true), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound5.c, partialResult=null), argConfig=ArgConfig(disable=true)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
+    XcfaConfig(inputConfig=InputConfig(inputFile=null, catFile=null, parseCtx=null, xcfaWCtx=present, propertyFile=null, property=ERROR_LOCATION, partialResult=null, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=C, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=CEGAR, solverHome=/home/klevis/.theta, timeoutMs=300000, inProcess=true, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=CegarConfig(initPrec=EMPTY, porLevel=NOPOR, porRandomSeed=0, coi=NO_COI, cexMonitor=CHECK, abstractorConfig=CegarAbstractorConfig(abstractionSolver=Z3, validateAbstractionSolver=false, domain=PRED_BOOL, maxEnum=2, search=ERR, havocMemory=false), refinerConfig=CegarRefinerConfig(refinementSolver=Z3, validateRefinementSolver=false, refinement=SEQ_ITP, exprSplitter=WHOLE, pruneStrategy=LAZY))), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=., acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=true, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=true), chcOutputConfig=ChcOutputConfig(disable=true), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound10.c, partialResult=null), argConfig=ArgConfig(disable=true)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
     Registered Legacy-Z3 SolverManager
     Registered Z3 SolverManager
     Registered JavaSMT SolverManager
@@ -2770,22 +2767,22 @@ ReusePartialResultsTest > testPartialResultsForPortfolio(String, String) > [1] /
     __loc_258 -> __loc_50346 [label="SequenceLabel[((assume (not (>= r (* 2 b)))))[choiceType=MAIN_PATH],\n(assign r (+ r (- b))),\n(assign q (+ q a)),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
     __loc_193 -> __loc_50364 [label="SequenceLabel[((assume (>= r y)))[choiceType=ALTERNATIVE_PATH],\n(assign a 1),\n(assign b y),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
     __loc_50391 -> __loc_50364 [label="SequenceLabel[((assume (not (= __VERIFIER_assert::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign __VERIFIER_assert_ret 0),\n(assign a (* 2 a)),\n(assign b (* 2 b)),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
-    main_init -> __loc_50346 [label="SequenceLabel[(assume (and (>= x -2147483648) (<= x 2147483647))),\n(assume (and (>= y -2147483648) (<= y 2147483647))),\n(assume (and (>= q -9223372036854775808) (<= q 9223372036854775807))),\n(assume (and (>= r -9223372036854775808) (<= r 9223372036854775807))),\n(assume (and (>= a -9223372036854775808) (<= a 9223372036854775807))),\n(assume (and (>= b -9223372036854775808) (<= b 9223372036854775807))),\n(havoc x),\n(assume (and (>= x -9223372036854775808) (<= x 9223372036854775807))),\n(assign assume_abort_if_not::cond (+ (ite (and (/= 0 (ite (>= (+ x) (+ 0)) 1 0)) (/= 0 (ite (<= (+ x) (+ 5)) 1 0))) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(havoc y),\n(assume (and (>= y -9223372036854775808) (<= y 9223372036854775807))),\n(assign assume_abort_if_not::cond (+ (ite (and (/= 0 (ite (>= (+ y) (+ 0)) 1 0)) (/= 0 (ite (<= (+ y) (+ 5)) 1 0))) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign assume_abort_if_not::cond (+ (ite (>= (+ y) (+ 1)) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign q 0),\n(assign r x),\n(assign a 0),\n(assign b 0),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
+    main_init -> __loc_50346 [label="SequenceLabel[(assume (and (>= x -2147483648) (<= x 2147483647))),\n(assume (and (>= y -2147483648) (<= y 2147483647))),\n(assume (and (>= q -9223372036854775808) (<= q 9223372036854775807))),\n(assume (and (>= r -9223372036854775808) (<= r 9223372036854775807))),\n(assume (and (>= a -9223372036854775808) (<= a 9223372036854775807))),\n(assume (and (>= b -9223372036854775808) (<= b 9223372036854775807))),\n(havoc x),\n(assume (and (>= x -9223372036854775808) (<= x 9223372036854775807))),\n(assign assume_abort_if_not::cond (+ (ite (and (/= 0 (ite (>= (+ x) (+ 0)) 1 0)) (/= 0 (ite (<= (+ x) (+ 10)) 1 0))) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(havoc y),\n(assume (and (>= y -9223372036854775808) (<= y 9223372036854775807))),\n(assign assume_abort_if_not::cond (+ (ite (and (/= 0 (ite (>= (+ y) (+ 0)) 1 0)) (/= 0 (ite (<= (+ y) (+ 10)) 1 0))) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign assume_abort_if_not::cond (+ (ite (>= (+ y) (+ 1)) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign q 0),\n(assign r x),\n(assign a 0),\n(assign b 0),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
 
     }
     }
 
     Starting verification of UnnamedXcfa using CEGAR
-    XcfaConfig(inputConfig=InputConfig(inputFile=null, catFile=null, parseCtx=null, xcfaWCtx=present, propertyFile=null, property=ERROR_LOCATION, partialResult=null, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=C, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=CEGAR, solverHome=/home/klevis/.theta, timeoutMs=300000, inProcess=true, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=CegarConfig(initPrec=EMPTY, porLevel=NOPOR, porRandomSeed=0, coi=NO_COI, cexMonitor=CHECK, abstractorConfig=CegarAbstractorConfig(abstractionSolver=Z3, validateAbstractionSolver=false, domain=PRED_BOOL, maxEnum=2, search=ERR, havocMemory=false), refinerConfig=CegarRefinerConfig(refinementSolver=Z3, validateRefinementSolver=false, refinement=SEQ_ITP, exprSplitter=CONJUNCTS, pruneStrategy=LAZY))), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=., acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=true, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=true), chcOutputConfig=ChcOutputConfig(disable=true), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound5.c, partialResult=null), argConfig=ArgConfig(disable=true)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
-    PartialResultJson: /tmp/partialResult8411185574422197187.json
+    XcfaConfig(inputConfig=InputConfig(inputFile=null, catFile=null, parseCtx=null, xcfaWCtx=present, propertyFile=null, property=ERROR_LOCATION, partialResult=null, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=C, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=CEGAR, solverHome=/home/klevis/.theta, timeoutMs=300000, inProcess=true, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=CegarConfig(initPrec=EMPTY, porLevel=NOPOR, porRandomSeed=0, coi=NO_COI, cexMonitor=CHECK, abstractorConfig=CegarAbstractorConfig(abstractionSolver=Z3, validateAbstractionSolver=false, domain=PRED_BOOL, maxEnum=2, search=ERR, havocMemory=false), refinerConfig=CegarRefinerConfig(refinementSolver=Z3, validateRefinementSolver=false, refinement=SEQ_ITP, exprSplitter=WHOLE, pruneStrategy=LAZY))), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=., acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=true, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=true), chcOutputConfig=ChcOutputConfig(disable=true), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound10.c, partialResult=null), argConfig=ArgConfig(disable=true)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
+    PartialResultJson: /tmp/partialResult9683302676854152282.json
     Starting process with -Xmx1420m of heap
     server: RunConfig
-    server: XcfaConfig(inputConfig=InputConfig(inputFile=/tmp/xcfa1528178610188747124.json, catFile=null, parseCtx=/tmp/parseContext16020756405880191976.json, xcfaWCtx=present, propertyFile=null, property=ERROR_LOCATION, partialResult=/tmp/partialResult8411185574422197187.json, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=JSON, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=CEGAR, solverHome=/home/klevis/.theta, timeoutMs=0, inProcess=false, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=CegarConfig(initPrec=EMPTY, porLevel=NOPOR, porRandomSeed=0, coi=NO_COI, cexMonitor=CHECK, abstractorConfig=CegarAbstractorConfig(abstractionSolver=Z3, validateAbstractionSolver=false, domain=PRED_BOOL, maxEnum=2, search=ERR, havocMemory=false), refinerConfig=CegarRefinerConfig(refinementSolver=Z3, validateRefinementSolver=false, refinement=SEQ_ITP, exprSplitter=CONJUNCTS, pruneStrategy=LAZY))), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=./2560816972015066335, acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=true, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=true), chcOutputConfig=ChcOutputConfig(disable=true), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound5.c, partialResult=/tmp/partialResult8411185574422197187.json), argConfig=ArgConfig(disable=false)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
+    server: XcfaConfig(inputConfig=InputConfig(inputFile=/tmp/xcfa1679756250598097291.json, catFile=null, parseCtx=/tmp/parseContext4860988671942380072.json, xcfaWCtx=present, propertyFile=null, property=ERROR_LOCATION, partialResult=/tmp/partialResult9683302676854152282.json, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=JSON, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=CEGAR, solverHome=/home/klevis/.theta, timeoutMs=0, inProcess=false, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=CegarConfig(initPrec=EMPTY, porLevel=NOPOR, porRandomSeed=0, coi=NO_COI, cexMonitor=CHECK, abstractorConfig=CegarAbstractorConfig(abstractionSolver=Z3, validateAbstractionSolver=false, domain=PRED_BOOL, maxEnum=2, search=ERR, havocMemory=false), refinerConfig=CegarRefinerConfig(refinementSolver=Z3, validateRefinementSolver=false, refinement=SEQ_ITP, exprSplitter=WHOLE, pruneStrategy=LAZY))), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=./4966817871215656530, acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=true, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=true), chcOutputConfig=ChcOutputConfig(disable=true), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound10.c, partialResult=/tmp/partialResult9683302676854152282.json), argConfig=ArgConfig(disable=false)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
     server: Registered Legacy-Z3 SolverManager
     server: Registered Z3 SolverManager
     server: Registered JavaSMT SolverManager
     server: Registered SMT-LIB SolverManager
-    server: Successfully loaded LocationInvariants from partialResult8411185574422197187.json
+    server: Successfully loaded LocationInvariants from partialResult9683302676854152282.json
     server: --------------XCFA------------------
     server: digraph G {
     server: label="";
@@ -2850,13 +2847,13 @@ ReusePartialResultsTest > testPartialResultsForPortfolio(String, String) > [1] /
     server: __loc_258 -> __loc_50346 [label="SequenceLabel[((assume (not (>= r (* 2 b)))))[choiceType=MAIN_PATH],\n(assign r (+ r (- b))),\n(assign q (+ q a)),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
     server: __loc_193 -> __loc_50364 [label="SequenceLabel[((assume (>= r y)))[choiceType=ALTERNATIVE_PATH],\n(assign a 1),\n(assign b y),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
     server: __loc_50391 -> __loc_50364 [label="SequenceLabel[((assume (not (= __VERIFIER_assert::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign __VERIFIER_assert_ret 0),\n(assign a (* 2 a)),\n(assign b (* 2 b)),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
-    server: main_init -> __loc_50346 [label="SequenceLabel[(assume (and (>= x -2147483648) (<= x 2147483647))),\n(assume (and (>= y -2147483648) (<= y 2147483647))),\n(assume (and (>= q -9223372036854775808) (<= q 9223372036854775807))),\n(assume (and (>= r -9223372036854775808) (<= r 9223372036854775807))),\n(assume (and (>= a -9223372036854775808) (<= a 9223372036854775807))),\n(assume (and (>= b -9223372036854775808) (<= b 9223372036854775807))),\n(havoc x),\n(assume (and (>= x -9223372036854775808) (<= x 9223372036854775807))),\n(assign assume_abort_if_not::cond (+ (ite (and (/= 0 (ite (>= (+ x) (+ 0)) 1 0)) (/= 0 (ite (<= (+ x) (+ 5)) 1 0))) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(havoc y),\n(assume (and (>= y -9223372036854775808) (<= y 9223372036854775807))),\n(assign assume_abort_if_not::cond (+ (ite (and (/= 0 (ite (>= (+ y) (+ 0)) 1 0)) (/= 0 (ite (<= (+ y) (+ 5)) 1 0))) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign assume_abort_if_not::cond (+ (ite (>= (+ y) (+ 1)) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign q 0),\n(assign r x),\n(assign a 0),\n(assign b 0),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
+    server: main_init -> __loc_50346 [label="SequenceLabel[(assume (and (>= x -2147483648) (<= x 2147483647))),\n(assume (and (>= y -2147483648) (<= y 2147483647))),\n(assume (and (>= q -9223372036854775808) (<= q 9223372036854775807))),\n(assume (and (>= r -9223372036854775808) (<= r 9223372036854775807))),\n(assume (and (>= a -9223372036854775808) (<= a 9223372036854775807))),\n(assume (and (>= b -9223372036854775808) (<= b 9223372036854775807))),\n(havoc x),\n(assume (and (>= x -9223372036854775808) (<= x 9223372036854775807))),\n(assign assume_abort_if_not::cond (+ (ite (and (/= 0 (ite (>= (+ x) (+ 0)) 1 0)) (/= 0 (ite (<= (+ x) (+ 10)) 1 0))) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(havoc y),\n(assume (and (>= y -9223372036854775808) (<= y 9223372036854775807))),\n(assign assume_abort_if_not::cond (+ (ite (and (/= 0 (ite (>= (+ y) (+ 0)) 1 0)) (/= 0 (ite (<= (+ y) (+ 10)) 1 0))) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign assume_abort_if_not::cond (+ (ite (>= (+ y) (+ 1)) 1 0))),\n((assume (not (= assume_abort_if_not::cond 0))))[choiceType=ALTERNATIVE_PATH],\n(assign q 0),\n(assign r x),\n(assign a 0),\n(assign b 0),\n(assign __VERIFIER_assert::cond (+ (ite (= (+ b) (+ (+ (* (+ y) (+ a))))) 1 0)))] "];
     server: 
     server: }
     server: }
     server: 
     server: Starting verification of UnnamedXcfa using CEGAR
-    server: XcfaConfig(inputConfig=InputConfig(inputFile=/tmp/xcfa1528178610188747124.json, catFile=null, parseCtx=/tmp/parseContext16020756405880191976.json, xcfaWCtx=present, propertyFile=null, property=ERROR_LOCATION, partialResult=/tmp/partialResult8411185574422197187.json, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=JSON, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=CEGAR, solverHome=/home/klevis/.theta, timeoutMs=0, inProcess=false, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=CegarConfig(initPrec=EMPTY, porLevel=NOPOR, porRandomSeed=0, coi=NO_COI, cexMonitor=CHECK, abstractorConfig=CegarAbstractorConfig(abstractionSolver=Z3, validateAbstractionSolver=false, domain=PRED_BOOL, maxEnum=2, search=ERR, havocMemory=false), refinerConfig=CegarRefinerConfig(refinementSolver=Z3, validateRefinementSolver=false, refinement=SEQ_ITP, exprSplitter=CONJUNCTS, pruneStrategy=LAZY))), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=./2560816972015066335, acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=true, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=true), chcOutputConfig=ChcOutputConfig(disable=true), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound5.c, partialResult=/tmp/partialResult8411185574422197187.json), argConfig=ArgConfig(disable=false)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
+    server: XcfaConfig(inputConfig=InputConfig(inputFile=/tmp/xcfa1679756250598097291.json, catFile=null, parseCtx=/tmp/parseContext4860988671942380072.json, xcfaWCtx=present, propertyFile=null, property=ERROR_LOCATION, partialResult=/tmp/partialResult9683302676854152282.json, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=JSON, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=CEGAR, solverHome=/home/klevis/.theta, timeoutMs=0, inProcess=false, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=CegarConfig(initPrec=EMPTY, porLevel=NOPOR, porRandomSeed=0, coi=NO_COI, cexMonitor=CHECK, abstractorConfig=CegarAbstractorConfig(abstractionSolver=Z3, validateAbstractionSolver=false, domain=PRED_BOOL, maxEnum=2, search=ERR, havocMemory=false), refinerConfig=CegarRefinerConfig(refinementSolver=Z3, validateRefinementSolver=false, refinement=SEQ_ITP, exprSplitter=WHOLE, pruneStrategy=LAZY))), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=./4966817871215656530, acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=true, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=true), chcOutputConfig=ChcOutputConfig(disable=true), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound10.c, partialResult=/tmp/partialResult9683302676854152282.json), argConfig=ArgConfig(disable=false)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false))
     server: Configuration: (CegarChecker (XcfaArgAbstractor (PriorityWaitlist XcfaDistToErrComparator)) (XcfaSingleExprTraceRefiner ExprTraceSeqItpChecker XcfaPrecRefiner))
     server: Iteration 1
     server: | Checking abstraction...
@@ -2929,10 +2926,10 @@ ReusePartialResultsTest > testPartialResultsForPortfolio(String, String) > [1] /
     server: |  |  Starting ARG: 2 nodes, 1 incomplete, 0 unsafe
     server: |  |  (StopCriterion FirstCex)...
     server: |  |  Building ARG...done
-    server: |  |  Finished ARG: 47 nodes, 5 incomplete, 1 unsafe
+    server: |  |  Finished ARG: 31 nodes, 4 incomplete, 1 unsafe
     server: | Checking abstraction done, result: (AbstractorResult Unsafe)
     server: | Refining abstraction...
-    server: |  |  Trace length: 15
+    server: |  |  Trace length: 11
     server: |  |  Checking trace...done, result: (ExprTraceStatus Infeasible)
     server: |  |  Pruning from index 2...done
     server: Refining abstraction done, result: (RefinerResult Spurious)
@@ -2942,39 +2939,126 @@ ReusePartialResultsTest > testPartialResultsForPortfolio(String, String) > [1] /
     server: |  |  Starting ARG: 2 nodes, 1 incomplete, 0 unsafe
     server: |  |  (StopCriterion FirstCex)...
     server: |  |  Building ARG...done
-    server: |  |  Finished ARG: 78 nodes, 0 incomplete, 0 unsafe
-    server: | Checking abstraction done, result: (AbstractorResult Safe)
-    server: (SafetyResult Safe)
-    server: AlgorithmTimeMs: 3884
-    server: Iterations: 7
-    server: 
-    server: Backend finished (in 4303 ms)
-    server: (SafetyResult Safe)
-    Backend finished (in 9979 ms)
-    (SafetyResult Safe)
-    Config XcfaConfig(inputConfig=InputConfig(inputFile=null, catFile=null, parseCtx=null, xcfaWCtx=present, propertyFile=null, property=ERROR_LOCATION, partialResult=null, frontendConfig=FrontendConfig(lbeLevel=LBE_SEQ, staticCoi=false, loopUnroll=1000, forceUnroll=-1, enableFew=false, inputType=C, specConfig=CFrontendConfig(arithmetic=efficient, architecture=ILP32)), backendConfig=BackendConfig(backend=CEGAR, solverHome=/home/klevis/.theta, timeoutMs=300000, inProcess=true, parseInProcess=false, memlimit=0, disablePartialResult=false, specConfig=CegarConfig(initPrec=EMPTY, porLevel=NOPOR, porRandomSeed=0, coi=NO_COI, cexMonitor=CHECK, abstractorConfig=CegarAbstractorConfig(abstractionSolver=Z3, validateAbstractionSolver=false, domain=PRED_BOOL, maxEnum=2, search=ERR, havocMemory=false), refinerConfig=CegarRefinerConfig(refinementSolver=Z3, validateRefinementSolver=false, refinement=SEQ_ITP, exprSplitter=CONJUNCTS, pruneStrategy=LAZY))), outputConfig=OutputConfig(versionInfo=false, enableOutput=false, resultFolder=., acceptUnreliableSafe=false, cOutputConfig=COutputConfig(disable=true, useArr=false, useExArr=false, useRange=false), xcfaOutputConfig=XcfaOutputConfig(disable=true), chcOutputConfig=ChcOutputConfig(disable=true), witnessConfig=WitnessConfig(disable=false, svcomp=false, concretizerSolver=Z3, validateConcretizerSolver=false, inputFileForWitness=/home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/resources/test/c/partialResultTest/cohendiv-ll_valuebound5.c, partialResult=null), argConfig=ArgConfig(disable=true)), debugConfig=DebugConfig(debug=false, stacktrace=true, logLevel=INFO, argdebug=false, argToFile=false)) succeeded in 10167 ms
-    success-result: EndNode(PRED_BOOL,CONJUNCTS)
-    Backend finished (in 10201 ms)
-    (SafetyResult Safe)
-
-
-    RES: hu.bme.mit.theta.analysis.algorithm.EmptyProof@5d03df76
-    ---- + ---- + ---- + ---- + ----
-
-Gradle Test Executor 22 finished executing tests.
-
-> Task :theta-xcfa-cli:test
-Finished generating test XML results (0.004 secs) into: /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/test-results/test
-Generating HTML test report...
-Finished generating test html results (0.009 secs) into: /home/klevis/Projects/theta/subprojects/xcfa/xcfa-cli/build/reports/tests/test
-Could not execute [report metric STATISTICS_COLLECT_METRICS_OVERHEAD]
-Could not execute [report metric STATISTICS_COLLECT_METRICS_OVERHEAD]
-
-Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
-
-You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
-
-For more on this, please refer to https://docs.gradle.org/8.9/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
-
-BUILD SUCCESSFUL in 21s
-89 actionable tasks: 21 executed, 68 up-to-date
+    server: |  |  Finished ARG: 31 nodes, 4 incomplete, 1 unsafe
+    server: | Checking abstraction done, result: (AbstractorResult Unsafe)
+    server: | Refining abstraction...
+    server: |  |  Trace length: 11
+    server: |  |  Checking trace...done, result: (ExprTraceStatus Infeasible)
+    server: |  |  Pruning from index 2...done
+    server: Refining abstraction done, result: (RefinerResult Spurious)
+    server: ! Precision DID change in this iteration
+    server: Iteration 8
+    server: | Checking abstraction...
+    server: |  |  Starting ARG: 2 nodes, 1 incomplete, 0 unsafe
+    server: |  |  (StopCriterion FirstCex)...
+    server: |  |  Building ARG...done
+    server: |  |  Finished ARG: 31 nodes, 4 incomplete, 1 unsafe
+    server: | Checking abstraction done, result: (AbstractorResult Unsafe)
+    server: | Refining abstraction...
+    server: |  |  Trace length: 11
+    server: |  |  Checking trace...done, result: (ExprTraceStatus Infeasible)
+    server: |  |  Pruning from index 5...done
+    server: Refining abstraction done, result: (RefinerResult Spurious)
+    server: ! Precision DID change in this iteration
+    server: Iteration 9
+    server: | Checking abstraction...
+    server: |  |  Starting ARG: 10 nodes, 2 incomplete, 0 unsafe
+    server: |  |  (StopCriterion FirstCex)...
+    server: |  |  Building ARG...done
+    server: |  |  Finished ARG: 39 nodes, 5 incomplete, 1 unsafe
+    server: | Checking abstraction done, result: (AbstractorResult Unsafe)
+    server: | Refining abstraction...
+    server: |  |  Trace length: 15
+    server: |  |  Checking trace...done, result: (ExprTraceStatus Infeasible)
+    server: |  |  Pruning from index 2...done
+    server: Refining abstraction done, result: (RefinerResult Spurious)
+    server: ! Precision DID change in this iteration
+    server: Iteration 10
+    server: | Checking abstraction...
+    server: |  |  Starting ARG: 2 nodes, 1 incomplete, 0 unsafe
+    server: |  |  (StopCriterion FirstCex)...
+    server: |  |  Building ARG...done
+    server: |  |  Finished ARG: 43 nodes, 4 incomplete, 1 unsafe
+    server: | Checking abstraction done, result: (AbstractorResult Unsafe)
+    server: | Refining abstraction...
+    server: |  |  Trace length: 16
+    server: |  |  Checking trace...done, result: (ExprTraceStatus Infeasible)
+    server: |  |  Pruning from index 2...done
+    server: Refining abstraction done, result: (RefinerResult Spurious)
+    server: ! Precision DID change in this iteration
+    server: Iteration 11
+    server: | Checking abstraction...
+    server: |  |  Starting ARG: 2 nodes, 1 incomplete, 0 unsafe
+    server: |  |  (StopCriterion FirstCex)...
+    server: |  |  Building ARG...done
+    server: |  |  Finished ARG: 49 nodes, 5 incomplete, 1 unsafe
+    server: | Checking abstraction done, result: (AbstractorResult Unsafe)
+    server: | Refining abstraction...
+    server: |  |  Trace length: 16
+    server: |  |  Checking trace...done, result: (ExprTraceStatus Infeasible)
+    server: |  |  Pruning from index 2...done
+    server: Refining abstraction done, result: (RefinerResult Spurious)
+    server: ! Precision DID change in this iteration
+    server: Iteration 12
+    server: | Checking abstraction...
+    server: |  |  Starting ARG: 2 nodes, 1 incomplete, 0 unsafe
+    server: |  |  (StopCriterion FirstCex)...
+    server: |  |  Building ARG...done
+    server: |  |  Finished ARG: 49 nodes, 5 incomplete, 1 unsafe
+    server: | Checking abstraction done, result: (AbstractorResult Unsafe)
+    server: | Refining abstraction...
+    server: |  |  Trace length: 16
+    server: |  |  Checking trace...done, result: (ExprTraceStatus Infeasible)
+    server: |  |  Pruning from index 2...done
+    server: Refining abstraction done, result: (RefinerResult Spurious)
+    server: ! Precision did NOT change in this iteration
+    server: Iteration 13
+    server: | Checking abstraction...
+    server: |  |  Starting ARG: 2 nodes, 1 incomplete, 0 unsafe
+    server: |  |  (StopCriterion FirstCex)...
+    server: |  |  Building ARG...done
+    server: |  |  Finished ARG: 49 nodes, 5 incomplete, 1 unsafe
+    server: | Checking abstraction done, result: (AbstractorResult Unsafe)
+    server: | Refining abstraction...
+    server: |  |  Trace length: 16
+    server: |  |  Checking trace...done, result: (ExprTraceStatus Infeasible)
+    server: |  |  Pruning from index 2...done
+    server: Refining abstraction done, result: (RefinerResult Spurious)
+    server: ! Precision did NOT change in this iteration
+    server: Iteration 14
+    server: | Checking abstraction...
+    server: |  |  Starting ARG: 2 nodes, 1 incomplete, 0 unsafe
+    server: |  |  (StopCriterion FirstCex)...
+    server: |  |  Building ARG...done
+    server: |  |  Finished ARG: 49 nodes, 5 incomplete, 1 unsafe
+    server: | Checking abstraction done, result: (AbstractorResult Unsafe)
+    server: | Refining abstraction...
+    server: |  |  Trace length: 16
+    server: |  |  Checking trace...done, result: (ExprTraceStatus Infeasible)
+    server: |  |  Pruning from index 2...done
+    server: Refining abstraction done, result: (RefinerResult Spurious)
+    server: ! Precision did NOT change in this iteration
+    server: Iteration 15
+    server: | Checking abstraction...
+    server: |  |  Starting ARG: 2 nodes, 1 incomplete, 0 unsafe
+    server: |  |  (StopCriterion FirstCex)...
+    server: |  |  Building ARG...done
+    server: |  |  Finished ARG: 49 nodes, 5 incomplete, 1 unsafe
+    server: | Checking abstraction done, result: (AbstractorResult Unsafe)
+    server: | Refining abstraction...
+    server: |  |  Trace length: 16
+    server: |  |  Checking trace...done, result: (ExprTraceStatus Infeasible)
+    server: |  |  Pruning from index 2...done
+    server: Refining abstraction done, result: (RefinerResult Spurious)
+    server: ! Precision did NOT change in this iteration
+    server: Iteration 16
+    server: | Checking abstraction...
+    server: |  |  Starting ARG: 2 nodes, 1 incomplete, 0 unsafe
+    server: |  |  (StopCriterion FirstCex)...
+    server: |  |  Building ARG...done
+    server: |  |  Finished ARG: 49 nodes, 5 incomplete, 1 unsafe
+    server: | Checking abstraction done, result: (AbstractorResult Unsafe)
+    server: Counterexample hash check: NO new cex found
+    server: ----Infinit Loop Detected by CexMonitor----
+    server: |  |  Starting ARG: 49 nodes, 5 incomplete, 1 unsafe
+    server: |  |  (StopCriterion FullExploration)...

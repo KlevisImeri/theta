@@ -20,6 +20,8 @@ import hu.bme.mit.theta.common.logging.*
 import hu.bme.mit.theta.common.logging.Logger
 import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig
 import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig.ArithmeticType.efficient
+import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig.ArchitectureType;
+import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig.ArithmeticType;
 import hu.bme.mit.theta.frontend.transformation.grammar.preprocess.ArithmeticTrait.*
 import hu.bme.mit.theta.xcfa.cli.params.*
 import hu.bme.mit.theta.xcfa.cli.params.InitPrec.*
@@ -46,14 +48,28 @@ class ReusePartialResultsTest {
         //
         // Arguments.of("/c/partialResultTest/large_const.c", true), // INFO: overkill for solver
         // Arguments.of("/c/partialResultTest/AllInterval-015.c", true), // INFO: TIMEOUT
-        // Arguments.of("/c/partialResultTest/bresenham-ll_unwindbound10.c", true),
+        // Arguments.of("/c/partialResultTest/bresenham-ll_unwindbound10.c", "PredDefault->PredConjuncts"),
         // Arguments.of("/c/partialResultTest/bresenham-ll_valuebound1.c", true), //INFO:: long
         // partial res
-        //
-        Arguments.of("/c/partialResultTest/cohendiv-ll.c", true) // INFO: maybe we can understand
-        // Arguments.of("/c/partialResultTest/egcd-ll_unwindbound2.c", true), //INFO:: long partial
-        // res
-        //
+
+        //-------------------------------------Error(verification stuck)-------------------------------------
+        //  INFO: 1 ite (?ms) vs 5 ite (?ms) [good]
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "PredCartDefault->PredCartConjuncts")
+        //  INFO: UnknownSolverStatusException
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound10.c", "PredBoolDefault->PredBoolConjuncts")
+        // ----
+        //  INFO: 1 ite (392ms) vs 4 ite (1487ms) [good]
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound2.c", "PredBoolDefault->PredBoolConjuncts")
+        //  INFO: Full exploration to long 
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound100.c", "PredBoolDefault->PredBoolConjuncts")
+        //  INFO: Full exploration -> solver error
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound5.c", "PredBoolDefault->PredBoolConjuncts")
+        //  INFO: Requires to much mem
+        // Arguments.of("/c/partialResultTest/mannadiv_unwindbound5.c", "PredBoolDefault->PredBoolConjuncts")
+        //----------------------------------------------------------------------------------------------------
+
+        //  INFO:: long partial res
+        // Arguments.of("/c/partialResultTest/egcd-ll_unwindbound2.c", true), 
         // Arguments.of("/c/partialResultTest/klevis.c", true),
       )
     }
@@ -61,33 +77,33 @@ class ReusePartialResultsTest {
 
   @ParameterizedTest
   @MethodSource("partialResultExamples")
-  fun testPartialResultsForPortfolio(cFile: String, expectSafe: Boolean) {
+  fun testPartialResultsForPortfolio(cFile: String, portfolioName: String) {
     try {
       val logger = ConsoleLogger(Logger.Level.VERBOSE)
       val uniqueLogger = UniqueWarningLogger(logger)
       // WebDebuggerLogger.enableWebDebuggerLogger();
 
       val result =
-        runConfig( // INFO: portfolio
+        runConfig( 
           XcfaConfig<SpecFrontendConfig, SpecBackendConfig>(
             inputConfig = InputConfig(input = File(javaClass.getResource(cFile)!!.path)),
             debugConfig =
               DebugConfig(
                 debug = false,
                 stacktrace = true,
-                logLevel = Logger.Level.VERBOSE,
+                logLevel = Logger.Level.INFO,
                 argdebug = false,
                 argToFile = false,
               ),
             frontendConfig =
               FrontendConfig(
                 specConfig =
-                  CFrontendConfig(arithmetic = ArchitectureConfig.ArithmeticType.efficient)
+                  CFrontendConfig(architecture = ArchitectureType.ILP32)
               ),
             backendConfig =
               BackendConfig(
                 backend = Backend.PORTFOLIO,
-                specConfig = PortfolioConfig(portfolio = "COMPLEX25PRED"),
+                specConfig = PortfolioConfig(portfolio = portfolioName),
               ),
             outputConfig = OutputConfig(),
           ),
@@ -95,74 +111,14 @@ class ReusePartialResultsTest {
           uniqueLogger,
           throwDontExit = false,
         )
-      // val result = runConfig( // INFO: baseConfig
-      //     XcfaConfig(
-      //       inputConfig = InputConfig(input = File(javaClass.getResource(cFile)!!.path)),
-      //       debugConfig =
-      //         DebugConfig(
-      //           debug = true,
-      //           stacktrace = true,
-      //           logLevel = Logger.Level.VERBOSE,
-      //           argdebug = false,
-      //           argToFile = false,
-      //         ),
-      //       frontendConfig =
-      //         FrontendConfig(
-      //           lbeLevel = LbePass.LbeLevel.LBE_SEQ,
-      //           specConfig = CFrontendConfig(
-      //             arithmetic = efficient,
-      //             architecture = ILP32
-      //           )
-      //         ),
-      //       backendConfig =
-      //         BackendConfig(
-      //           backend = CEGAR,
-      //           timeoutMs = 0,
-      //           specConfig =
-      //             CegarConfig(
-      //               initPrec = EMPTY,
-      //               porLevel = NOPOR,
-      //               porRandomSeed = -1,
-      //               coi = NO_COI,
-      //               cexMonitor = CHECK,
-      //               abstractorConfig =
-      //                 CegarAbstractorConfig(
-      //                   abstractionSolver = "Z3",
-      //                   validateAbstractionSolver = false,
-      //                   domain = PRED_CART,
-      //                   maxEnum = 1,
-      //                   search = ERR,
-      //                 ),
-      //               refinerConfig =
-      //                 CegarRefinerConfig(
-      //                   refinementSolver = "Z3",
-      //                   validateRefinementSolver = false,
-      //                   refinement = SEQ_ITP,
-      //                   exprSplitter = WHOLE, // CONJUNCTS | WHOLE | ATOM
-      //                   pruneStrategy = LAZY,
-      //                 ),
-      //             ),
-      //         ),
-      //       outputConfig = OutputConfig(),
-      //     ),
-      //     logger,
-      //     uniqueLogger,
-      //     throwDontExit = false,
-      //   )
 
       println("\n\nRES: ${result.getProof().toString().replace("main::", "")}")
 
       // WebDebuggerLogger.getInstance().writeToFile("./Arg.cfa");
-      //
-      // if (expectSafe) {
-      //   Assertions.assertTrue(result.isSafe(), "Expected safe, but was $result")
-      // } else {
-      //   Assertions.assertTrue(result.isUnsafe(), "Expected unsafe, but was $result")
-      // }
-
-      println("✅ [$cFile] => " + if (expectSafe) "SAFE" else "UNSAFE")
+      println("---- + ---- + ---- + ---- + ----")
     } catch (e: Throwable) {
       println(e.stackTraceToString())
     }
   }
 }
+

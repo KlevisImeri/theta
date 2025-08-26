@@ -171,12 +171,11 @@ fun frontend(
       println("--------------XCFA------------------")
       println(xcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
 
-      println("\n--------------PartialResult------------------")
-      println(partialResult)
-
-      if (partialResult == null) {
+      if (partialResult == null || partialResult.getPartitions().isEmpty()) {
         xcfa
       } else {
+        println("\n--------------PartialResult------------------")
+        println(partialResult)
         val updatedXcfa =
           xcfa.optimizeFurther(ApplyLocationInvariantsPassManager(parseContext, partialResult))
         println("\n--------------XCFA+PartialResult------------------")

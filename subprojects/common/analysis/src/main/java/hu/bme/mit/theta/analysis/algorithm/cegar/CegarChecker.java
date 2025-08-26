@@ -179,7 +179,7 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
         } catch (RuntimeException e) {
            if (computePartialResult) {
               logger.write(
-                      Level.MAINSTEP, "----Some Solver Error----%n");
+                      Level.MAINSTEP, "%n-------------Some Solver Error-------------%n");
               abstractor.unroll(proof, prec);
               logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
               return SafetyResult.partial(proof, getStats.get());
