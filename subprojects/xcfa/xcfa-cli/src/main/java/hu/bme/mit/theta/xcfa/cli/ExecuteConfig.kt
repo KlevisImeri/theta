@@ -296,7 +296,7 @@ private fun backend(
       )
 
       val checker = getChecker(xcfa, mcm, config, parseContext, logger, uniqueLogger)
-      val result =
+      var result =
         exitOnError(config.debugConfig.stacktrace, config.debugConfig.debug || throwDontExit) {
             checker.check()
           }
@@ -364,15 +364,21 @@ private fun backend(
             }
           }
 
+      val backendAlgoTimeMs =stopwatch.elapsed(TimeUnit.MILLISECONDS)
       logger.write(
         INFO,
-        "Backend finished (in ${
-                stopwatch.elapsed(TimeUnit.MILLISECONDS)
-            } ms)\n",
+        "Backend finished (in ${backendAlgoTimeMs} ms)\n",
       )
 
-      logger.write(RESULT, result.toString() + "\n")
-      result
+      val outResult = if(result.stats.isEmpty) {
+        result.withStats(XcfaBackendStatistics(listOf(backendAlgoTimeMs)))
+      } else {
+        result
+      }
+
+      logger.write(RESULT, outResult.toString() + "\n")
+
+      outResult
     }
   }
 

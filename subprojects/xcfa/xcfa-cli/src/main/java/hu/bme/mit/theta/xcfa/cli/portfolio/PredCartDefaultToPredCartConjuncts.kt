@@ -179,9 +179,13 @@ fun predCartDefaultToPredCartConjuncts(
         )
 
     val edge = Edge(startNode, endNode, timeoutOrNotSolvableError)
-    val stm = STM(startNode, setOf(edge))
-    // val stm = STM(endNode, setOf(edge))
+    val actualStartNode = if ((portfolioConfig.backendConfig.specConfig as PortfolioConfig).partialResultTestOnlyEndNode) {
+        endNode
+    } else {
+        startNode
+    }
 
+    val stm = STM(actualStartNode, setOf(edge))
     println(stm.visualize())
     return stm
 }

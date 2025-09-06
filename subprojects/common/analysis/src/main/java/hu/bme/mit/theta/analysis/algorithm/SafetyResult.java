@@ -45,6 +45,9 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
         return stats;
     }
 
+    public abstract SafetyResult<Pr, C> withStats(final Statistics stats);
+
+
     public static <Pr extends Proof, C extends Cex> Safe<Pr, C> safe(final Pr witness) {
         return new Safe<>(witness, Optional.empty());
     }
@@ -102,6 +105,11 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
     public static final class Safe<Pr extends Proof, C extends Cex> extends SafetyResult<Pr, C> {
         private Safe(final Pr proof, final Optional<Statistics> stats) {
             super(proof, stats);
+        }
+
+        @Override
+        public Safe<Pr, C> withStats(final Statistics stats) {
+            return new Safe<>(getProof(), Optional.of(stats));
         }
 
         @Override
@@ -170,6 +178,11 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
         private Unsafe(final C cex, final Pr proof, final Optional<Statistics> stats) {
             super(proof, stats);
             this.cex = checkNotNull(cex);
+        }
+
+        @Override
+        public Unsafe<Pr, C> withStats(final Statistics stats) {
+            return new Unsafe<>(getCex(), getProof(), Optional.of(stats));
         }
 
         public C getCex() {
@@ -244,6 +257,11 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
         }
 
         @Override
+        public Unknown<Pr, C> withStats(final Statistics stats) {
+            return new Unknown<>(Optional.of(stats));
+        }
+
+        @Override
         public boolean isSafe() {
             return false;
         }
@@ -312,6 +330,11 @@ public abstract class SafetyResult<Pr extends Proof, C extends Cex> implements R
 
         private Partial(final Pr proof, final Optional<Statistics> stats) {
             super(proof, stats);
+        }
+
+        @Override
+        public Partial<Pr, C> withStats(final Statistics stats) {
+            return new Partial<>(getProof(), Optional.of(stats));
         }
 
         @Override

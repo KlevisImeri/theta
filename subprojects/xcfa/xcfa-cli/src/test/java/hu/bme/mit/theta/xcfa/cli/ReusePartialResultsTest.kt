@@ -35,6 +35,7 @@ import java.util.stream.Stream
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import hu.bme.mit.theta.xcfa.cli.checkers.InProcessChecker
 
 class ReusePartialResultsTest {
   companion object {
@@ -54,18 +55,18 @@ class ReusePartialResultsTest {
 
         //-------------------------------------Error(verification stuck)-------------------------------------
         //  INFO: 1 ite (?ms) vs 5 ite (?ms) [good]
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "PredCartDefault->PredCartConjuncts")
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "PredCartDefault->PredCartConjuncts", true)
         //  INFO: UnknownSolverStatusException
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound10.c", "PredBoolDefault->PredBoolConjuncts")
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound10.c", "PredBoolDefault->PredBoolConjuncts", true)
         // ----
         //  INFO: 1 ite (392ms) vs 4 ite (1487ms) [good]
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound2.c", "PredBoolDefault->PredBoolConjuncts")
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound2.c", "PredBoolDefault->PredBoolConjuncts", true)
         //  INFO: Full exploration to long 
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound100.c", "PredBoolDefault->PredBoolConjuncts")
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound100.c", "PredBoolDefault->PredBoolConjuncts", true)
         //  INFO: Full exploration -> solver error
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound5.c", "PredBoolDefault->PredBoolConjuncts")
-        //  INFO: Requires to much mem
-        // Arguments.of("/c/partialResultTest/mannadiv_unwindbound5.c", "PredBoolDefault->PredBoolConjuncts")
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound5.c", "PredBoolDefault->PredBoolConjuncts", true)
+        //  INFO:  
+        Arguments.of("/c/partialResultTest/mannadiv_unwindbound5.c", "PredBoolDefault->PredBoolConjuncts", true)
         //----------------------------------------------------------------------------------------------------
 
         //  INFO:: long partial res
@@ -77,15 +78,12 @@ class ReusePartialResultsTest {
 
   @ParameterizedTest
   @MethodSource("partialResultExamples")
-  fun testPartialResultsForPortfolio(cFile: String, portfolioName: String) {
+  fun testPartialResultsForPortfolio(cFile: String, portfolioName: String, resultType: Boolean) {
     try {
       val logger = ConsoleLogger(Logger.Level.VERBOSE)
       val uniqueLogger = UniqueWarningLogger(logger)
-      // WebDebuggerLogger.enableWebDebuggerLogger();
-
-      val result =
-        runConfig( 
-          XcfaConfig<SpecFrontendConfig, SpecBackendConfig>(
+      
+      val config = XcfaConfig<SpecFrontendConfig, SpecBackendConfig>(
             inputConfig = InputConfig(input = File(javaClass.getResource(cFile)!!.path)),
             debugConfig =
               DebugConfig(
@@ -106,15 +104,41 @@ class ReusePartialResultsTest {
                 specConfig = PortfolioConfig(portfolio = portfolioName),
               ),
             outputConfig = OutputConfig(),
-          ),
-          logger,
-          uniqueLogger,
-          throwDontExit = false,
-        )
+          )
+      val configWithOnlyEndNode = config.copy(
+            backendConfig = config.backendConfig.copy(
+              specConfig = (config.backendConfig.specConfig as PortfolioConfig).copy(
+                partialResultTestOnlyEndNode = true
+              )
+            )
+          )
 
-      println("\n\nRES: ${result.getProof().toString().replace("main::", "")}")
+      val resultWithPartial = runConfig(config, logger, uniqueLogger, throwDontExit = false);
+      InProcessChecker.backendTime.clear(); //TODO: shold be put into the config as a varible -1 would meen dont touch it
+      val result = runConfig(configWithOnlyEndNode, logger, uniqueLogger, throwDontExit = false);
 
-      // WebDebuggerLogger.getInstance().writeToFile("./Arg.cfa");
+
+      if (
+        (resultWithPartial.isSafe && resultType != true) ||
+        (result.isSafe && resultType != true)
+      ) {
+        throw IllegalStateException("Safety condition mismatch: Expected resultType to be true, but got false.")
+      }
+
+
+      val partialBackendTime = resultWithPartial.getStats().get().get("backendTimeMs") as List<Long>
+      val backendTime = result.getStats().get().get("backendTimeMs") as List<Long>
+      println(partialBackendTime);
+      println(backendTime);
+
+      val timeOfPartialLastNode = partialBackendTime.last() as Long
+      val time = backendTime.last() as Long
+
+      println("Algorithm Time (Partial): $timeOfPartialLastNode ms")
+      println("Algorithm Time (Full): $time ms")
+      assert(timeOfPartialLastNode <= time)
+
+      // println("\n\nRES: ${result.getProof().toString().replace("main::", "")}")
       println("---- + ---- + ---- + ---- + ----")
     } catch (e: Throwable) {
       println(e.stackTraceToString())

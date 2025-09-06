@@ -4,6 +4,8 @@ and the other config is one where the solver could solve it
 You hav to pass the partial result it one run and the other you dont pass 
 the partial result and you see the differnce
 The config should be spawsn as processes and the partical result shoudl be 
+- write to help getConfig<name>()
+- 
 passed between processes.
 - [ ] After many test as above we can run a full sv-bech run
 - [ ] Pass the timer to the process how long in time should it run.

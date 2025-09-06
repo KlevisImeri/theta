@@ -23,26 +23,48 @@ import hu.bme.mit.theta.xcfa.model.StmtLabel
 import hu.bme.mit.theta.xcfa.model.XcfaProcedureBuilder
 import hu.bme.mit.theta.xcfa.passes.ProcedurePass
 import hu.bme.mit.theta.xcfa.witnesses.*
+import hu.bme.mit.theta.xcfa.model.*
+import hu.bme.mit.theta.analysis.expr.ExprState;
+import hu.bme.mit.theta.core.type.*;
+import hu.bme.mit.theta.core.type.booltype.*;
+
+
 
 class ApplyLocationInvariantsPass(parseContext: ParseContext, val witness: LocationInvariants) :
   ProcedurePass {
   override fun run(builder: XcfaProcedureBuilder): XcfaProcedureBuilder {
-    val invariantMap = witness.getPartitions()
+    val invariantMap: Map<XcfaLocation, Collection<ExprState>> = witness.getPartitions()
 
     for (loc in builder.getLocs()) {
       if (!invariantMap.containsKey(loc)) continue
       val invariants = invariantMap[loc]!!
       if (invariants.isEmpty()) continue
 
-      val stmtXcfaLabels = invariants.map { expr -> StmtLabel(Stmts.Assume(expr.toExpr())) }
+      val exprs: Iterable<Expr<BoolType>> = invariants.map { expr -> expr.toExpr() }
+      val stmtXcfaLabel = StmtLabel(Stmts.Assume(OrExpr.of(exprs)));
 
       for (edge in loc.incomingEdges.toList()) {
         val currentLabels = (edge.label as? SequenceLabel)?.labels ?: listOf(edge.label)
-        val newEdge = edge.withLabel(SequenceLabel(currentLabels + stmtXcfaLabels))
+        val newEdge = edge.withLabel(SequenceLabel(currentLabels + stmtXcfaLabel))
         builder.removeEdge(edge)
         builder.addEdge(newEdge)
       }
     }
+
+    // for (loc in builder.getLocs()) {
+    //   if (!invariantMap.containsKey(loc)) continue
+    //   val invariants = invariantMap[loc]!!
+    //   if (invariants.isEmpty()) continue
+    //
+    //   val stmtXcfaLabels = invariants.map { expr -> StmtLabel(Stmts.Assume(expr.toExpr())) }
+    //
+    //   for (edge in loc.incomingEdges.toList()) {
+    //     val currentLabels = (edge.label as? SequenceLabel)?.labels ?: listOf(edge.label)
+    //     val newEdge = edge.withLabel(SequenceLabel(currentLabels + stmtXcfaLabels))
+    //     builder.removeEdge(edge)
+    //     builder.addEdge(newEdge)
+    //   }
+    // }
 
     return builder
   }

@@ -36,6 +36,7 @@ import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.createTempDirectory
+import hu.bme.mit.theta.xcfa.cli.XcfaBackendStatistics
 
 class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
   val xcfa: XCFA?,
@@ -177,6 +178,12 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
     return booleanSafetyResult as SafetyResult<EmptyProof, EmptyCex>
   }
 
+
+  companion object {
+    var backendTime = Collections.synchronizedList(mutableListOf<Long>()); 
+  }
+
+
   private inner class ProcessHandler : NuAbstractProcessHandler() {
 
     private val stdout = LinkedList<String>()
@@ -191,28 +198,33 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
         val bytes = ByteArray(buffer.remaining())
         buffer[bytes]
         val str = bytes.decodeToString()
-
+        
         stdoutRemainder += str
+        if (stdoutRemainder.contains("Backend finished")) {
+          val regex = Regex(".*Backend finished.*?\\(in (\\d+) ms\\)") //INFO: Both work but below faster
+          // val regex = Regex("    server: Backend finished \\(in (\\d+) ms\\)")
+          backendTime.add(regex.find(stdoutRemainder)?.groupValues?.get(1)?.toLong() ?: -1L);
+        }
         if (stdoutRemainder.contains("SafetyResult Safe")) {
-          safetyResult = SafetyResult.safe<EmptyProof, EmptyCex>(EmptyProof.getInstance())
+          safetyResult = SafetyResult.safe<EmptyProof, EmptyCex>(EmptyProof.getInstance(), XcfaBackendStatistics(backendTime.toList()))
         }
         if (stdoutRemainder.contains("SafetyResult Unsafe")) {
-          safetyResult = SafetyResult.unsafe(EmptyCex.getInstance(), EmptyProof.getInstance())
+          safetyResult = SafetyResult.unsafe(EmptyCex.getInstance(), EmptyProof.getInstance(), XcfaBackendStatistics(backendTime.toList()))
         }
         if (stdoutRemainder.contains("SafetyResult Unknown")) {
           safetyResult = SafetyResult.unknown<EmptyProof, EmptyCex>()
         }
         if (stdoutRemainder.contains("SafetyResult Partial")) {
-          if (config.backendConfig.parseInProcess) {
-            safetyResult = SafetyResult.partial<EmptyProof, EmptyCex>(EmptyProof.getInstance())
-          }
+          // if (config.backendConfig.parseInProcess) {
+          //   safetyResult = SafetyResult.partial<EmptyProof, EmptyCex>(EmptyProof.getInstance())
+          // }
           xcfa!!
           var tempLoc = LocationInvariants()
           LocationInvariants.fromFile(partialResultJson, getGson(xcfa), logger)?.let {
             loadedInvariants ->
             tempLoc = loadedInvariants
           }
-          safetyResult = SafetyResult.partial<LocationInvariants, EmptyCex>(tempLoc)
+          safetyResult = SafetyResult.partial<LocationInvariants, EmptyCex>(tempLoc, XcfaBackendStatistics(backendTime.toList()))
         }
 
         val newLines = stdoutRemainder.split("\n") // if ends with \n, last element will be ""

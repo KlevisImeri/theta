@@ -442,7 +442,8 @@ data class OcConfig(
 
 data class PortfolioConfig(
   @Parameter(names = ["--portfolio"], description = "Portfolio to run")
-  var portfolio: String = "COMPLEX"
+  var portfolio: String = "COMPLEX",
+  var partialResultTestOnlyEndNode: Boolean = false
 ) : SpecBackendConfig
 
 data class MddConfig(
