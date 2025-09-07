@@ -48,6 +48,7 @@ import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 import hu.bme.mit.theta.xcfa.cli.utils.getSolver
 import hu.bme.mit.theta.xcfa.dereferences
 import hu.bme.mit.theta.xcfa.model.XCFA
+import hu.bme.mit.theta.core.type.booltype.*;
 
 fun getCegarChecker(
   xcfa: XCFA,
@@ -225,11 +226,25 @@ fun getCegarChecker(
                 }
                 .toList()
             }
+            
+        val simplifiedLocMap = locmap.mapValues { (loc, exprStates) ->
+            if (exprStates.isEmpty()) {
+                exprStates
+            } else {
+                val exprs = exprStates.map { it.toExpr() }
+                val simplifiedExpr = abstractionSolverInstance.simplify(OrExpr.of(exprs))
+                // val simplifiedExpr = abstractionSolverInstance.simplify(AndExpr.of(exprs))
+                // val simplifiedExpr = abstractionSolverFactory.createSolver().simplify(OrExpr.of(exprs))
+                // val simplifiedExpr = AndExpr.of(exprs)
+                // val simplifiedExpr = OrExpr.of(exprs)
+                listOf(PredState.of(simplifiedExpr))
+            }
+        }
 
         return if (ret.isSafe) {
-          SafetyResult.safe(LocationInvariants(locmap))
+          SafetyResult.safe(LocationInvariants(simplifiedLocMap))
         } else if (ret.isPartial) {
-          SafetyResult.partial(LocationInvariants(locmap))
+          SafetyResult.partial(LocationInvariants(simplifiedLocMap))
         } else {
           error("The SafetyResult type has changed during runtime")
         }

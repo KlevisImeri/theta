@@ -75,8 +75,8 @@ fun runConfig(
   throwDontExit: Boolean,
   partialResult: LocationInvariants? = null,
 ): SafetyResult<*, *> {
-  println("RunConfig");
-  println(config)
+  // println("RunConfig");
+  // println(config)
   propagateInputOptions(config, logger, uniqueLogger)
 
   registerAllSolverManagers(config.backendConfig.solverHome, logger)

@@ -32,40 +32,48 @@ import hu.bme.mit.theta.core.type.booltype.*;
 
 class ApplyLocationInvariantsPass(parseContext: ParseContext, val witness: LocationInvariants) :
   ProcedurePass {
-  override fun run(builder: XcfaProcedureBuilder): XcfaProcedureBuilder {
-    val invariantMap: Map<XcfaLocation, Collection<ExprState>> = witness.getPartitions()
+    override fun run(builder: XcfaProcedureBuilder): XcfaProcedureBuilder {
+        val invariantMap: Map<XcfaLocation, Collection<ExprState>> = witness.getPartitions()
+        var partialCnt = 0
+        
+        val edgesToAdd = mutableSetOf<XcfaEdge>()
+        val edgesToRemove = mutableSetOf<XcfaEdge>()
+        val locationsToAdd = mutableSetOf<XcfaLocation>()
+        
+        for (loc in builder.getLocs()) {
+            if (!invariantMap.containsKey(loc)) continue
+            val invariants = invariantMap[loc]!!
+            if (invariants.isEmpty()) continue
 
-    for (loc in builder.getLocs()) {
-      if (!invariantMap.containsKey(loc)) continue
-      val invariants = invariantMap[loc]!!
-      if (invariants.isEmpty()) continue
-
-      val exprs: Iterable<Expr<BoolType>> = invariants.map { expr -> expr.toExpr() }
-      val stmtXcfaLabel = StmtLabel(Stmts.Assume(OrExpr.of(exprs)));
-
-      for (edge in loc.incomingEdges.toList()) {
-        val currentLabels = (edge.label as? SequenceLabel)?.labels ?: listOf(edge.label)
-        val newEdge = edge.withLabel(SequenceLabel(currentLabels + stmtXcfaLabel))
-        builder.removeEdge(edge)
-        builder.addEdge(newEdge)
-      }
+            val exprs: List<Expr<BoolType>> = invariants.map { expr -> expr.toExpr() }
+            // val stmtXcfaLabel = StmtLabel(Stmts.Assume(OrExpr.of(exprs)));
+            val stmtXcfaLabel = StmtLabel(Stmts.Assume(exprs.last()));
+            // val stmtXcfaLabel = StmtLabel(Stmts.Assume(AndExpr.of(exprs)));
+            
+            val newLoc = XcfaLocation(name = "partial$partialCnt", metadata = EmptyMetaData)
+            partialCnt++
+            
+            val newEdge = XcfaEdge(
+                source = newLoc, 
+                target = loc,
+                label = SequenceLabel(listOf(stmtXcfaLabel)),
+                EmptyMetaData
+            )
+            
+            for (incomingEdge in loc.incomingEdges) {
+                val redirectedEdge = incomingEdge.withTarget(newLoc)
+                edgesToRemove.add(incomingEdge)
+                edgesToAdd.add(redirectedEdge)
+            }
+            
+            edgesToAdd.add(newEdge)
+            locationsToAdd.add(newLoc)
+        }
+        
+        edgesToRemove.forEach { builder.removeEdge(it) }
+        edgesToAdd.forEach { builder.addEdge(it) }
+        locationsToAdd.forEach { builder.addLoc(it) }
+        
+        return builder
     }
-
-    // for (loc in builder.getLocs()) {
-    //   if (!invariantMap.containsKey(loc)) continue
-    //   val invariants = invariantMap[loc]!!
-    //   if (invariants.isEmpty()) continue
-    //
-    //   val stmtXcfaLabels = invariants.map { expr -> StmtLabel(Stmts.Assume(expr.toExpr())) }
-    //
-    //   for (edge in loc.incomingEdges.toList()) {
-    //     val currentLabels = (edge.label as? SequenceLabel)?.labels ?: listOf(edge.label)
-    //     val newEdge = edge.withLabel(SequenceLabel(currentLabels + stmtXcfaLabels))
-    //     builder.removeEdge(edge)
-    //     builder.addEdge(newEdge)
-    //   }
-    // }
-
-    return builder
-  }
 }

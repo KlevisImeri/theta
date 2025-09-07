@@ -60,13 +60,13 @@ class ReusePartialResultsTest {
         // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound10.c", "PredBoolDefault->PredBoolConjuncts", true)
         // ----
         //  INFO: 1 ite (392ms) vs 4 ite (1487ms) [good]
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound2.c", "PredBoolDefault->PredBoolConjuncts", true)
+        Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound2.c", "PredBoolDefault->PredBoolConjuncts", true)
         //  INFO: Full exploration to long 
         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound100.c", "PredBoolDefault->PredBoolConjuncts", true)
         //  INFO: Full exploration -> solver error
         // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound5.c", "PredBoolDefault->PredBoolConjuncts", true)
         //  INFO:  
-        Arguments.of("/c/partialResultTest/mannadiv_unwindbound5.c", "PredBoolDefault->PredBoolConjuncts", true)
+        // Arguments.of("/c/partialResultTest/mannadiv_unwindbound5.c", "PredBoolDefault->PredBoolConjuncts", true)
         //----------------------------------------------------------------------------------------------------
 
         //  INFO:: long partial res
@@ -113,29 +113,29 @@ class ReusePartialResultsTest {
             )
           )
 
-      val resultWithPartial = runConfig(config, logger, uniqueLogger, throwDontExit = false);
-      InProcessChecker.backendTime.clear(); //TODO: shold be put into the config as a varible -1 would meen dont touch it
       val result = runConfig(configWithOnlyEndNode, logger, uniqueLogger, throwDontExit = false);
+      InProcessChecker.backendTime.clear(); //TODO: shold be put into the config as a varible -1 would meen dont touch it
+      val resultWithPartial = runConfig(config, logger, uniqueLogger, throwDontExit = false);
 
 
       if (
-        (resultWithPartial.isSafe && resultType != true) ||
-        (result.isSafe && resultType != true)
+        (result.isSafe && resultType != true) ||
+        (resultWithPartial.isSafe && resultType != true)
       ) {
         throw IllegalStateException("Safety condition mismatch: Expected resultType to be true, but got false.")
       }
 
 
-      val partialBackendTime = resultWithPartial.getStats().get().get("backendTimeMs") as List<Long>
       val backendTime = result.getStats().get().get("backendTimeMs") as List<Long>
-      println(partialBackendTime);
+      val partialBackendTime = resultWithPartial.getStats().get().get("backendTimeMs") as List<Long>
       println(backendTime);
+      println(partialBackendTime);
 
-      val timeOfPartialLastNode = partialBackendTime.last() as Long
       val time = backendTime.last() as Long
+      val timeOfPartialLastNode = partialBackendTime.last() as Long
 
+      println("Algorithm Time (NoPartial): $time ms")
       println("Algorithm Time (Partial): $timeOfPartialLastNode ms")
-      println("Algorithm Time (Full): $time ms")
       assert(timeOfPartialLastNode <= time)
 
       // println("\n\nRES: ${result.getProof().toString().replace("main::", "")}")

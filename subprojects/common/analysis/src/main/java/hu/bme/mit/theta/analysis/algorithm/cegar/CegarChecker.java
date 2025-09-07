@@ -143,6 +143,7 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
                         logger.write(
                                 Level.MAINSTEP, "----Infinit Loop Detected by CexMonitor----%n");
                         abstractor.unroll(proof, prec);
+                        // abstractor.unroll(proof, initPrec);
                         logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
                         return SafetyResult.partial(proof, getStats.get());
                     } else {
