@@ -57,14 +57,18 @@ class ReusePartialResultsTest {
         // partial res
 
         //-------------------------------------Error(verification stuck)-------------------------------------
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "PredCartDefault->PredCartConjuncts", true)
         // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound10.c", "PredBoolDefault->PredBoolConjuncts", true)
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "PredCartDefault->PredCartConjuncts", true)
         // ----
-         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound2.c", "PredBoolDefault->PredBoolConjuncts", true)
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound2.c", "PredBoolDefault->PredBoolConjuncts", true)
         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound100.c", "PredBoolDefault->PredBoolConjuncts", true)
         Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound5.c", "PredBoolDefault->PredBoolConjuncts", true)
         // Arguments.of("/c/partialResultTest/test_locks_14-2.c", "ExplDefault->ExplFull", false),
         // Arguments.of("/c/partialResultTest/test_locks_15-1.c", "ExplDefault->ExplFull", false)
+        // ---
+        // Arguments.of("/c/partialResultTest/test_locks_14-2.c", "ExplDefault->PredCartDefault", false)
+        // Arguments.of("/c/partialResultTest/test_locks_15-1.c", "ExplDefault->PredCartDefault", false)
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "ExplDefault->PredCartDefault", true)
         //----------------------------------------------------------------------------------------------------
 
           
@@ -75,49 +79,55 @@ class ReusePartialResultsTest {
     }
   }
 
+
   @ParameterizedTest
   @MethodSource("partialResultExamples")
   fun testPartialResultsForPortfolio(cFile: String, portfolioName: String, resultType: Boolean) {
     try {
       val logger = ConsoleLogger(Logger.Level.VERBOSE)
       val uniqueLogger = UniqueWarningLogger(logger)
-      
-      val config = XcfaConfigs.createDefaultPortfolioConfig(cFile, portfolioName);
+
+      val config = XcfaConfigs.createDefaultPortfolioConfig(cFile, portfolioName)
       val configWithOnlyEndNode = config.copy(
-            backendConfig = config.backendConfig.copy(
-              specConfig = (config.backendConfig.specConfig as PortfolioConfig).copy(
-                partialResultTestOnlyEndNode = true
-              )
-            ), 
-            outputConfig = config.outputConfig.copy(
-                resultFolder =  Paths.get("./outputNoPartial").toFile(),
-            )
+        backendConfig = config.backendConfig.copy(
+          specConfig = (config.backendConfig.specConfig as PortfolioConfig).copy(
+            partialResultTestOnlyEndNode = true
           )
+        ),
+        outputConfig = config.outputConfig.copy(
+          resultFolder = Paths.get("./outputNoPartial").toFile()
+        )
+      )
 
-      val result = runConfig(configWithOnlyEndNode, logger, uniqueLogger, throwDontExit = false);
-      val resultWithPartial = runConfig(config, logger, uniqueLogger, throwDontExit = false);
+      val runs = 20
+      val timesNoPartial = mutableListOf<Long>()
+      val timesPartial = mutableListOf<Long>()
 
-      if (
-        (result.isSafe && resultType != true) || (result.isUnsafe && resultType != false) ||
-        (resultWithPartial.isSafe && resultType != true) || (resultWithPartial.isUnsafe && resultType != false) 
-      ) {
-        throw IllegalStateException("Safety condition mismatch: Expected resultType to be $resultType, but got ${!resultType}.")
+      repeat(runs) {
+        val result = runConfig(configWithOnlyEndNode, logger, uniqueLogger, throwDontExit = false)
+        val resultWithPartial = runConfig(config, logger, uniqueLogger, throwDontExit = false)
+
+        if (
+          (result.isSafe && resultType != true) || (result.isUnsafe && resultType != false) ||
+          (resultWithPartial.isSafe && resultType != true) || (resultWithPartial.isUnsafe && resultType != false)
+        ) {
+          throw IllegalStateException("Safety condition mismatch: Expected resultType=$resultType")
+        }
+
+        val backendTime = result.getStats().get()["backendTimeMs"] as List<Long>
+        val partialBackendTime = resultWithPartial.getStats().get()["backendTimeMs"] as List<Long>
+
+        timesNoPartial += backendTime.last()
+        timesPartial += partialBackendTime.last()
       }
 
+      val avgNoPartial = timesNoPartial.average()
+      val avgPartial = timesPartial.average()
 
-      val backendTime = result.getStats().get().get("backendTimeMs") as List<Long>
-      val partialBackendTime = resultWithPartial.getStats().get().get("backendTimeMs") as List<Long>
-      println(backendTime);
-      println(partialBackendTime);
+      println("Average Time (NoPartial): $avgNoPartial ms")
+      println("Average Time (Partial): $avgPartial ms")
+      assert(avgPartial <= avgNoPartial)
 
-      val time = backendTime.last() as Long
-      val timeOfPartialLastNode = partialBackendTime.last() as Long
-
-      println("Algorithm Time (NoPartial): $time ms")
-      println("Algorithm Time (Partial): $timeOfPartialLastNode ms")
-      assert(timeOfPartialLastNode <= time)
-
-      // println("\n\nRES: ${result.getProof().toString().replace("main::", "")}")
       println("---- + ---- + ---- + ---- + ----")
     } catch (e: IllegalStateException) {
       println(red(e.message ?: ""))
@@ -130,4 +140,3 @@ class ReusePartialResultsTest {
     }
   }
 }
-

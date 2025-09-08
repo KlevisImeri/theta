@@ -465,7 +465,7 @@ private fun postVerificationLogging(
     if (locInvNew !is LocationInvariants) {
       logger.write(
         Logger.Level.INFO,
-        "For the moment thetas XCFA subproject can only process LocationInvariants as partial results between analyses!",
+        "For the moment thetas XCFA subproject can only process LocationInvariants as partial results between analyses!\n",
       )
     } else if (
       !config.backendConfig.disablePartialResult &&
@@ -482,13 +482,13 @@ private fun postVerificationLogging(
 
       val finalInvariants =
         if (locInvOld != null) {
-          logger.write(Logger.Level.INFO, "Merging new partial results with existing ones.")
+          logger.write(Logger.Level.INFO, "Merging new partial results with existing ones.\n")
           locInvNew.merge(locInvOld)
           locInvNew  // WARN:  Eventually we have to merge
         } else {
           locInvNew
         }
-        // println("invariants: $finalInvariants")
+        println(finalInvariants)
 
       finalInvariants.toJsonFile(outputFile, gson, logger)
     }
@@ -525,7 +525,7 @@ private fun postVerificationLogging(
 
       logger.write(
         Logger.Level.INFO,
-        "Writing post-verification artifacts to directory ${resultFolder.absolutePath}\n",
+        "Writing post-verification artifacts to directory ${resultFolder.absolutePath}%n",
       )
 
       // WARN: Probably bad

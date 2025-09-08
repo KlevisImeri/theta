@@ -17,3 +17,6 @@ they probably produce very similar paths and invariants so the invariants i add 
 i Will make some configs and try so many different combination at the svbenchcloud thing
 
 - Try clever ways to unroll
+
+
+DO one round of ExplState with good init precision -> pred state

@@ -52,6 +52,9 @@ import hu.bme.mit.theta.core.type.booltype.*;
 import hu.bme.mit.theta.core.type.booltype.BoolExprs.And;
 import hu.bme.mit.theta.core.type.booltype.BoolExprs.False;
 import hu.bme.mit.theta.core.type.booltype.BoolExprs.True;
+import hu.bme.mit.theta.analysis.utils.ArgVisualizer;
+import java.io.FileWriter
+import hu.bme.mit.theta.common.visualization.writer.GraphvizWriter;
 
 fun getCegarChecker(
   xcfa: XCFA,
@@ -192,6 +195,12 @@ fun getCegarChecker(
           } else {
             ret.asPartial().proof
           }
+        
+
+        // logger.info("Printing ARG to file...")
+        // val g = ArgVisualizer.getDefault().visualize(arg as ARG)
+        // val outputFile = config.outputConfig.resultFolder.resolve("Arg.dot")
+        // outputFile.writeText(GraphvizWriter.getInstance().writeString(g))
 
         val locmap =
           xcfa.procedures
@@ -230,22 +239,39 @@ fun getCegarChecker(
                 .toList()
             }
 
-        val simplifiedLocMap = locmap.mapValues { (loc, exprStates) -> //WARN: keept herebecause writing to file can be slow
-            if (exprStates.isEmpty()) {
-                exprStates
-            } else {
-                // val exprs = exprStates.map { it.toExpr() }.filterNot { it is TrueExpr } //WARN: for som reason you cant parse it if you add remove .filterNot
-                val exprs = exprStates.map { it.toExpr() }
-                val simplifiedExpr = abstractionSolverInstance.simplify(OrExpr.of(exprs))
-                // val simplifiedExpr = abstractionSolverInstance.simplify(AndExpr.of(exprs))
-                // val simplifiedExpr = abstractionSolverFactory.createSolver().simplify(OrExpr.of(exprs))
-                // val simplifiedExpr = AndExpr.of(exprs)
-                // val simplifiedExpr = OrExpr.of(exprs)
-                listOf(PredState.of(simplifiedExpr))
-                // exprStates
-            }
-        }
         // val simplifiedLocMap  = locmap
+        // val simplifiedLocMap = locmap.mapValues { (loc, exprStates) -> //WARN: keept herebecause writing to file can be slow
+        //     if (exprStates.isEmpty()) {
+        //         exprStates
+        //     } else {
+        //         val exprs = exprStates.map { it.toExpr() }.filterNot { it is TrueExpr } 
+        //          val exprs = exprStates.map { it.toExpr() }
+        //         if (exprs.isEmpty()) {
+        //           listOf<PredState>();
+        //         } else {
+        //           val simplifiedExpr = abstractionSolverInstance.simplify(OrExpr.of(exprs))
+        //           // val simplifiedExpr = abstractionSolverInstance.simplify(AndExpr.of(exprs))
+        //           // val simplifiedExpr = abstractionSolverFactory.createSolver().simplify(OrExpr.of(exprs))
+        //           // val simplifiedExpr = AndExpr.of(exprs)
+        //           // val simplifiedExpr = OrExpr.of(exprs)
+        //           listOf(PredState.of(simplifiedExpr))
+        //           // exprStates
+        //         } 
+        //     }
+        // }.filterValues { it.isNotEmpty() }
+        val simplifiedLocMap = locmap.mapValues { (loc, exprStates) ->
+          if (exprStates.isEmpty()) {
+              exprStates
+          } else {
+              val exprs = exprStates.map { it.toExpr() }
+              if (exprs.any { it is TrueExpr }) {
+                  emptyList<PredState>()
+              } else {
+                  val simplifiedExpr = abstractionSolverInstance.simplify(OrExpr.of(exprs))
+                  listOf(PredState.of(simplifiedExpr))
+              }
+          }
+        }.filterValues { it.isNotEmpty() }
 
         return if (ret.isSafe) {
           SafetyResult.safe(LocationInvariants(simplifiedLocMap))
