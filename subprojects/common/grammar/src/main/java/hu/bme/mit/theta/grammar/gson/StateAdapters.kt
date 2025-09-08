@@ -122,8 +122,13 @@ class ExprStateAdapter : JsonSerializer<ExprState>, JsonDeserializer<ExprState> 
         val typeElement = jsonObject.get(TYPE_FIELD)
             ?: throw JsonParseException("Missing type discriminator field: $TYPE_FIELD")
 
+        val typeName = typeElement.asString
         val actualType = try {
-            Class.forName(typeElement.asString)
+          when {
+           typeName.endsWith("ExplState.NonBottom") -> ExplState::class.java
+            typeName.endsWith("ExplState.Bottom") -> ExplState::class.java
+            else -> Class.forName(typeName)
+          }
         } catch (e: ClassNotFoundException) {
             throw JsonParseException("Cannot find class for type: ${typeElement.asString}", e)
         }

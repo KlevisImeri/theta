@@ -121,7 +121,8 @@ fun predBoolDefaultToPredBoolConjuncts(
             outputConfig =
             OutputConfig(
                 versionInfo = false,
-                resultFolder = Paths.get("./").toFile(),
+                resultFolder = portfolioConfig.outputConfig.resultFolder
+                    .resolve((portfolioConfig.backendConfig.specConfig as PortfolioConfig).portfolio),
                 cOutputConfig = COutputConfig(disable = true),
                 witnessConfig =
                 WitnessConfig(
@@ -151,6 +152,9 @@ fun predBoolDefaultToPredBoolConjuncts(
                     exprSplitter = WHOLE
                 )
             )
+        ),
+        outputConfig = baseConfig.outputConfig.copy(
+            resultFolder =  baseConfig.outputConfig.resultFolder.resolve("PredBoolDefault"),
         )
     )
 
@@ -162,6 +166,9 @@ fun predBoolDefaultToPredBoolConjuncts(
                     exprSplitter = ExprSplitterOptions.CONJUNCTS 
                 )
             )
+        ),
+        outputConfig = baseConfig.outputConfig.copy(
+            resultFolder =  baseConfig.outputConfig.resultFolder.resolve("PredCartConjuncts"),
         )
     )
 

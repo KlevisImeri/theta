@@ -54,11 +54,11 @@ data class LocationInvariants(
     try {
       val jsonString = gson.toJson(this)
       file.writeText(jsonString)
-      logger.write(INFO, "Successfully wrote LocationInvariants to ${file.name}")
+      logger.write(INFO, "Successfully wrote LocationInvariants to ${file.absolutePath}\n")
     } catch (e: Exception) {
       logger.write(
         INFO,
-        "[Error] Could not write LocationInvariants to file '${file.name}'. Reason: ${e.message}",
+        "[Error] Could not write LocationInvariants to file '${file.absolutePath}'. Reason: ${e.message}\n",
       )
     }
   }
@@ -68,6 +68,10 @@ data class LocationInvariants(
       if (!file.exists() || !file.isFile) {
         return null
       }
+      if (file.length() == 0L) {
+        logger.write(INFO, "LocationInvariants ${file.absolutePath} is empty!\n")
+      }
+
 
       return try {
         val invariants =
@@ -79,7 +83,7 @@ data class LocationInvariants(
       } catch (e: Exception) {
         logger.write(
           INFO,
-          "[Error] Could not parse LocationInvariants file '${file.name}'. Reason: ${e.message}\n",
+          "[Error] Could not parse LocationInvariants file '${file.absolutePath}'. Reason: ${e.message}\n",
         )
         null
       }

@@ -36,6 +36,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import hu.bme.mit.theta.xcfa.cli.checkers.InProcessChecker
+import hu.bme.mit.theta.xcfa.cli.params.*
+import hu.bme.mit.theta.termui.TermUI.red
+import java.nio.file.Paths
 
 class ReusePartialResultsTest {
   companion object {
@@ -54,21 +57,17 @@ class ReusePartialResultsTest {
         // partial res
 
         //-------------------------------------Error(verification stuck)-------------------------------------
-        //  INFO: 1 ite (?ms) vs 5 ite (?ms) [good]
         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "PredCartDefault->PredCartConjuncts", true)
-        //  INFO: UnknownSolverStatusException
         // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound10.c", "PredBoolDefault->PredBoolConjuncts", true)
         // ----
-        //  INFO: 1 ite (392ms) vs 4 ite (1487ms) [good]
-        Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound2.c", "PredBoolDefault->PredBoolConjuncts", true)
-        //  INFO: Full exploration to long 
+         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound2.c", "PredBoolDefault->PredBoolConjuncts", true)
         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound100.c", "PredBoolDefault->PredBoolConjuncts", true)
-        //  INFO: Full exploration -> solver error
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound5.c", "PredBoolDefault->PredBoolConjuncts", true)
-        //  INFO:  
-        // Arguments.of("/c/partialResultTest/mannadiv_unwindbound5.c", "PredBoolDefault->PredBoolConjuncts", true)
+        Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound5.c", "PredBoolDefault->PredBoolConjuncts", true)
+        // Arguments.of("/c/partialResultTest/test_locks_14-2.c", "ExplDefault->ExplFull", false),
+        // Arguments.of("/c/partialResultTest/test_locks_15-1.c", "ExplDefault->ExplFull", false)
         //----------------------------------------------------------------------------------------------------
 
+          
         //  INFO:: long partial res
         // Arguments.of("/c/partialResultTest/egcd-ll_unwindbound2.c", true), 
         // Arguments.of("/c/partialResultTest/klevis.c", true),
@@ -83,46 +82,26 @@ class ReusePartialResultsTest {
       val logger = ConsoleLogger(Logger.Level.VERBOSE)
       val uniqueLogger = UniqueWarningLogger(logger)
       
-      val config = XcfaConfig<SpecFrontendConfig, SpecBackendConfig>(
-            inputConfig = InputConfig(input = File(javaClass.getResource(cFile)!!.path)),
-            debugConfig =
-              DebugConfig(
-                debug = false,
-                stacktrace = true,
-                logLevel = Logger.Level.INFO,
-                argdebug = false,
-                argToFile = false,
-              ),
-            frontendConfig =
-              FrontendConfig(
-                specConfig =
-                  CFrontendConfig(architecture = ArchitectureType.ILP32)
-              ),
-            backendConfig =
-              BackendConfig(
-                backend = Backend.PORTFOLIO,
-                specConfig = PortfolioConfig(portfolio = portfolioName),
-              ),
-            outputConfig = OutputConfig(),
-          )
+      val config = XcfaConfigs.createDefaultPortfolioConfig(cFile, portfolioName);
       val configWithOnlyEndNode = config.copy(
             backendConfig = config.backendConfig.copy(
               specConfig = (config.backendConfig.specConfig as PortfolioConfig).copy(
                 partialResultTestOnlyEndNode = true
               )
+            ), 
+            outputConfig = config.outputConfig.copy(
+                resultFolder =  Paths.get("./outputNoPartial").toFile(),
             )
           )
 
       val result = runConfig(configWithOnlyEndNode, logger, uniqueLogger, throwDontExit = false);
-      InProcessChecker.backendTime.clear(); //TODO: shold be put into the config as a varible -1 would meen dont touch it
       val resultWithPartial = runConfig(config, logger, uniqueLogger, throwDontExit = false);
 
-
       if (
-        (result.isSafe && resultType != true) ||
-        (resultWithPartial.isSafe && resultType != true)
+        (result.isSafe && resultType != true) || (result.isUnsafe && resultType != false) ||
+        (resultWithPartial.isSafe && resultType != true) || (resultWithPartial.isUnsafe && resultType != false) 
       ) {
-        throw IllegalStateException("Safety condition mismatch: Expected resultType to be true, but got false.")
+        throw IllegalStateException("Safety condition mismatch: Expected resultType to be $resultType, but got ${!resultType}.")
       }
 
 
@@ -140,8 +119,14 @@ class ReusePartialResultsTest {
 
       // println("\n\nRES: ${result.getProof().toString().replace("main::", "")}")
       println("---- + ---- + ---- + ---- + ----")
+    } catch (e: IllegalStateException) {
+      println(red(e.message ?: ""))
+      throw e
+    } catch (e: AssertionError) {
+      println(red(e.message ?: ""))
+      throw e
     } catch (e: Throwable) {
-      println(e.stackTraceToString())
+      println(red(e.stackTraceToString()))
     }
   }
 }

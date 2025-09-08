@@ -45,7 +45,7 @@ class ApplyLocationInvariantsPass(parseContext: ParseContext, val witness: Locat
             val invariants = invariantMap[loc]!!
             if (invariants.isEmpty()) continue
 
-            val exprs: List<Expr<BoolType>> = invariants.map { expr -> expr.toExpr() }
+            val exprs: List<Expr<BoolType>> = invariants.map { expr -> expr.toExpr() }//.filterNot { it is TrueExpr }
             // val stmtXcfaLabel = StmtLabel(Stmts.Assume(OrExpr.of(exprs)));
             val stmtXcfaLabel = StmtLabel(Stmts.Assume(exprs.last()));
             // val stmtXcfaLabel = StmtLabel(Stmts.Assume(AndExpr.of(exprs)));

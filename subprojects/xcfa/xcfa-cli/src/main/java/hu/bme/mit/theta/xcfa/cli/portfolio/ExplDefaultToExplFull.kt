@@ -34,8 +34,8 @@ import hu.bme.mit.theta.xcfa.cli.params.Backend.OC
 import hu.bme.mit.theta.xcfa.cli.params.CexMonitorOptions.CHECK
 import hu.bme.mit.theta.xcfa.cli.params.ConeOfInfluenceMode.COI
 import hu.bme.mit.theta.xcfa.cli.params.ConeOfInfluenceMode.NO_COI
-import hu.bme.mit.theta.xcfa.cli.params.Domain.EXPL
-import hu.bme.mit.theta.xcfa.cli.params.Domain.PRED_CART
+import hu.bme.mit.theta.xcfa.cli.params.Domain.*
+import hu.bme.mit.theta.xcfa.cli.params.Domain.PRED_BOOL
 import hu.bme.mit.theta.xcfa.cli.params.ExitCodes.SERVER_ERROR
 import hu.bme.mit.theta.xcfa.cli.params.ExitCodes.SOLVER_ERROR
 import hu.bme.mit.theta.xcfa.cli.params.ExprSplitterOptions.WHOLE
@@ -53,7 +53,7 @@ import hu.bme.mit.theta.xcfa.passes.LoopUnrollPass
 import java.nio.file.Paths
 import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig.ArchitectureType;
 
-fun predCartDefaultToPredCartConjuncts(
+fun explDefaultToExplFull(
     xcfa: XCFA,
     mcm: MCM,
     parseContext: ParseContext,
@@ -81,27 +81,31 @@ fun predCartDefaultToPredCartConjuncts(
                 loopUnroll = LoopUnrollPass.UNROLL_LIMIT,
                 inputType = InputType.C,
                 specConfig = CFrontendConfig(
-                  architecture = if (specConfig is CFrontendConfig) { specConfig.architecture } else { ArchitectureType.LP64 }
+                    architecture = if (specConfig is CFrontendConfig) {
+                        specConfig.architecture
+                    } else {
+                        ArchitectureType.LP64 
+                    }
                 ),
             ),
             backendConfig =
             BackendConfig(
                 backend = CEGAR,
                 solverHome = portfolioConfig.backendConfig.solverHome,
-                timeoutMs = 60*1000,
+                timeoutMs = 5*60*1000,
                 specConfig =
                 CegarConfig(
                     initPrec = EMPTY,
                     porLevel = NOPOR,
                     porRandomSeed = 0,
                     coi = NO_COI,
-                    cexMonitor = CexMonitorOptions.CHECK,
+                    cexMonitor = CHECK,
                     abstractorConfig =
                     CegarAbstractorConfig(
                         abstractionSolver = "Z3",
                         validateAbstractionSolver = false,
-                        domain = PRED_CART,
-                        maxEnum = 2,
+                        domain = EXPL,
+                        maxEnum = 1,
                         search = ERR,
                     ),
                     refinerConfig =
@@ -109,8 +113,7 @@ fun predCartDefaultToPredCartConjuncts(
                         refinementSolver = "Z3",
                         validateRefinementSolver = false,
                         refinement = SEQ_ITP,
-                        exprSplitter = WHOLE,
-                        pruneStrategy = LAZY,
+                        pruneStrategy = FULL,
                     ),
                 ),
             ),
@@ -135,7 +138,9 @@ fun predCartDefaultToPredCartConjuncts(
                 xcfaOutputConfig = XcfaOutputConfig(disable = true),
                 chcOutputConfig = ChcOutputConfig(disable = true),
             ),
-            debugConfig = portfolioConfig.debugConfig.copy(stacktrace = true),
+            debugConfig = portfolioConfig.debugConfig.copy(
+                stacktrace = true,
+            ),
         )
 
     val startNodeConfig = baseConfig.copy(
@@ -143,12 +148,12 @@ fun predCartDefaultToPredCartConjuncts(
             inProcess = true,
             specConfig = (baseConfig.backendConfig.specConfig as CegarConfig).copy(
                 refinerConfig = (baseConfig.backendConfig.specConfig as CegarConfig).refinerConfig.copy(
-                    exprSplitter = WHOLE
+                    pruneStrategy = FULL 
                 )
             )
         ),
         outputConfig = baseConfig.outputConfig.copy(
-            resultFolder =  baseConfig.outputConfig.resultFolder.resolve("PredCartDefault"),
+            resultFolder =  baseConfig.outputConfig.resultFolder.resolve("ExplDefault"),
         )
     )
 
@@ -157,23 +162,23 @@ fun predCartDefaultToPredCartConjuncts(
             inProcess = true,
             specConfig = (baseConfig.backendConfig.specConfig as CegarConfig).copy(
                 refinerConfig = (baseConfig.backendConfig.specConfig as CegarConfig).refinerConfig.copy(
-                    exprSplitter = ExprSplitterOptions.CONJUNCTS
+                    pruneStrategy = LAZY 
                 )
             )
         ),
         outputConfig = baseConfig.outputConfig.copy(
-            resultFolder =  baseConfig.outputConfig.resultFolder.resolve("PredCartConjucts"),
+            resultFolder =  baseConfig.outputConfig.resultFolder.resolve("ExplFull"),
         )
     )
 
     val startNode = ConfigNode(
-        "StartNode",
+        "StartNode(EXPL,FULL)",
         startNodeConfig,
         ::checker
     )
 
     val endNode = ConfigNode(
-        "EndNode",
+        "EndNode(EXPL,LAZY)",
         endNodeConfig,
         ::checker
     )
@@ -181,7 +186,7 @@ fun predCartDefaultToPredCartConjuncts(
     val timeoutOrNotSolvableError =
         ExceptionTrigger(
             fallthroughExceptions =
-            setOf(ErrorCodeException(ExitCodes.SOLVER_ERROR.code), ErrorCodeException(ExitCodes.SERVER_ERROR.code)),
+            setOf(ErrorCodeException(SERVER_ERROR.code), ErrorCodeException(SOLVER_ERROR.code)),
             label = "TimeoutOrNotSolvableError",
         )
 
@@ -193,6 +198,7 @@ fun predCartDefaultToPredCartConjuncts(
     }
 
     val stm = STM(actualStartNode, setOf(edge))
+
     println(stm.visualize())
     return stm
 }

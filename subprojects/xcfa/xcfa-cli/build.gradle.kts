@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":theta-grammar"))
     implementation(project(":theta-llvm2xcfa"))
     implementation(project(":theta-litmus2xcfa"))
+    implementation(project(":theta-ui")) 
     implementation(project(":theta-graph-solver"))
     implementation(project(":theta-cat"))
     implementation(project(":theta-cfa"))

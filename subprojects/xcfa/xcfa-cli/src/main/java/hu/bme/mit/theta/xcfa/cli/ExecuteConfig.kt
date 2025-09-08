@@ -67,6 +67,7 @@ import hu.bme.mit.theta.xcfa2chc.toSMT2CHC
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
+import hu.bme.mit.theta.xcfa.cli.checkers.InProcessChecker
 
 fun runConfig(
   config: XcfaConfig<*, *>,
@@ -104,6 +105,7 @@ fun runConfig(
 }
 
 private fun propagateInputOptions(config: XcfaConfig<*, *>, logger: Logger, uniqueLogger: Logger) {
+  if(!config.backendConfig.inProcess) InProcessChecker.backendTime.clear();
   config.inputConfig.property = determineProperty(config, logger)
   LbePass.level = config.frontendConfig.lbeLevel
   StaticCoiPass.enabled = config.frontendConfig.staticCoi
@@ -168,18 +170,18 @@ fun frontend(
 ): Triple<XCFA, MCM, ParseContext> {
   val addPartialResultToXcfa =
     { xcfa: XCFA, parseContext: ParseContext, partialResult: LocationInvariants? ->
-      println("--------------XCFA------------------")
-      println(xcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
+      // println("--------------XCFA------------------")
+      // println(xcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
 
       if (partialResult == null || partialResult.getPartitions().isEmpty()) {
         xcfa
       } else {
-        println("\n--------------PartialResult------------------")
-        println(partialResult)
+        // println("\n--------------PartialResult------------------")
+        // println(partialResult)
         val updatedXcfa =
           xcfa.optimizeFurther(ApplyLocationInvariantsPassManager(parseContext, partialResult))
-        println("\n--------------XCFA+PartialResult------------------")
-        println(updatedXcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
+        // println("\n--------------XCFA+PartialResult------------------")
+        // println(updatedXcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
         updatedXcfa
       }
     }
@@ -290,10 +292,10 @@ private fun backend(
     } else {
       val stopwatch = Stopwatch.createStarted()
 
-      logger.write(
-        Logger.Level.INFO,
-        "Starting verification of ${if (xcfa?.name == "") "UnnamedXcfa" else (xcfa?.name ?: "DeferredXcfa")} using ${config.backendConfig.backend}\n${config}\n",
-      )
+      // logger.write(
+      //   Logger.Level.INFO,
+      //   "Starting verification of ${if (xcfa?.name == "") "UnnamedXcfa" else (xcfa?.name ?: "DeferredXcfa")} using ${config.backendConfig.backend}\n${config}\n",
+      // )
 
       val checker = getChecker(xcfa, mcm, config, parseContext, logger, uniqueLogger)
       var result =
@@ -393,12 +395,13 @@ private fun preVerificationLogging(
   if (config.outputConfig.enableOutput) {
     try {
       val resultFolder = config.outputConfig.resultFolder
+      // println("resultFolder:${resultFolder}")
       resultFolder.mkdirs()
 
-      logger.write(
-        Logger.Level.INFO,
-        "Writing pre-verification artifacts to directory ${resultFolder.absolutePath} with config ${config.outputConfig}\n",
-      )
+      // logger.write(
+      //   Logger.Level.INFO,
+      //   "Writing pre-verification artifacts to directory ${resultFolder.absolutePath} with config ${config.outputConfig}\n",
+      // )
 
       if (!config.outputConfig.chcOutputConfig.disable) {
         xcfa.procedures.forEach {
@@ -481,9 +484,11 @@ private fun postVerificationLogging(
         if (locInvOld != null) {
           logger.write(Logger.Level.INFO, "Merging new partial results with existing ones.")
           locInvNew.merge(locInvOld)
+          locInvNew  // WARN:  Eventually we have to merge
         } else {
           locInvNew
         }
+        // println("invariants: $finalInvariants")
 
       finalInvariants.toJsonFile(outputFile, gson, logger)
     }
@@ -522,6 +527,18 @@ private fun postVerificationLogging(
         Logger.Level.INFO,
         "Writing post-verification artifacts to directory ${resultFolder.absolutePath}\n",
       )
+
+      // WARN: Probably bad
+      // if (!config.outputConfig.xcfaOutputConfig.disable) {
+        xcfa!!
+        val xcfaDotFile = File(resultFolder, "xcfa.dot")
+        xcfaDotFile.writeText(xcfa.toDot())
+
+        // val xcfaJsonFile = File(resultFolder, "xcfa.json")
+        // val uglyJson = getGson(xcfa).toJson(xcfa)
+        // val create = GsonBuilder().setPrettyPrinting().create()
+        // xcfaJsonFile.writeText(create.toJson(JsonParser.parseString(uglyJson)))
+      // }
 
       // TODO eliminate the need for the instanceof check
       if (

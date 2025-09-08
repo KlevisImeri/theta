@@ -90,7 +90,7 @@ fun getPortfolioChecker(
       
       "PredCartDefault->PredCartConjuncts", -> predCartDefaultToPredCartConjuncts(xcfa, mcm, parseContext, config, logger, uniqueLogger)
       "PredBoolDefault->PredBoolConjuncts", -> predBoolDefaultToPredBoolConjuncts(xcfa, mcm, parseContext, config, logger, uniqueLogger)
-
+      "ExplDefault->ExplFull", -> explDefaultToExplFull(xcfa, mcm, parseContext, config, logger, uniqueLogger)
 
       else -> {
         if (File(portfolioName).exists()) {

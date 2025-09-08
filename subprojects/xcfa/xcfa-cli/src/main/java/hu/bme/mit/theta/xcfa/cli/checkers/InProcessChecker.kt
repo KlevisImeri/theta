@@ -37,6 +37,8 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.createTempDirectory
 import hu.bme.mit.theta.xcfa.cli.XcfaBackendStatistics
+import java.nio.file.Paths
+
 
 class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
   val xcfa: XCFA?,
@@ -47,7 +49,8 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
 
   private val placeholder = LocationInvariants()
 
-  private val partialResultJson =
+  // private val partialResultJson = Paths.get("./output").toFile().resolve("partialResults.json")
+  private val partialResultJson = 
     CachingFileSerializer.serialize("partialResult.json", placeholder) {
       getGson().toJson(placeholder)
     }

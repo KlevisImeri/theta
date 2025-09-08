@@ -87,6 +87,28 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
                 abstractor, refiner, logger, proofVisualizer, computePartialResult);
     }
 
+    public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
+            final Abstractor<P, Pr> abstractor,
+            final Refiner<P, Pr, C> refiner,
+            final ProofVisualizer<Pr> proofVisualizer) {
+        return create(
+                abstractor,
+                refiner,
+                NullLogger.getInstance(),
+                proofVisualizer,
+                false);
+    }
+
+    public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
+            final Abstractor<P, Pr> abstractor,
+            final Refiner<P, Pr, C> refiner,
+            final Logger logger,
+            final ProofVisualizer<? super Pr> proofVisualizer) {
+        return new CegarChecker<>(
+                abstractor, refiner, logger, proofVisualizer, false);
+    }
+
+
     public Pr getProof() {
         return proof;
     }

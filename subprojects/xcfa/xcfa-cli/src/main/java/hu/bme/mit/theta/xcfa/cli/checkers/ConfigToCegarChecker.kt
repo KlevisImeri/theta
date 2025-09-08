@@ -49,6 +49,9 @@ import hu.bme.mit.theta.xcfa.cli.utils.getSolver
 import hu.bme.mit.theta.xcfa.dereferences
 import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.core.type.booltype.*;
+import hu.bme.mit.theta.core.type.booltype.BoolExprs.And;
+import hu.bme.mit.theta.core.type.booltype.BoolExprs.False;
+import hu.bme.mit.theta.core.type.booltype.BoolExprs.True;
 
 fun getCegarChecker(
   xcfa: XCFA,
@@ -226,11 +229,12 @@ fun getCegarChecker(
                 }
                 .toList()
             }
-            
-        val simplifiedLocMap = locmap.mapValues { (loc, exprStates) ->
+
+        val simplifiedLocMap = locmap.mapValues { (loc, exprStates) -> //WARN: keept herebecause writing to file can be slow
             if (exprStates.isEmpty()) {
                 exprStates
             } else {
+                // val exprs = exprStates.map { it.toExpr() }.filterNot { it is TrueExpr } //WARN: for som reason you cant parse it if you add remove .filterNot
                 val exprs = exprStates.map { it.toExpr() }
                 val simplifiedExpr = abstractionSolverInstance.simplify(OrExpr.of(exprs))
                 // val simplifiedExpr = abstractionSolverInstance.simplify(AndExpr.of(exprs))
@@ -238,8 +242,10 @@ fun getCegarChecker(
                 // val simplifiedExpr = AndExpr.of(exprs)
                 // val simplifiedExpr = OrExpr.of(exprs)
                 listOf(PredState.of(simplifiedExpr))
+                // exprStates
             }
         }
+        // val simplifiedLocMap  = locmap
 
         return if (ret.isSafe) {
           SafetyResult.safe(LocationInvariants(simplifiedLocMap))

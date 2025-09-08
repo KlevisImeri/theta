@@ -36,9 +36,26 @@ public final class ArgCegarChecker {
     public static <S extends State, A extends Action, P extends Prec>
             CegarChecker<P, ARG<S, A>, Trace<S, A>> create(
                     final ArgAbstractor<S, A, P> abstractor,
+                    final ArgRefiner<S, A, P> refiner) {
+        return create(abstractor, refiner, NullLogger.getInstance(), false); //WARN: WHAT is the good defautl
+    }
+
+
+    public static <S extends State, A extends Action, P extends Prec>
+            CegarChecker<P, ARG<S, A>, Trace<S, A>> create(
+                    final ArgAbstractor<S, A, P> abstractor,
                     final ArgRefiner<S, A, P> refiner,
                     final Boolean computePartialResult) {
         return create(abstractor, refiner, NullLogger.getInstance(), computePartialResult);
+    }
+
+    public static <S extends State, A extends Action, P extends Prec>
+            CegarChecker<P, ARG<S, A>, Trace<S, A>> create(
+                    final ArgAbstractor<S, A, P> abstractor,
+                    final ArgRefiner<S, A, P> refiner,
+                    final Logger logger) {
+        return CegarChecker.create(
+                abstractor, refiner, logger, ArgVisualizer.getDefault(), false);
     }
 
     public static <S extends State, A extends Action, P extends Prec>
