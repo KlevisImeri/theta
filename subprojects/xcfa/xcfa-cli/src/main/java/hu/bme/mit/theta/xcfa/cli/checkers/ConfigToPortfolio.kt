@@ -40,6 +40,8 @@ import javax.script.Bindings
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 import javax.script.SimpleBindings
+import hu.bme.mit.theta.xcfa.cli.portfolio.specFromNamePortfolio
+import java.nio.file.Path;
 
 fun getPortfolioChecker(
   xcfa: XCFA,
@@ -105,7 +107,28 @@ fun getPortfolioChecker(
           bindings["uniqueLogger"] = uniqueLogger
           kotlinEngine.eval(FileReader(portfolioName), bindings) as STM
         } else {
-          error("No such file or built-in config: $portfolioName")
+          try {
+              specFromNamePortfolio(xcfa, mcm, parseContext, config, portfolioName, logger, uniqueLogger)
+          } catch (e: Exception) {
+              error("""
+                  No such file or built-in config: $portfolioName
+                  
+                  If you are trying to write a simple config spec as a string name, the script 
+                  parsing failed with the following error:
+                  
+                  ${e::class.simpleName}: ${e.message}
+                  
+                  Example valid portfolio specifications:
+                  - "Cegar(EXPL,FULL) -> Cegar(EXPL,LAZY)"
+                  - "Cegar(domain=EXPL, pruneStrategy=LAZY) -> Cegar(domain=PRED_BOOL, pruneStrategy=FULL)"
+                  - "Cegar(PRED_BOOL,LAZY,WHOLE,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,2)"
+                  - "Cegar(PRED_CART,LAZY,WHOLE,2) -> Cegar(PRED_CART,LAZY,CONJUNCTS,2)"
+                  - ...
+                  
+                  Stack trace:
+                  ${e.stackTrace.take(5).joinToString("\n") { "  at $it" }}
+              """.trimIndent())
+          }
         }
       }
     }
@@ -124,3 +147,5 @@ fun getPortfolioChecker(
       Trace<XcfaState<PtrState<*>>, XcfaAction>,
     >?
 }
+
+

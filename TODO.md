@@ -1,3 +1,10 @@
+### TEST
+InitPrec and normal prec 
+how may itrations to run 
+and from what analysis to what
+
+
+
 - Add explicit state example 
     - check if it gives good results if yes then the size of the location invariants of the explisit state is a problem
 
@@ -20,3 +27,7 @@ i Will make some configs and try so many different combination at the svbenchclo
 
 
 DO one round of ExplState with good init precision -> pred state
+
+
+CHECK PRUNING
+TRY FULL PRUNINGF

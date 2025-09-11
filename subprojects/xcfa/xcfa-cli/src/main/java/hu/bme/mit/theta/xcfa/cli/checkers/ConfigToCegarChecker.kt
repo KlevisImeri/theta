@@ -239,39 +239,39 @@ fun getCegarChecker(
                 .toList()
             }
 
-        val simplifiedLocMap  = locmap
-        val simplifiedLocMap = locmap.mapValues { (loc, exprStates) -> //WARN: keept herebecause writing to file can be slow
-            if (exprStates.isEmpty()) {
-                exprStates
-            } else {
-                val exprs = exprStates.map { it.toExpr() }.filterNot { it is TrueExpr } 
-                 val exprs = exprStates.map { it.toExpr() }
-                if (exprs.isEmpty()) {
-                  listOf<PredState>();
-                } else {
-                  val simplifiedExpr = abstractionSolverInstance.simplify(OrExpr.of(exprs))
-                  // val simplifiedExpr = abstractionSolverInstance.simplify(AndExpr.of(exprs))
-                  // val simplifiedExpr = abstractionSolverFactory.createSolver().simplify(OrExpr.of(exprs))
-                  // val simplifiedExpr = AndExpr.of(exprs)
-                  // val simplifiedExpr = OrExpr.of(exprs)
-                  listOf(PredState.of(simplifiedExpr))
-                  // exprStates
-                } 
-            }
-        }.filterValues { it.isNotEmpty() }
-        // val simplifiedLocMap = locmap.mapValues { (loc, exprStates) ->
-        //   if (exprStates.isEmpty()) {
-        //       exprStates
-        //   } else {
-        //       val exprs = exprStates.map { it.toExpr() }
-        //       if (exprs.any { it is TrueExpr }) {
-        //           emptyList<PredState>()
-        //       } else {
+        // val simplifiedLocMap  = locmap
+        // val simplifiedLocMap = locmap.mapValues { (loc, exprStates) -> //WARN: keept herebecause writing to file can be slow
+        //     if (exprStates.isEmpty()) {
+        //         exprStates
+        //     } else {
+        //         // val exprs = exprStates.map { it.toExpr() }.filterNot { it is TrueExpr } 
+        //         val exprs = exprStates.map { it.toExpr() }
+        //         if (exprs.isEmpty()) {
+        //           listOf<PredState>();
+        //         } else {
         //           val simplifiedExpr = abstractionSolverInstance.simplify(OrExpr.of(exprs))
+        //           // val simplifiedExpr = abstractionSolverInstance.simplify(AndExpr.of(exprs))
+        //           // val simplifiedExpr = abstractionSolverFactory.createSolver().simplify(OrExpr.of(exprs))
+        //           // val simplifiedExpr = AndExpr.of(exprs)
+        //           // val simplifiedExpr = OrExpr.of(exprs)
         //           listOf(PredState.of(simplifiedExpr))
-        //       }
-        //   }
+        //           // exprStates
+        //         } 
+        //     }
         // }.filterValues { it.isNotEmpty() }
+        val simplifiedLocMap = locmap.mapValues { (loc, exprStates) -> // TODO: REmve only if the whole expresoin can be simplifed true
+          if (exprStates.isEmpty()) {
+              exprStates
+          } else {
+              val exprs = exprStates.map { it.toExpr() }
+              if (exprs.any { it is TrueExpr }) {
+                  emptyList<PredState>()
+              } else {
+                  val simplifiedExpr = abstractionSolverInstance.simplify(OrExpr.of(exprs))
+                  listOf(PredState.of(simplifiedExpr))
+              }
+          }
+        }.filterValues { it.isNotEmpty() }
 
         return if (ret.isSafe) {
           SafetyResult.safe(LocationInvariants(simplifiedLocMap))

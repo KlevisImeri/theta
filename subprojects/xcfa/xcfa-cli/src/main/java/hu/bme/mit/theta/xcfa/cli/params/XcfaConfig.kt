@@ -33,6 +33,8 @@ import hu.bme.mit.theta.xcfa.passes.LbePass
 import hu.bme.mit.theta.xcfa2chc.RankingFunction
 import java.io.File
 import java.nio.file.Paths
+import java.nio.file.Path
+
 
 interface Config {
 
@@ -73,6 +75,10 @@ data class XcfaConfig<F : SpecFrontendConfig, B : SpecBackendConfig>(
     listOf(inputConfig, frontendConfig, backendConfig, outputConfig, debugConfig)
       .map { it.update() }
       .any { it == true }
+
+  fun withBackendConfig(newBackendConfig: BackendConfig<B>): XcfaConfig<F, B> {
+      return this.copy(backendConfig = newBackendConfig)
+  }
 }
 
 data class InputConfig(
@@ -443,6 +449,11 @@ data class OcConfig(
 data class PortfolioConfig(
   @Parameter(names = ["--portfolio"], description = "Portfolio to run")
   var portfolio: String = "COMPLEX",
+  @Parameter(
+    names = ["--portofolio-spec"],
+    description = "Read special.kt (The special portofolio parses this to create a config)",
+  )
+  val portfolioSpec: String = "",
   var partialResultTestOnlyEndNode: Boolean = false
 ) : SpecBackendConfig
 
@@ -514,6 +525,13 @@ data class OutputConfig(
       chcOutputConfig.getObjects() union
       witnessConfig.getObjects() union
       argConfig.getObjects()
+  }
+
+
+  fun withOutputSubdirectory(subdirectory: String): OutputConfig {
+    return this.copy(
+      resultFolder = this.resultFolder.resolve(subdirectory)
+    )
   }
 
   override fun update(): Boolean =

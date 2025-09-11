@@ -488,7 +488,7 @@ private fun postVerificationLogging(
         } else {
           locInvNew
         }
-        println(finalInvariants)
+        // println(finalInvariants)
 
       finalInvariants.toJsonFile(outputFile, gson, logger)
     }

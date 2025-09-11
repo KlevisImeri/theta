@@ -59,14 +59,30 @@ class ReusePartialResultsTest {
         //-------------------------------------Error(verification stuck)-------------------------------------
         // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound10.c", "PredBoolDefault->PredBoolConjuncts", true)
         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "PredCartDefault->PredCartConjuncts", true)
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "Cegar(PRED_CART,LAZY,WHOLE,2) -> Cegar(PRED_CART,LAZY,CONJUNCTS,2)", true)
         // ----
         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound2.c", "PredBoolDefault->PredBoolConjuncts", true)
         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound100.c", "PredBoolDefault->PredBoolConjuncts", true)
-        Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound5.c", "PredBoolDefault->PredBoolConjuncts", true)
+        // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound5.c", "PredBoolDefault->PredBoolConjuncts", true)
+        Arguments.of(
+          "/c/partialResultTest/cohendiv-ll_valuebound5.c",
+          "Cegar(PRED_BOOL,LAZY,CONJUNCTS,2)",
+          "Cegar(PRED_BOOL,LAZY,WHOLE,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,2)", 
+          true
+        )
         // Arguments.of("/c/partialResultTest/test_locks_14-2.c", "ExplDefault->ExplFull", false),
         // Arguments.of("/c/partialResultTest/test_locks_15-1.c", "ExplDefault->ExplFull", false)
+        // Arguments.of(
+        //   "/c/partialResultTest/test_locks_15-1.c", 
+        //   "Cegar(EXPL,LAZY)", 
+        //   "Cegar(EXPL,FULL) -> Cegar(EXPL,LAZY)", 
+        //   false
+        // ),
+
+
+
         // ---
-        // Arguments.of("/c/partialResultTest/test_locks_14-2.c", "ExplDefault->PredCartDefault", false)
+        // Arguments.of("/c/partialResultTest/test_locks_14-2.c", "ExplDefault->PredCartDefault", false) //TODO: check 
         // Arguments.of("/c/partialResultTest/test_locks_15-1.c", "ExplDefault->PredCartDefault", false)
         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "ExplDefault->PredCartDefault", true)
         //----------------------------------------------------------------------------------------------------
@@ -82,30 +98,22 @@ class ReusePartialResultsTest {
 
   @ParameterizedTest
   @MethodSource("partialResultExamples")
-  fun testPartialResultsForPortfolio(cFile: String, portfolioName: String, resultType: Boolean) {
+  fun testPartialResultsForPortfolio(cFile: String, portfolioNameNoParital: String,  portfolioNamePartial: String, resultType: Boolean) {
     try {
       val logger = ConsoleLogger(Logger.Level.VERBOSE)
       val uniqueLogger = UniqueWarningLogger(logger)
 
-      val config = XcfaConfigs.createDefaultPortfolioConfig(cFile, portfolioName)
-      val configWithOnlyEndNode = config.copy(
-        backendConfig = config.backendConfig.copy(
-          specConfig = (config.backendConfig.specConfig as PortfolioConfig).copy(
-            partialResultTestOnlyEndNode = true
-          )
-        ),
-        outputConfig = config.outputConfig.copy(
-          resultFolder = Paths.get("./outputNoPartial").toFile()
-        )
-      )
+      val configNoParial = createDefaultPortfolioConfig(cFile, portfolioNameNoParital)
+      val configParial = createDefaultPortfolioConfig(cFile, portfolioNamePartial)
 
-      val runs = 20
+
+      val runs = 1
       val timesNoPartial = mutableListOf<Long>()
       val timesPartial = mutableListOf<Long>()
 
       repeat(runs) {
-        val result = runConfig(configWithOnlyEndNode, logger, uniqueLogger, throwDontExit = false)
-        val resultWithPartial = runConfig(config, logger, uniqueLogger, throwDontExit = false)
+        val result = runConfig(configNoParial, logger, uniqueLogger, throwDontExit = false)
+        val resultWithPartial = runConfig(configParial, logger, uniqueLogger, throwDontExit = false)
 
         if (
           (result.isSafe && resultType != true) || (result.isUnsafe && resultType != false) ||
@@ -139,4 +147,33 @@ class ReusePartialResultsTest {
       println(red(e.stackTraceToString()))
     }
   }
+}
+
+
+fun createDefaultPortfolioConfig(cFile: String, portfolioName: String): XcfaConfig<SpecFrontendConfig, SpecBackendConfig> {
+   return XcfaConfig<SpecFrontendConfig, SpecBackendConfig>(
+            inputConfig = InputConfig(input = File(ReusePartialResultsTest::class.java.getResource(cFile)!!.path)),
+            debugConfig =
+              DebugConfig(
+                debug = false,
+                stacktrace = true,
+                logLevel = Logger.Level.INFO,
+                argdebug = false,
+                argToFile = false,
+              ),
+            frontendConfig =
+              FrontendConfig(
+                specConfig =
+                  CFrontendConfig(architecture = ArchitectureType.ILP32)
+              ),
+            backendConfig =
+              BackendConfig(
+                backend = Backend.PORTFOLIO,
+                specConfig = PortfolioConfig(portfolio = portfolioName),
+              ),
+            outputConfig = OutputConfig(
+              enableOutput = true,
+              resultFolder = Paths.get("./output").toFile()
+            ),
+          )
 }
