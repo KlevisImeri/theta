@@ -19,26 +19,34 @@ import java.io.File
 
 object CachingFileSerializer {
 
-  private val cache: MutableMap<Pair<String, Any>, File> = LinkedHashMap()
+    private val cache: MutableMap<Pair<String, Any>, File> = LinkedHashMap()
+    private val shmDir = File("/dev/shm")
 
-  /**
-   * key: unique id for serialization groups obj: object to serialize func: generator function if a
-   * cache miss occurs
-   */
-  fun serialize(key: String, obj: Any, func: (Any) -> String): File =
-    if (cache.containsKey(Pair(key, obj))) {
-      cache[Pair(key, obj)]!!
-    } else {
-      val str = func(obj)
-      val pattern = key.split(".")
-      val file =
-        File.createTempFile(
-          pattern.subList(0, pattern.size - 1).joinToString("."),
-          "." + pattern.last(),
-        )
-      file.deleteOnExit()
-      file.writeText(str)
-      cache[Pair(key, obj)] = file
-      file
+    /**
+     * key: unique id for serialization groups obj: object to serialize func: generator function if a
+     * cache miss occurs
+     */
+    fun serialize(key: String, obj: Any, func: (Any) -> String): File =
+        cache.getOrPut(Pair(key, obj)) {
+            val content = func(obj)
+            val pattern = key.split(".")
+            val tempDir = if (shmDir.exists() && shmDir.isDirectory && shmDir.canWrite()) { //TODO: do not check everytime
+                shmDir
+            } else {
+                File(System.getProperty("java.io.tmpdir"))
+            }
+            val file = File.createTempFile(
+                pattern.subList(0, pattern.size - 1).joinToString("."),
+                ".${pattern.last()}",
+                tempDir
+            )
+            file.deleteOnExit()
+            file.writeText(content)
+            file
+        }
+
+    fun clear() {
+        cache.values.forEach { it.delete() }
+        cache.clear()
     }
 }

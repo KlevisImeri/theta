@@ -73,6 +73,8 @@ fun baseCegarConfig(
           solverHome = portfolioConfig.backendConfig.solverHome,
           timeoutMs = 0,
           parseInProcess = !serialize,
+          disablePartialResult = portfolioConfig.backendConfig.disablePartialResult,
+          inPortfolio = true,
           specConfig =
             CegarConfig(
               initPrec = EMPTY,

@@ -68,6 +68,14 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 import hu.bme.mit.theta.xcfa.cli.checkers.InProcessChecker
+import hu.bme.mit.theta.xcfa.cli.utils.CachingFileSerializer
+
+// object RunConfigStats {
+//   // TODO: Probably in the future shoudl be passed int eh runConfig as parameter
+//   // Because if you do multiThreading then i wont even work out
+//   var depth: Int = 0; 
+// }
+
 
 fun runConfig(
   config: XcfaConfig<*, *>,
@@ -78,6 +86,13 @@ fun runConfig(
 ): SafetyResult<*, *> {
   // println("RunConfig");
   // println(config)
+  // println("disablePartialResult: ${config.backendConfig.disablePartialResult}")
+  if(!config.backendConfig.inProcess && !config.backendConfig.inPortfolio){ 
+    // NOTE: if you run several runConfigs you have to clear up 
+    XcfaBackendStatistics.clear();
+    CachingFileSerializer.clear();
+  }
+
   propagateInputOptions(config, logger, uniqueLogger)
 
   registerAllSolverManagers(config.backendConfig.solverHome, logger)
@@ -105,7 +120,6 @@ fun runConfig(
 }
 
 private fun propagateInputOptions(config: XcfaConfig<*, *>, logger: Logger, uniqueLogger: Logger) {
-  if(!config.backendConfig.inProcess) InProcessChecker.backendTime.clear();
   config.inputConfig.property = determineProperty(config, logger)
   LbePass.level = config.frontendConfig.lbeLevel
   StaticCoiPass.enabled = config.frontendConfig.staticCoi
@@ -296,11 +310,26 @@ private fun backend(
       //   Logger.Level.INFO,
       //   "Starting verification of ${if (xcfa?.name == "") "UnnamedXcfa" else (xcfa?.name ?: "DeferredXcfa")} using ${config.backendConfig.backend}\n${config}\n",
       // )
-
+      
+      fun addBackendTimeToStatisticsAndLog() {
+        val backendAlgoTimeMs =stopwatch.elapsed(TimeUnit.MILLISECONDS)
+        logger.write(
+          RESULT,
+          "Backend finished (in ${backendAlgoTimeMs} ms)\n",
+        )
+        val key = if (config.backendConfig.inPortfolio) {
+          "inPortfolio"
+        }  else { "Total" }
+        XcfaBackendStatistics.addTime(key, backendAlgoTimeMs);
+      }
       val checker = getChecker(xcfa, mcm, config, parseContext, logger, uniqueLogger)
-      var result =
-        exitOnError(config.debugConfig.stacktrace, config.debugConfig.debug || throwDontExit) {
-            checker.check()
+      var result = exitOnError(config.debugConfig.stacktrace, config.debugConfig.debug || throwDontExit) {
+              try{
+                  checker.check()
+              } catch(e: Throwable) {
+                addBackendTimeToStatisticsAndLog()
+                throw e
+              }
           }
           .let ResultMapper@{ result ->
             when {
@@ -366,16 +395,18 @@ private fun backend(
             }
           }
 
-      val backendAlgoTimeMs =stopwatch.elapsed(TimeUnit.MILLISECONDS)
-      logger.write(
-        INFO,
-        "Backend finished (in ${backendAlgoTimeMs} ms)\n",
-      )
+      addBackendTimeToStatisticsAndLog()
 
       val outResult = if(result.stats.isEmpty) {
-        result.withStats(XcfaBackendStatistics(listOf(backendAlgoTimeMs)))
+        result.withStats(XcfaBackendStatistics())
       } else {
-        result
+        val stats = result.stats.get()
+        if (stats is XcfaBackendStatistics && !config.backendConfig.inPortfolio) {
+          val backendStats = stats as XcfaBackendStatistics
+          result.withStats(XcfaBackendStatistics()) // Update the statistics
+        } else {
+          result
+        }
       }
 
       logger.write(RESULT, outResult.toString() + "\n")
@@ -460,39 +491,54 @@ private fun postVerificationLogging(
   logger: Logger,
   uniqueLogger: Logger,
 ) {
-  if (safetyResult.isPartial) {
+  if (safetyResult.isPartial && config.backendConfig.inProcess) {
     val locInvNew = safetyResult.asPartial().proof
     if (locInvNew !is LocationInvariants) {
       logger.write(
         Logger.Level.INFO,
-        "For the moment thetas XCFA subproject can only process LocationInvariants as partial results between analyses!\n",
+        "[WARN] For the moment thetas XCFA subproject can only process LocationInvariants as partial results between analyses!\n",
       )
-    } else if (
-      !config.backendConfig.disablePartialResult &&
-        config.outputConfig.witnessConfig.partialResult != null
-    ) {
-      xcfa!!
-      val outputFile = config.outputConfig.witnessConfig.partialResult!!
-      val gson = getGson(xcfa)
+    } else if(config.backendConfig.disablePartialResult &&  config.outputConfig.partialResultOutputConfig.enable) {
+        logger.write(Logger.Level.INFO,
+          "[WARN] You have [--disable-partial-results] but you have enabled [--enable-epartial-result-to-file]. " +
+          "There is no partial result to put into a file!"
+        );
+    } else {
+        val partialResultOutputConfig = config.outputConfig.partialResultOutputConfig
+        if (partialResultOutputConfig.tempFileLocation == null) {
+          logger.write(Logger.Level.INFO,
+            "[WARN] Partial results are on but no tempFileLocation for the partialResult is specified! " +
+            "Using config.inputConfig.partialResult as output temporary file for partialResult"
+          );
+          partialResultOutputConfig.tempFileLocation = config.inputConfig.partialResult
+        }
+        xcfa!!
+        val partialResultTempFile = partialResultOutputConfig.tempFileLocation!!
+        val gson = getGson(xcfa)
 
-      val locInvOld =
+        val locInvOld =
         config.inputConfig.partialResult?.let { inputFile ->
           LocationInvariants.fromFile(inputFile, gson, logger)
         }
 
-      val finalInvariants =
+        val finalInvariants =
         if (locInvOld != null) {
-          logger.write(Logger.Level.INFO, "Merging new partial results with existing ones.\n")
-          locInvNew.merge(locInvOld)
-          locInvNew  // WARN:  Eventually we have to merge
+          // logger.write(Logger.Level.INFO, "Merging new partial results with existing ones.\n")
+          // locInvNew.merge(locInvOld)
+          locInvNew  // WARN:  Eventually we have to merg
         } else {
           locInvNew
         }
         // println(finalInvariants)
+        println(finalInvariants.toString().lineSequence().take(10).joinToString("\n"))
 
-      finalInvariants.toJsonFile(outputFile, gson, logger)
+        finalInvariants.toJsonFile(partialResultTempFile, gson, logger)
+        
+        if(partialResultOutputConfig.enable) {
+            partialResultTempFile.copyTo(config.outputConfig.resultFolder.resolve("PartialResult.json"), overwrite = true)
+        }
+      }
     }
-  }
 
   if (
     config.frontendConfig.inputType == InputType.CHC &&
@@ -528,19 +574,7 @@ private fun postVerificationLogging(
         "Writing post-verification artifacts to directory ${resultFolder.absolutePath}%n",
       )
 
-      // WARN: Probably bad
-      // if (!config.outputConfig.xcfaOutputConfig.disable) {
-        xcfa!!
-        val xcfaDotFile = File(resultFolder, "xcfa.dot")
-        xcfaDotFile.writeText(xcfa.toDot())
-
-        // val xcfaJsonFile = File(resultFolder, "xcfa.json")
-        // val uglyJson = getGson(xcfa).toJson(xcfa)
-        // val create = GsonBuilder().setPrettyPrinting().create()
-        // xcfaJsonFile.writeText(create.toJson(JsonParser.parseString(uglyJson)))
-      // }
-
-      // TODO eliminate the need for the instanceof check
+      // TODO: eliminate the need for the instanceof check
       if (
         !config.outputConfig.argConfig.disable && safetyResult.proof is ARG<out State, out Action>
       ) {

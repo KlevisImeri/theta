@@ -197,12 +197,16 @@ data class BackendConfig<T : SpecBackendConfig>(
     description = "Parse input in process instead of passing intermediate",
   )
   var parseInProcess: Boolean = false,
+  @Parameter(names = ["--in-portfolio"], description = "Analysis running in a portfolio")
+  var inPortfolio: Boolean = false,
   @Parameter(
     names = ["--memlimit"],
     description = "Maximum memory to use when --in-process (in bytes, 0 for default)",
   )
   var memlimit: Long = 0L,
-  @Parameter(names = ["--disable-partial-result"]) var disablePartialResult: Boolean = false,
+  @Parameter(names = ["--disable-partial-results"]) 
+  var disablePartialResult: Boolean = false,
+
   override var specConfig: T? = null,
 ) : SpecializableConfig<T> {
 
@@ -345,7 +349,7 @@ data class BoundedConfig(
   var reversed: Boolean = false,
   @Parameter(names = ["--cegar"], description = "Wrap the check in a predicate-based CEGAR loop")
   var cegar: Boolean = false,
-  @Parameter(names = ["--initprec"], description = "Wrap the check in a predicate-based CEGAR loop")
+  @Parameter(names = ["--initprec"], description = "Wrap the check in a predicate-based CEGAR loop") // TODO:
   var initPrec: InitPrec = InitPrec.EMPTY,
   val bmcConfig: BMCConfig = BMCConfig(),
   val indConfig: InductionConfig = InductionConfig(),
@@ -449,12 +453,7 @@ data class OcConfig(
 data class PortfolioConfig(
   @Parameter(names = ["--portfolio"], description = "Portfolio to run")
   var portfolio: String = "COMPLEX",
-  @Parameter(
-    names = ["--portofolio-spec"],
-    description = "Read special.kt (The special portofolio parses this to create a config)",
-  )
-  val portfolioSpec: String = "",
-  var partialResultTestOnlyEndNode: Boolean = false
+  var partialResultTestOnlyEndNode: Boolean = false // WARN: Has to be remove
 ) : SpecBackendConfig
 
 data class MddConfig(
@@ -515,6 +514,7 @@ data class OutputConfig(
   val xcfaOutputConfig: XcfaOutputConfig = XcfaOutputConfig(),
   val chcOutputConfig: ChcOutputConfig = ChcOutputConfig(),
   val witnessConfig: WitnessConfig = WitnessConfig(),
+  val partialResultOutputConfig: PartialResultOutputConfig = PartialResultOutputConfig(),
   val argConfig: ArgConfig = ArgConfig(),
 ) : Config {
 
@@ -567,9 +567,27 @@ data class WitnessConfig(
   )
   var validateConcretizerSolver: Boolean = false,
   @Parameter(names = ["--input-file-for-witness"]) var inputFileForWitness: File? = null,
-  @Parameter(names = ["--partial-result"], description = "Output path of the partial result JSON")
-  var partialResult: File? = null,
 ) : Config
+
+data class PartialResultOutputConfig(
+  // NOTE: if enable then the temporary file will be copied to OutputConfig.resultFolder
+  // The outputTempFile is not the same sa the OutputConfig.resultFolder beacuse the
+  // - temporary file should exits even if you have note enabled the output but you 
+  //   have enabled partial results (you have to pass the results between the processes)
+  // - you can use folder which which leverage ram just like /dev/shm in linux for a faster 
+  //   way to paste between processes
+  @Parameter(
+    names = ["--enable-partial-result-to-file"], 
+    description = "If enabled the outputTempFile below is copied to the OutputConfig.resultFolder"
+  ) 
+  var enable: Boolean = false,
+  @Parameter(
+    names = ["--partial-result-temp-file"], 
+    description = "Output path of the temp partial result JSON"
+  )
+  var tempFileLocation: File? = null,
+)
+
 
 data class ArgConfig(
   @Parameter(names = ["--disable-arg-generation"]) var disable: Boolean = false

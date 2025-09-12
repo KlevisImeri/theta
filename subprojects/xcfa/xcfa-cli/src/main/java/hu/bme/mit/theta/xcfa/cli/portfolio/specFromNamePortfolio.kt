@@ -46,6 +46,7 @@ import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.xcfa.passes.LbePass
 import hu.bme.mit.theta.xcfa.passes.LoopUnrollPass
 import hu.bme.mit.theta.xcfa.cli.portfolio.timeoutOrNotSolvableError
+import hu.bme.mit.theta.xcfa.cli.portfolio.anyError
 import java.nio.file.Paths
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
@@ -117,7 +118,7 @@ fun specFromNamePortfolio(
     val edges = mutableListOf<Edge>()
     for(i in 0 until configNodes.size - 1) {
         edges.add(
-          Edge(configNodes[i], configNodes[i + 1], timeoutOrNotSolvableError)
+          Edge(configNodes[i], configNodes[i + 1], anyError)
         )
     }
 
@@ -169,6 +170,7 @@ fun Cegar(
           parseInProcess = parseInProcess,
           memlimit = memlimit,
           disablePartialResult = disablePartialResult,
+          inPortfolio = true, //TODO:
           specConfig = CegarConfig(
               initPrec = initPrec,
               porLevel = porLevel,
@@ -192,6 +194,75 @@ fun Cegar(
           )
       )
   }
+
+  fun Bounded( 
+    // Configuration parameters aligned with BoundedConfig structure
+    maxBound: Int = 0,
+    reversed: Boolean = false,
+    cegar: Boolean = false,
+    initPrec: InitPrec = InitPrec.EMPTY,
+    
+    // BMC configuration
+    disableBmc: Boolean = false,
+    nonLfPath: Boolean = false,
+    bmcSolver: String = "Z3",
+    validateBmcSolver: Boolean = false,
+    
+    // Induction configuration
+    disableInduction: Boolean = false,
+    indSolver: String = "Z3",
+    validateIndSolver: Boolean = false,
+    indMinBound: Int = 0,
+    indFrequency: Int = 1,
+    
+    // Interpolation configuration
+    disableInterpolation: Boolean = false,
+    itpSolver: String = "Z3",
+    validateItpSolver: Boolean = false,
+    
+    // General backend configuration
+    solverHome: String = SmtLibSolverManager.HOME.toAbsolutePath().toString(),
+    timeoutMs: Long = 5 * 60 * 1000L,
+    inProcess: Boolean = true,
+    parseInProcess: Boolean = false,
+    memlimit: Long = 0L,
+    disablePartialResult: Boolean = false
+
+  ): BackendConfig<BoundedConfig> =
+    BackendConfig(
+        backend = Backend.BOUNDED,
+        solverHome = solverHome,
+        timeoutMs = timeoutMs,
+        inProcess = inProcess,
+        parseInProcess = parseInProcess,
+        memlimit = memlimit,
+        disablePartialResult = disablePartialResult,
+        inPortfolio = true,
+        specConfig = BoundedConfig(
+            maxBound = maxBound,
+            reversed = reversed,
+            cegar = cegar,
+            initPrec = initPrec,
+            bmcConfig = BMCConfig(
+                disable = disableBmc,
+                nonLfPath = nonLfPath,
+                bmcSolver = bmcSolver,
+                validateBMCSolver = validateBmcSolver
+            ),
+            indConfig = InductionConfig(
+                disable = disableInduction,
+                indSolver = indSolver,
+                validateIndSolver = validateIndSolver,
+                indMinBound = indMinBound,
+                indFreq = indFrequency
+            ),
+            itpConfig = InterpolationConfig(
+                disable = disableInterpolation,
+                itpSolver = itpSolver,
+                validateItpSolver = validateItpSolver
+            )
+        )
+    )
 
   fun createDefaultBaseConfig(
     portfolioConfig: XcfaConfig<*,*>,
@@ -226,6 +297,8 @@ fun Cegar(
                 backend = CEGAR,
                 solverHome = portfolioConfig.backendConfig.solverHome,
                 timeoutMs = 5*60*1000,
+                disablePartialResult = portfolioConfig.backendConfig.disablePartialResult,
+                inPortfolio = true,
                 specConfig =
                 CegarConfig(
                     initPrec = EMPTY,
@@ -250,27 +323,29 @@ fun Cegar(
                     ),
                 ),
             ),
-            outputConfig =
-            OutputConfig(
-                versionInfo = false,
-                resultFolder = portfolioConfig.outputConfig.resultFolder
-                    .resolve((portfolioConfig.backendConfig.specConfig as PortfolioConfig).portfolio),
-                cOutputConfig = COutputConfig(disable = true),
-                witnessConfig =
-                WitnessConfig(
-                    disable = false,
-                    concretizerSolver = "Z3",
-                    validateConcretizerSolver = false,
-                    inputFileForWitness =
-                    portfolioConfig.outputConfig.witnessConfig.inputFileForWitness
-                        ?: portfolioConfig.inputConfig.input,
-                ),
-                argConfig = ArgConfig(disable = true),
-                enableOutput = portfolioConfig.outputConfig.enableOutput,
-                acceptUnreliableSafe = portfolioConfig.outputConfig.acceptUnreliableSafe,
-                xcfaOutputConfig = XcfaOutputConfig(disable = true),
-                chcOutputConfig = ChcOutputConfig(disable = true),
+            outputConfig = OutputConfig(
+               resultFolder = portfolioConfig.outputConfig.resultFolder
+                              .resolve((portfolioConfig.backendConfig.specConfig as PortfolioConfig).portfolio),
+              enableOutput = portfolioConfig.outputConfig.enableOutput,
+              acceptUnreliableSafe = portfolioConfig.outputConfig.acceptUnreliableSafe,
+              cOutputConfig = COutputConfig(disable=true),
+              chcOutputConfig = ChcOutputConfig(disable=true),
+              witnessConfig = WitnessConfig(disable=true),
+              xcfaOutputConfig = XcfaOutputConfig(disable=false),
+              partialResultOutputConfig = PartialResultOutputConfig(enable=true),
+              argConfig = ArgConfig(disable=true)
             ),
+
+            // outputConfig = portfolioConfig.outputConfig.copy(
+            //     resultFolder = portfolioConfig.outputConfig.resultFolder
+            //         .resolve((portfolioConfig.backendConfig.specConfig as PortfolioConfig).portfolio),
+            //     witnessConfig =  portfolioConfig.outputConfig.witnessConfig.copy(
+            //         inputFileForWitness = portfolioConfig.outputConfig.witnessConfig.inputFileForWitness
+            //               ?: portfolioConfig.inputConfig.input,
+            //     ),
+            //     enableOutput = portfolioConfig.outputConfig.enableOutput,
+            //     acceptUnreliableSafe = portfolioConfig.outputConfig.acceptUnreliableSafe,
+            // ),
             debugConfig = portfolioConfig.debugConfig.copy(
                 stacktrace = true,
             ),

@@ -263,7 +263,7 @@ fun getCegarChecker(
           if (exprStates.isEmpty()) {
               exprStates
           } else {
-              val exprs = exprStates.map { it.toExpr() }
+              val exprs = exprStates.map { it.toExpr() } // TODO:  what about if you "true inside the exprstate" what about if you have "and true"
               if (exprs.any { it is TrueExpr }) {
                   emptyList<PredState>()
               } else {

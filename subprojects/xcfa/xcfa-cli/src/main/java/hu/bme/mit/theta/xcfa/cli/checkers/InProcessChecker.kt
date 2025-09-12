@@ -36,8 +36,9 @@ import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.createTempDirectory
-import hu.bme.mit.theta.xcfa.cli.XcfaBackendStatistics
 import java.nio.file.Paths
+import java.nio.file.Files
+import hu.bme.mit.theta.xcfa.cli.XcfaBackendStatistics
 
 
 class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
@@ -49,18 +50,24 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
 
   private val placeholder = LocationInvariants()
 
-  // private val partialResultJson = Paths.get("./output").toFile().resolve("partialResults.json")
+  // private val partialResultJson = Paths.get("./output").toFile().resolve("partialResults.json") //SLOW compared to below
   private val partialResultJson = 
     CachingFileSerializer.serialize("partialResult.json", placeholder) {
       getGson().toJson(placeholder)
-    }
+  } // INFO: partialResult file in the cache is always the same -> we get the partial input from where and we overwrite there
+
 
   override fun check(prec: XcfaPrec<*>?): SafetyResult<EmptyProof, EmptyCex> {
     return check()
   }
 
   override fun check(): SafetyResult<EmptyProof, EmptyCex> {
-    val tempDir = createTempDirectory(config.outputConfig.resultFolder.toPath())
+    // println("HEHEHE ${config.outputConfig.resultFolder.toPath()}");
+    val resultPath = config.outputConfig.resultFolder.toPath()
+    // if (!Files.exists(resultPath)) {
+    //   Files.createDirectories(resultPath)
+    // }
+    val tempDir = createTempDirectory(resultPath)
     Runtime.getRuntime()
       .addShutdownHook(
         Thread {
@@ -81,8 +88,8 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
             outputConfig =
               config.outputConfig.copy(
                 resultFolder = tempDir.toFile(),
-                witnessConfig =
-                  config.outputConfig.witnessConfig.copy(partialResult = partialResultJson),
+                partialResultOutputConfig =
+                  config.outputConfig.partialResultOutputConfig.copy(tempFileLocation = partialResultJson),
               ),
             backendConfig = config.backendConfig.copy(inProcess = false, timeoutMs = 0),
           )
@@ -110,15 +117,15 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
             outputConfig =
               config.outputConfig.copy(
                 resultFolder = tempDir.toFile(),
-                cOutputConfig = COutputConfig(disable = true),
-                xcfaOutputConfig = XcfaOutputConfig(disable = true),
-                chcOutputConfig = ChcOutputConfig(disable = true),
-                witnessConfig =
-                  config.outputConfig.witnessConfig.copy(partialResult = partialResultJson),
-                argConfig =
-                  config.outputConfig.argConfig.copy(
-                    disable = false
-                  ), // we need the arg to be produced
+                // cOutputConfig = COutputConfig(disable = true),
+                // xcfaOutputConfig = XcfaOutputConfig(disable = true),
+                // chcOutputConfig = ChcOutputConfig(disable = true),
+                // witnessConfig = witnessConfig(disable = true)
+                partialResultOutputConfig = config.outputConfig.partialResultOutputConfig.copy(tempFileLocation = partialResultJson),
+                // argConfig =
+                //   config.outputConfig.argConfig.copy(
+                //     disable = false
+                //   ), // we need the arg to be produced
               ),
           )
         CachingFileSerializer.serialize("config.json", config) { getGson(xcfa).toJson(config) }
@@ -182,11 +189,6 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
   }
 
 
-  companion object {
-    var backendTime = Collections.synchronizedList(mutableListOf<Long>()); 
-  }
-
-
   private inner class ProcessHandler : NuAbstractProcessHandler() {
 
     private val stdout = LinkedList<String>()
@@ -206,13 +208,14 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
         if (stdoutRemainder.contains("Backend finished")) {
           val regex = Regex(".*Backend finished.*?\\(in (\\d+) ms\\)") //INFO: Both work but below faster
           // val regex = Regex("    server: Backend finished \\(in (\\d+) ms\\)")
-          backendTime.add(regex.find(stdoutRemainder)?.groupValues?.get(1)?.toLong() ?: -1L);
+          val backendTime = regex.find(stdoutRemainder)?.groupValues?.get(1)?.toLong() ?: -1L;
+          XcfaBackendStatistics.addTime("inProcess", backendTime);
         }
         if (stdoutRemainder.contains("SafetyResult Safe")) {
-          safetyResult = SafetyResult.safe<EmptyProof, EmptyCex>(EmptyProof.getInstance(), XcfaBackendStatistics(backendTime.toList()))
+          safetyResult = SafetyResult.safe<EmptyProof, EmptyCex>(EmptyProof.getInstance())
         }
         if (stdoutRemainder.contains("SafetyResult Unsafe")) {
-          safetyResult = SafetyResult.unsafe(EmptyCex.getInstance(), EmptyProof.getInstance(), XcfaBackendStatistics(backendTime.toList()))
+          safetyResult = SafetyResult.unsafe(EmptyCex.getInstance(), EmptyProof.getInstance())
         }
         if (stdoutRemainder.contains("SafetyResult Unknown")) {
           safetyResult = SafetyResult.unknown<EmptyProof, EmptyCex>()
@@ -227,7 +230,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
             loadedInvariants ->
             tempLoc = loadedInvariants
           }
-          safetyResult = SafetyResult.partial<LocationInvariants, EmptyCex>(tempLoc, XcfaBackendStatistics(backendTime.toList()))
+          safetyResult = SafetyResult.partial<LocationInvariants, EmptyCex>(tempLoc)
         }
 
         val newLines = stdoutRemainder.split("\n") // if ends with \n, last element will be ""

@@ -54,12 +54,11 @@ data class LocationInvariants(
     try {
       val jsonString = gson.toJson(this)
       file.writeText(jsonString)
-      logger.write(INFO, "Successfully wrote LocationInvariants to ${file.absolutePath}\n")
+      logger.write(INFO, "[INFO] Successfully wrote LocationInvariants to ${file.absolutePath}\n") 
     } catch (e: Exception) {
-      logger.write(
-        INFO,
-        "[Error] Could not write LocationInvariants to file '${file.absolutePath}'. Reason: ${e.message}\n",
-      )
+      val message = "[Error] Could not write LocationInvariants to file '${file.absolutePath}'. Reason: ${e.message}\n";
+      logger.write(INFO,message)
+      file.writeText(message)
     }
   }
 
@@ -78,7 +77,7 @@ data class LocationInvariants(
           file.reader().use { fileReader ->
             gson.fromJson(fileReader, LocationInvariants::class.java)
           }
-        logger.write(INFO, "Successfully loaded LocationInvariants from ${file.name}\n")
+        logger.write(INFO, "Successfully loaded LocationInvariants from ${file.absolutePath}\n")
         invariants
       } catch (e: Exception) {
         logger.write(
