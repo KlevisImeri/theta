@@ -106,6 +106,7 @@ class SpecBackendConfigTypeAdapter(val gsonSupplier: () -> Gson) : TypeAdapter<B
     writer.name("inProcess").value(value.inProcess)
     writer.name("parseInProcess").value(value.parseInProcess)
     writer.name("disablePartialResult").value(value.disablePartialResult)
+    writer.name("inPortfolio").value(value.inPortfolio)
     writer.name("specConfig")
     if (value.specConfig != null) {
       writer.beginObject()
@@ -135,6 +136,7 @@ class SpecBackendConfigTypeAdapter(val gsonSupplier: () -> Gson) : TypeAdapter<B
         "inProcess" -> instance.inProcess = reader.nextBoolean()
         "parseInProcess" -> instance.parseInProcess = reader.nextBoolean()
         "disablePartialResult" -> instance.disablePartialResult = reader.nextBoolean()
+        "inPortfolio" -> instance.inPortfolio = reader.nextBoolean()
         "specConfig" -> instance.specConfig = readSpecConfig(reader)
         else -> reader.skipValue()
       }

@@ -52,6 +52,7 @@ import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 import hu.bme.mit.theta.solver.smtlib.SmtLibSolverManager
 import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig.ArchitectureType;
+import hu.bme.mit.theta.termui.TermUI.lightBlue
 
 fun specFromNamePortfolio(
     xcfa: XCFA,
@@ -62,6 +63,13 @@ fun specFromNamePortfolio(
     logger: Logger,
     uniqueLogger: Logger,
 ): STM {
+    if(portfolioConfig.backendConfig.timeoutMs != 0L) {
+      timeoutMsDefualt = portfolioConfig.backendConfig.timeoutMs
+    } else {
+      logger.write(Logger.Level.INFO, lightBlue(
+        "[INFO] TimoutMs is 0 but we set TimoutMs=${timeoutMsDefualt} for specFromNamePortfolio!\n"
+      ));
+    }
 
     fun checker(config: XcfaConfig<*, *>, witness: LocationInvariants? = null) =
         runConfig(config, logger, uniqueLogger, true, witness)
@@ -129,6 +137,8 @@ fun specFromNamePortfolio(
     // return  STM(ConfigNode("Klvis", baseConfig, ::checker),setOf())
 }
 
+var timeoutMsDefualt = 1*60*1000L;
+
 //Example:
 //Cegar(EXPL,FULL) -> Cegar(EXPL,LAZY)
 //Cegar(PRED_BOOL,LAZY,WHOLE,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,2)
@@ -137,11 +147,11 @@ fun Cegar(
       domain: Domain = EXPL,
       pruneStrategy: PruneStrategy = FULL,
       exprSplitter: ExprSplitterOptions = WHOLE, // NOTE: only for pred abstraction
+      pRes: Boolean = true,
       maxEnum: Int = 1,
-      disablePartialResult: Boolean = false,
 
       //TODO: decide what should be the right order
-      timeoutMs: Long = 5 * 60 * 1000L,
+      timeoutMs: Long = timeoutMsDefualt,
       inProcess: Boolean = true,
       parseInProcess: Boolean = false,
       memlimit: Long = 0L,
@@ -169,7 +179,7 @@ fun Cegar(
           inProcess = inProcess,
           parseInProcess = parseInProcess,
           memlimit = memlimit,
-          disablePartialResult = disablePartialResult,
+          disablePartialResult = !pRes,
           inPortfolio = true, //TODO:
           specConfig = CegarConfig(
               initPrec = initPrec,
@@ -222,12 +232,11 @@ fun Cegar(
     
     // General backend configuration
     solverHome: String = SmtLibSolverManager.HOME.toAbsolutePath().toString(),
-    timeoutMs: Long = 5 * 60 * 1000L,
+    timeoutMs: Long = timeoutMsDefualt,
     inProcess: Boolean = true,
     parseInProcess: Boolean = false,
     memlimit: Long = 0L,
-    disablePartialResult: Boolean = false
-
+    pRes: Boolean = true,
   ): BackendConfig<BoundedConfig> =
     BackendConfig(
         backend = Backend.BOUNDED,
@@ -236,7 +245,7 @@ fun Cegar(
         inProcess = inProcess,
         parseInProcess = parseInProcess,
         memlimit = memlimit,
-        disablePartialResult = disablePartialResult,
+        disablePartialResult = !pRes,
         inPortfolio = true,
         specConfig = BoundedConfig(
             maxBound = maxBound,
@@ -292,62 +301,24 @@ fun Cegar(
                     }
                 ),
             ),
-            backendConfig =
-            BackendConfig(
-                backend = CEGAR,
-                solverHome = portfolioConfig.backendConfig.solverHome,
-                timeoutMs = 5*60*1000,
-                disablePartialResult = portfolioConfig.backendConfig.disablePartialResult,
-                inPortfolio = true,
-                specConfig =
-                CegarConfig(
-                    initPrec = EMPTY,
-                    porLevel = NOPOR,
-                    porRandomSeed = 0,
-                    coi = NO_COI,
-                    cexMonitor = CHECK,
-                    abstractorConfig =
-                    CegarAbstractorConfig(
-                        abstractionSolver = "Z3",
-                        validateAbstractionSolver = false,
-                        domain = EXPL,
-                        maxEnum = 1,
-                        search = ERR,
-                    ),
-                    refinerConfig =
-                    CegarRefinerConfig(
-                        refinementSolver = "Z3",
-                        validateRefinementSolver = false,
-                        refinement = SEQ_ITP,
-                        pruneStrategy = FULL,
-                    ),
-                ),
-            ),
-            outputConfig = OutputConfig(
-               resultFolder = portfolioConfig.outputConfig.resultFolder
-                              .resolve((portfolioConfig.backendConfig.specConfig as PortfolioConfig).portfolio),
-              enableOutput = portfolioConfig.outputConfig.enableOutput,
-              acceptUnreliableSafe = portfolioConfig.outputConfig.acceptUnreliableSafe,
-              cOutputConfig = COutputConfig(disable=true),
-              chcOutputConfig = ChcOutputConfig(disable=true),
-              witnessConfig = WitnessConfig(disable=true),
-              xcfaOutputConfig = XcfaOutputConfig(disable=false),
-              partialResultOutputConfig = PartialResultOutputConfig(enable=true),
-              argConfig = ArgConfig(disable=true)
-            ),
-
-            // outputConfig = portfolioConfig.outputConfig.copy(
-            //     resultFolder = portfolioConfig.outputConfig.resultFolder
-            //         .resolve((portfolioConfig.backendConfig.specConfig as PortfolioConfig).portfolio),
-            //     witnessConfig =  portfolioConfig.outputConfig.witnessConfig.copy(
-            //         inputFileForWitness = portfolioConfig.outputConfig.witnessConfig.inputFileForWitness
-            //               ?: portfolioConfig.inputConfig.input,
-            //     ),
-            //     enableOutput = portfolioConfig.outputConfig.enableOutput,
-            //     acceptUnreliableSafe = portfolioConfig.outputConfig.acceptUnreliableSafe,
+            // outputConfig = OutputConfig(
+            //    resultFolder = portfolioConfig.outputConfig.resultFolder
+            //                   .resolve((portfolioConfig.backendConfig.specConfig as PortfolioConfig).portfolio),
+            //   enableOutput = portfolioConfig.outputConfig.enableOutput,
+            //   acceptUnreliableSafe = portfolioConfig.outputConfig.acceptUnreliableSafe,
+            //   cOutputConfig = COutputConfig(disable=true),
+            //   chcOutputConfig = ChcOutputConfig(disable=true),
+            //   witnessConfig = WitnessConfig(disable=true),
+            //   xcfaOutputConfig = XcfaOutputConfig(disable=false),
+            //   partialResultOutputConfig = PartialResultOutputConfig(enable=true),
+            //   argConfig = ArgConfig(disable=true)
             // ),
-            debugConfig = portfolioConfig.debugConfig.copy(
-                stacktrace = true,
+
+            outputConfig = portfolioConfig.outputConfig.copy(
+                resultFolder = portfolioConfig.outputConfig.resultFolder
+                    .resolve((portfolioConfig.backendConfig.specConfig as PortfolioConfig).portfolio),
+                enableOutput = portfolioConfig.outputConfig.enableOutput,
+                acceptUnreliableSafe = portfolioConfig.outputConfig.acceptUnreliableSafe,
             ),
       )
   }

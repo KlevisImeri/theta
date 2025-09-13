@@ -1,3 +1,7 @@
+### 17-09-2025
+- Understand the BoundedConfig parameters
+- Talk bout the current results 
+
 ### TEST
 InitPrec and normal prec 
 how may itrations to run 

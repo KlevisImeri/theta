@@ -69,13 +69,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 import hu.bme.mit.theta.xcfa.cli.checkers.InProcessChecker
 import hu.bme.mit.theta.xcfa.cli.utils.CachingFileSerializer
-
-// object RunConfigStats {
-//   // TODO: Probably in the future shoudl be passed int eh runConfig as parameter
-//   // Because if you do multiThreading then i wont even work out
-//   var depth: Int = 0; 
-// }
-
+import hu.bme.mit.theta.termui.TermUI.yellow
 
 fun runConfig(
   config: XcfaConfig<*, *>,
@@ -87,11 +81,6 @@ fun runConfig(
   // println("RunConfig");
   // println(config)
   // println("disablePartialResult: ${config.backendConfig.disablePartialResult}")
-  if(!config.backendConfig.inProcess && !config.backendConfig.inPortfolio){ 
-    // NOTE: if you run several runConfigs you have to clear up 
-    XcfaBackendStatistics.clear();
-    CachingFileSerializer.clear();
-  }
 
   propagateInputOptions(config, logger, uniqueLogger)
 
@@ -115,6 +104,8 @@ fun runConfig(
   val result = backend(xcfa, mcm, parseContext, config, logger, uniqueLogger, throwDontExit)
 
   postVerificationLogging(xcfa, result, mcm, parseContext, config, logger, uniqueLogger)
+  
+  cleanUp(config, logger)
 
   return result
 }
@@ -491,25 +482,31 @@ private fun postVerificationLogging(
   logger: Logger,
   uniqueLogger: Logger,
 ) {
-  if (safetyResult.isPartial && config.backendConfig.inProcess) {
+  if (config.outputConfig.enableOutput && safetyResult.isPartial && !config.backendConfig.inProcess && config.backendConfig.inPortfolio) {
     val locInvNew = safetyResult.asPartial().proof
     if (locInvNew !is LocationInvariants) {
       logger.write(
         Logger.Level.INFO,
-        "[WARN] For the moment thetas XCFA subproject can only process LocationInvariants as partial results between analyses!\n",
+        yellow("[WARN] For the moment thetas XCFA subproject can only process LocationInvariants as partial results between analyses!\n"),
       )
     } else if(config.backendConfig.disablePartialResult &&  config.outputConfig.partialResultOutputConfig.enable) {
-        logger.write(Logger.Level.INFO,
+        logger.write(Logger.Level.INFO, yellow(
           "[WARN] You have [--disable-partial-results] but you have enabled [--enable-epartial-result-to-file]. " +
-          "There is no partial result to put into a file!"
-        );
+          "There is no partial result to put into a file!\n"
+        ));
     } else {
         val partialResultOutputConfig = config.outputConfig.partialResultOutputConfig
         if (partialResultOutputConfig.tempFileLocation == null) {
-          logger.write(Logger.Level.INFO,
+          if (config.inputConfig.partialResult == null) {
+            error(
+              "Both config.inputConfig.partialResult and config.outputConfig.partialResultOutputConfig.tempFileLocation are null! " +
+              "You have partial results on but there is no input or output file path for them.\n"
+                )
+          }
+          logger.write(Logger.Level.INFO, yellow(
             "[WARN] Partial results are on but no tempFileLocation for the partialResult is specified! " +
-            "Using config.inputConfig.partialResult as output temporary file for partialResult"
-          );
+            "Using config.inputConfig.partialResult as output temporary file for partialResult.\n"
+          ));
           partialResultOutputConfig.tempFileLocation = config.inputConfig.partialResult
         }
         xcfa!!
@@ -535,7 +532,9 @@ private fun postVerificationLogging(
         finalInvariants.toJsonFile(partialResultTempFile, gson, logger)
         
         if(partialResultOutputConfig.enable) {
-            partialResultTempFile.copyTo(config.outputConfig.resultFolder.resolve("PartialResult.json"), overwrite = true)
+            val resultFolder  = config.outputConfig.resultFolder
+            partialResultTempFile.copyTo(resultFolder.resolve("PartialResult.json"), overwrite = true)
+            resultFolder.resolve("PartialResult.txt").writeText(finalInvariants.toString())
         }
       }
     }
@@ -658,6 +657,7 @@ private fun postVerificationLogging(
   }
 }
 
+
 private fun writeSequenceTrace(
   sequenceFile: File,
   trace: Trace<XcfaState<ExplState>, XcfaAction>,
@@ -684,3 +684,21 @@ private fun writeSequenceTrace(
     }
   sequenceFile.appendText("@enduml\n")
 }
+
+private fun cleanUp(config: XcfaConfig<*, *>, logger: Logger) {
+  val resultFolder = config.outputConfig.resultFolder;
+  if (resultFolder.exists() && resultFolder.isDirectory && resultFolder.listFiles().isNullOrEmpty()) {
+    logger.write(Logger.Level.VERBOSE,  yellow(
+      "[WARN] The output result folder was empty so it was deleted. "+
+      "The folder creation and deletion is taking compute time for no reason. \n"
+    ))
+    resultFolder.delete()
+  }
+
+  if(!config.backendConfig.inProcess && !config.backendConfig.inPortfolio){ 
+    // NOTE: if you run several runConfigs you have to clear up 
+    XcfaBackendStatistics.clear();
+    CachingFileSerializer.clear();
+  }
+}
+

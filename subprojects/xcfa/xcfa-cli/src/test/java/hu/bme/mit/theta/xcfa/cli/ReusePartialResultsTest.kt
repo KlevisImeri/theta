@@ -59,12 +59,30 @@ class ReusePartialResultsTest {
         //-------------------------------------Error(verification stuck)-------------------------------------
         // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound10.c", "PredBoolDefault->PredBoolConjuncts", true)
         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "PredCartDefault->PredCartConjuncts", true)
+        // Arguments.of(
+        //   "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
+        //   "Cegar(PRED_CART,LAZY,WHOLE,2,true) -> Cegar(PRED_CART,LAZY,CONJUNCTS,2,true)",
+        //   "Cegar(PRED_CART,LAZY,WHOLE,2) -> Cegar(PRED_CART,LAZY,CONJUNCTS,2,true)",
+        //   true
+        // )
         Arguments.of(
           "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
-          "Cegar(PRED_CART,LAZY,WHOLE,2,true) -> Cegar(PRED_CART,LAZY,CONJUNCTS,2,true)",
-          "Cegar(PRED_CART,LAZY,WHOLE,2) -> Cegar(PRED_CART,LAZY,CONJUNCTS,2)",
+          "Cegar(PRED_CART,FULL,WHOLE,false,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
+          "Cegar(PRED_CART,FULL,WHOLE,true,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
           true
         )
+        // Arguments.of(
+        //   "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
+        //   "Cegar(PRED_CART,FULL,WHOLE,true,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
+        //   "Cegar(PRED_CART,FULL,WHOLE,false,2) -> Bounded()",
+        //   true
+        // )
+        // Arguments.of(
+        //   "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
+        //   "Cegar(PRED_CART,FULL,WHOLE,false,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
+        //   "Cegar(EXPL,LAZY,pRes=true) -> Bounded()",
+        //   true
+        // )
         // ----
         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound2.c", "PredBoolDefault->PredBoolConjuncts", true)
         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound100.c", "PredBoolDefault->PredBoolConjuncts", true)
@@ -108,15 +126,15 @@ class ReusePartialResultsTest {
   }
 
 
-  @ParameterizedTest
+@ParameterizedTest
   @MethodSource("partialResultExamples")
-  fun testPartialResultsForPortfolio(cFile: String, portfolioNameNoParital: String,  portfolioNamePartial: String, resultType: Boolean) {
+  fun testPartialResultsForPortfolio(cFile: String, portfolioName1: String,  portfolioNamePartial: String, resultType: Boolean) {
     try {
       val logger = ConsoleLogger(Logger.Level.VERBOSE)
       val uniqueLogger = UniqueWarningLogger(logger)
 
-      val configNoParial = createDefaultPortfolioConfig(cFile, portfolioNameNoParital)
-      val configParial = createDefaultPortfolioConfig(cFile, portfolioNamePartial)
+      val config1 = createDefaultPortfolioConfig(cFile, portfolioName1)
+      val config2 = createDefaultPortfolioConfig(cFile, portfolioNamePartial)
 
 
       val runs = 1
@@ -124,8 +142,8 @@ class ReusePartialResultsTest {
       val timesPartial = mutableListOf<Long>()
 
       repeat(runs) {
-        val resultWithPartial = runConfig(configParial, logger, uniqueLogger, throwDontExit = false)
-        val result = runConfig(configNoParial, logger, uniqueLogger, throwDontExit = false)
+        val result = runConfig(config1, logger, uniqueLogger, throwDontExit = false)
+        val resultWithPartial = runConfig(config2, logger, uniqueLogger, throwDontExit = false)
 
         if (
           (result.isSafe && resultType != true) || (result.isUnsafe && resultType != false) ||
@@ -165,6 +183,7 @@ class ReusePartialResultsTest {
 }
 
 
+
 fun createDefaultPortfolioConfig(
   cFile: String, 
   portfolioName: String,
@@ -174,8 +193,9 @@ fun createDefaultPortfolioConfig(
             debugConfig =
               DebugConfig(
                 stacktrace = true,
-                logLevel = Logger.Level.MAINSTEP,
+                // logLevel = Logger.Level.MAINSTEP,
                 // logLevel = Logger.Level.INFO,
+                logLevel = Logger.Level.VERBOSE,
               ),
             frontendConfig =
               FrontendConfig(

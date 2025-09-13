@@ -35,6 +35,7 @@ object CachingFileSerializer {
             } else {
                 File(System.getProperty("java.io.tmpdir"))
             }
+            // val tempDir = File(System.getProperty("java.io.tmpdir")) 
             val file = File.createTempFile(
                 pattern.subList(0, pattern.size - 1).joinToString("."),
                 ".${pattern.last()}",

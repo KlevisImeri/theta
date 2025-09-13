@@ -55,7 +55,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
     CachingFileSerializer.serialize("partialResult.json", placeholder) {
       getGson().toJson(placeholder)
   } // INFO: partialResult file in the cache is always the same -> we get the partial input from where and we overwrite there
-
+  //TODO: if disabled-partial-result then you dont neeed this
 
   override fun check(prec: XcfaPrec<*>?): SafetyResult<EmptyProof, EmptyCex> {
     return check()
@@ -63,7 +63,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
 
   override fun check(): SafetyResult<EmptyProof, EmptyCex> {
     // println("HEHEHE ${config.outputConfig.resultFolder.toPath()}");
-    val resultPath = config.outputConfig.resultFolder.toPath()
+    val resultPath = config.outputConfig.resultFolder.toPath() 
     // if (!Files.exists(resultPath)) {
     //   Files.createDirectories(resultPath)
     // }
@@ -180,8 +180,12 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
         processHandler.safetyResult
       }
 
-    tempDir.toFile().listFiles()?.forEach {
-      it.copyTo(config.outputConfig.resultFolder.resolve(it.name), overwrite = true)
+
+    val files = tempDir.toFile().listFiles()
+    if (!files.isNullOrEmpty()) {
+      files.forEach {
+        it.copyTo(config.outputConfig.resultFolder.resolve(it.name), overwrite = true)
+      }
     }
     tempDir.toFile().deleteRecursively()
 
@@ -225,6 +229,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
           //   safetyResult = SafetyResult.partial<EmptyProof, EmptyCex>(EmptyProof.getInstance())
           // }
           xcfa!!
+          println("config.backendConfig.inProcess: ${config.backendConfig.inProcess}")
           var tempLoc = LocationInvariants()
           LocationInvariants.fromFile(partialResultJson, getGson(xcfa), logger)?.let {
             loadedInvariants ->
