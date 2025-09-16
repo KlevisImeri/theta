@@ -317,8 +317,6 @@ fun Cegar(
             outputConfig = portfolioConfig.outputConfig.copy(
                 resultFolder = portfolioConfig.outputConfig.resultFolder
                     .resolve((portfolioConfig.backendConfig.specConfig as PortfolioConfig).portfolio),
-                enableOutput = portfolioConfig.outputConfig.enableOutput,
-                acceptUnreliableSafe = portfolioConfig.outputConfig.acceptUnreliableSafe,
             ),
       )
   }

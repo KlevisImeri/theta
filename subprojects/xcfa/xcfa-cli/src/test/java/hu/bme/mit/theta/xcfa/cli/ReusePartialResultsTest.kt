@@ -65,12 +65,12 @@ class ReusePartialResultsTest {
         //   "Cegar(PRED_CART,LAZY,WHOLE,2) -> Cegar(PRED_CART,LAZY,CONJUNCTS,2,true)",
         //   true
         // )
-        Arguments.of(
-          "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
-          "Cegar(PRED_CART,FULL,WHOLE,false,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
-          "Cegar(PRED_CART,FULL,WHOLE,true,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
-          true
-        )
+        // Arguments.of(
+        //   "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
+        //   "Cegar(PRED_CART,FULL,WHOLE,false,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
+        //   "Cegar(PRED_CART,FULL,WHOLE,true,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
+        //   true
+        // )
         // Arguments.of(
         //   "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
         //   "Cegar(PRED_CART,FULL,WHOLE,true,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
@@ -95,8 +95,8 @@ class ReusePartialResultsTest {
         // )
         // Arguments.of(
         //   "/c/partialResultTest/cohendiv-ll_valuebound5.c",
-        //   "Cegar(PRED_BOOL,LAZY,WHOLE,2,true) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,2,true)",
-        //   "Cegar(PRED_BOOL,LAZY,WHOLE,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,2)", 
+        //   "Cegar(PRED_BOOL,LAZY,WHOLE,false,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,false,2)",
+        //   "Cegar(PRED_BOOL,LAZY,WHOLE,true,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,false,2)", 
         //   true
         // )
 
@@ -109,7 +109,12 @@ class ReusePartialResultsTest {
         //   false
         // ),
 
-
+        // Arguments.of(
+        //   "/c/partialResultTest/test_locks_15-1.c", 
+        //   "Cegar(EXPL,FULL) -> Cegar(PRED_CART,LAZY,WHOLE,2)", 
+        //   "Cegar(EXPL,FULL,pRes=true) -> Cegar(PRED_CART,LAZY,WHOLE,2)", 
+        //   false
+        // ),
 
         // ---
         // Arguments.of("/c/partialResultTest/test_locks_14-2.c", "ExplDefault->PredCartDefault", false) //TODO: check 
@@ -117,6 +122,26 @@ class ReusePartialResultsTest {
         // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "ExplDefault->PredCartDefault", true)
         //----------------------------------------------------------------------------------------------------
 
+        //--------------------- TO TEST -------------
+        // Arguments.of(
+        //   "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
+        //   "Cegar(PRED_CART,FULL,WHOLE,false,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
+        //   "Cegar(PRED_CART,FULL,WHOLE,true,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
+        //   true
+        // )
+        Arguments.of(
+          "/c/partialResultTest/cohendiv-ll_valuebound5.c",
+          "Cegar(PRED_BOOL,LAZY,WHOLE,false,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,false,2)",
+          "Cegar(PRED_BOOL,LAZY,WHOLE,true,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,false,2)", 
+          true
+        )
+        // Arguments.of(
+        //   "/c/partialResultTest/test_locks_15-1.c", 
+        //   "Cegar(EXPL,FULL) -> Cegar(PRED_CART,LAZY,WHOLE,false,2)", 
+        //   "Cegar(EXPL,FULL,pRes=true) -> Cegar(PRED_CART,LAZY,WHOLE,false,2)", 
+        //   false
+        // )
+        //------------------------
           
         //  INFO:: long partial res
         // Arguments.of("/c/partialResultTest/egcd-ll_unwindbound2.c", true), 
@@ -213,7 +238,7 @@ fun createDefaultPortfolioConfig(
               cOutputConfig = COutputConfig(disable=true),
               chcOutputConfig = ChcOutputConfig(disable=true),
               witnessConfig = WitnessConfig(disable=true),
-              xcfaOutputConfig = XcfaOutputConfig(disable=true),
+              xcfaOutputConfig = XcfaOutputConfig(disable=false),
               partialResultOutputConfig = PartialResultOutputConfig(enable=false),
               argConfig = ArgConfig(disable=true)
             ),
