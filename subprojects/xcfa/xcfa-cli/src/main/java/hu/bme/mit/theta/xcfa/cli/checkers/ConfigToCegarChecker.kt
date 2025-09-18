@@ -166,6 +166,7 @@ fun getCegarChecker(
         AasporRefiner.create(refiner, cegarConfig.refinerConfig.pruneStrategy, ignoredVarRegistry),
         logger,
         !config.backendConfig.disablePartialResult,
+        config.backendConfig.timeoutMs,
       )
     else
       ArgCegarChecker.create(
@@ -173,8 +174,9 @@ fun getCegarChecker(
         refiner,
         logger,
         !config.backendConfig.disablePartialResult,
+        config.backendConfig.timeoutMs,
       )
-
+  println("CEGARCHEKER: $cegarChecker")
   // initialize monitors
   MonitorCheckpoint.reset()
   if (cegarConfig.cexMonitor == CexMonitorOptions.CHECK) {

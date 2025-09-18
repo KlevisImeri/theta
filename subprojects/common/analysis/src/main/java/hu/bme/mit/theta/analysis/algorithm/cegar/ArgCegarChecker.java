@@ -37,7 +37,7 @@ public final class ArgCegarChecker {
             CegarChecker<P, ARG<S, A>, Trace<S, A>> create(
                     final ArgAbstractor<S, A, P> abstractor,
                     final ArgRefiner<S, A, P> refiner) {
-        return create(abstractor, refiner, NullLogger.getInstance(), false); //WARN: WHAT is the good defautl
+        return create(abstractor, refiner, NullLogger.getInstance(), false, 0);
     }
 
 
@@ -46,7 +46,16 @@ public final class ArgCegarChecker {
                     final ArgAbstractor<S, A, P> abstractor,
                     final ArgRefiner<S, A, P> refiner,
                     final Boolean computePartialResult) {
-        return create(abstractor, refiner, NullLogger.getInstance(), computePartialResult);
+        return create(abstractor, refiner, NullLogger.getInstance(), computePartialResult, 0L);
+    }
+
+    public static <S extends State, A extends Action, P extends Prec>
+            CegarChecker<P, ARG<S, A>, Trace<S, A>> create(
+                    final ArgAbstractor<S, A, P> abstractor,
+                    final ArgRefiner<S, A, P> refiner,
+                    final Boolean computePartialResult, 
+                    final long timeoutMs) {
+        return create(abstractor, refiner, NullLogger.getInstance(), computePartialResult, timeoutMs);
     }
 
     public static <S extends State, A extends Action, P extends Prec>
@@ -55,7 +64,7 @@ public final class ArgCegarChecker {
                     final ArgRefiner<S, A, P> refiner,
                     final Logger logger) {
         return CegarChecker.create(
-                abstractor, refiner, logger, ArgVisualizer.getDefault(), false);
+                abstractor, refiner, logger, ArgVisualizer.getDefault(), false, 0L);
     }
 
     public static <S extends State, A extends Action, P extends Prec>
@@ -65,6 +74,16 @@ public final class ArgCegarChecker {
                     final Logger logger,
                     final Boolean computePartialResult) {
         return CegarChecker.create(
-                abstractor, refiner, logger, ArgVisualizer.getDefault(), computePartialResult);
+                abstractor, refiner, logger, ArgVisualizer.getDefault(), computePartialResult, 0L);
+    }
+
+    public static <S extends State, A extends Action, P extends Prec>
+            CegarChecker<P, ARG<S, A>, Trace<S, A>> create(
+                    final ArgAbstractor<S, A, P> abstractor,
+                    final ArgRefiner<S, A, P> refiner,
+                    final Logger logger,
+                    final Boolean computePartialResult, 
+                    final long timeoutMs) {
+        return CegarChecker.create(abstractor, refiner, logger, ArgVisualizer.getDefault(), computePartialResult, timeoutMs);
     }
 }

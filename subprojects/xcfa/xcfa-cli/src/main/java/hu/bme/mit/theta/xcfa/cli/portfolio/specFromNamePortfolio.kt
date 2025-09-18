@@ -53,6 +53,9 @@ import javax.script.ScriptEngineManager
 import hu.bme.mit.theta.solver.smtlib.SmtLibSolverManager
 import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig.ArchitectureType;
 import hu.bme.mit.theta.termui.TermUI.lightBlue
+import hu.bme.mit.theta.analysis.expr.refinement.PruneStrategy.LAZY
+
+var timeoutSecDefault = 900L; //sv-comp max time in seconds
 
 fun specFromNamePortfolio(
     xcfa: XCFA,
@@ -63,13 +66,14 @@ fun specFromNamePortfolio(
     logger: Logger,
     uniqueLogger: Logger,
 ): STM {
-    if(portfolioConfig.backendConfig.timeoutMs != 0L) {
-      timeoutMsDefualt = portfolioConfig.backendConfig.timeoutMs
-    } else {
-      logger.write(Logger.Level.INFO, lightBlue(
-        "[INFO] TimoutMs is 0 but we set TimoutMs=${timeoutMsDefualt} for specFromNamePortfolio!\n"
-      ));
-    }
+    timeoutSecDefault = portfolioConfig.backendConfig.timeoutMs / 1000L
+    // if(portfolioConfig.backendConfig.timeoutMs != 0L) {
+    //   timeoutSecDefault = portfolioConfig.backendConfig.timeoutMs
+    // } else {
+    //   logger.write(Logger.Level.INFO, lightBlue(
+    //     "[INFO] TimoutMs is 0 but we set TimoutMs=${timeoutSecDefault} for specFromNamePortfolio!\n"
+    //   ));
+    // }
 
     fun checker(config: XcfaConfig<*, *>, witness: LocationInvariants? = null) =
         runConfig(config, logger, uniqueLogger, true, witness)
@@ -77,9 +81,6 @@ fun specFromNamePortfolio(
  
     if(portfolioNameAsSpec.isEmpty()) error("Your portfolio name cannot be empty")
     var parts = portfolioNameAsSpec.split("->").map { it.trim() }
-    // if(parts.isEmpty() || (parts.size == 1 && parts[0].isEmpty())) {
-    //    parts = listOf(portfolioNameAsSpec)
-    // }
     
     val baseConfig = createDefaultBaseConfig(portfolioConfig, xcfa, mcm, parseContext)
     val kotlinEngine: ScriptEngine = ScriptEngineManager().getEngineByExtension("kts")
@@ -131,27 +132,45 @@ fun specFromNamePortfolio(
     }
 
     val stm = STM(configNodes.first(),edges.toSet())
- 
+
     // println(stm.visualize()) // WARN: When there is only one config you cant print for some reason
     return stm 
-    // return  STM(ConfigNode("Klvis", baseConfig, ::checker),setOf())
 }
 
-var timeoutMsDefualt = 1*60*1000L;
+fun PredCart(sec: Long = timeoutSecDefault, pRes: Boolean = false) =
+  Cegar(
+    domain = PRED_CART,
+    pruneStrategy = LAZY,
+    sec = sec,
+    pRes = pRes,
+    exprSplitter = CONJUNCTS,
+    maxEnum = 2
+  )
 
-//Example:
-//Cegar(EXPL,FULL) -> Cegar(EXPL,LAZY)
-//Cegar(PRED_BOOL,LAZY,WHOLE,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,2)
-//Cegar(PRED_CART,LAZY,WHOLE,2) -> Cegar(PRED_CART,LAZY,CONJUNCTS,2)
+fun Expl(sec: Long = timeoutSecDefault, pRes: Boolean = false) =
+  Cegar(
+    domain = EXPL,
+    pruneStrategy = FULL,
+    sec = sec, 
+    pRes = pRes,
+  )
+
+fun KInd(sec: Long = timeoutSecDefault, pRes: Boolean = false) =
+  Bounded(
+    sec = sec,
+    disableInterpolation = true,
+    pRes = pRes,
+  )
+
+
 fun Cegar(
       domain: Domain = EXPL,
       pruneStrategy: PruneStrategy = FULL,
       exprSplitter: ExprSplitterOptions = WHOLE, // NOTE: only for pred abstraction
       pRes: Boolean = true,
       maxEnum: Int = 1,
-
-      //TODO: decide what should be the right order
-      timeoutMs: Long = timeoutMsDefualt,
+      // TODO: decide what should be the right order
+      sec: Long = timeoutSecDefault,
       inProcess: Boolean = true,
       parseInProcess: Boolean = false,
       memlimit: Long = 0L,
@@ -175,12 +194,12 @@ fun Cegar(
       return BackendConfig(
           backend = CEGAR,
           solverHome = solverHome,
-          timeoutMs = timeoutMs,
+          timeoutMs = sec * 1000L,
           inProcess = inProcess,
           parseInProcess = parseInProcess,
           memlimit = memlimit,
           disablePartialResult = !pRes,
-          inPortfolio = true, //TODO:
+          inPortfolio = true,
           specConfig = CegarConfig(
               initPrec = initPrec,
               porLevel = porLevel,
@@ -205,7 +224,7 @@ fun Cegar(
       )
   }
 
-  fun Bounded( 
+  fun Bounded(
     // Configuration parameters aligned with BoundedConfig structure
     maxBound: Int = 0,
     reversed: Boolean = false,
@@ -232,7 +251,7 @@ fun Cegar(
     
     // General backend configuration
     solverHome: String = SmtLibSolverManager.HOME.toAbsolutePath().toString(),
-    timeoutMs: Long = timeoutMsDefualt,
+    sec: Long = timeoutSecDefault,
     inProcess: Boolean = true,
     parseInProcess: Boolean = false,
     memlimit: Long = 0L,
@@ -241,7 +260,7 @@ fun Cegar(
     BackendConfig(
         backend = Backend.BOUNDED,
         solverHome = solverHome,
-        timeoutMs = timeoutMs,
+        timeoutMs = sec * 1000L, 
         inProcess = inProcess,
         parseInProcess = parseInProcess,
         memlimit = memlimit,
@@ -278,7 +297,7 @@ fun Cegar(
     xcfa: XCFA,
     mcm: MCM,
     parseContext: ParseContext,
-    ): XcfaConfig<SpecFrontendConfig, SpecBackendConfig> { 
+    ): XcfaConfig<SpecFrontendConfig, SpecBackendConfig> {
     val specConfig = portfolioConfig.frontendConfig.specConfig
     return XcfaConfig(
             inputConfig =
@@ -297,7 +316,7 @@ fun Cegar(
                     architecture = if (specConfig is CFrontendConfig) {
                         specConfig.architecture
                     } else {
-                        ArchitectureType.LP64 
+                        ArchitectureType.LP64
                     }
                 ),
             ),
@@ -313,11 +332,9 @@ fun Cegar(
             //   partialResultOutputConfig = PartialResultOutputConfig(enable=true),
             //   argConfig = ArgConfig(disable=true)
             // ),
-
             outputConfig = portfolioConfig.outputConfig.copy(
                 resultFolder = portfolioConfig.outputConfig.resultFolder
                     .resolve((portfolioConfig.backendConfig.specConfig as PortfolioConfig).portfolio),
             ),
       )
   }
-

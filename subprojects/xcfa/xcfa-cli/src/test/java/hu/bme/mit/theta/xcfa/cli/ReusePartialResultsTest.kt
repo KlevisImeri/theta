@@ -129,18 +129,24 @@ class ReusePartialResultsTest {
         //   "Cegar(PRED_CART,FULL,WHOLE,true,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
         //   true
         // )
-        Arguments.of(
-          "/c/partialResultTest/cohendiv-ll_valuebound5.c",
-          "Cegar(PRED_BOOL,LAZY,WHOLE,false,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,false,2)",
-          "Cegar(PRED_BOOL,LAZY,WHOLE,true,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,false,2)", 
-          true
-        )
+        // Arguments.of(
+        //   "/c/partialResultTest/cohendiv-ll_valuebound5.c",
+        //   "Cegar(PRED_BOOL,LAZY,WHOLE,false,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,false,2)",
+        //   "Cegar(PRED_BOOL,LAZY,WHOLE,true,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,false,2)", 
+        //   true
+        // )
         // Arguments.of(
         //   "/c/partialResultTest/test_locks_15-1.c", 
         //   "Cegar(EXPL,FULL) -> Cegar(PRED_CART,LAZY,WHOLE,false,2)", 
         //   "Cegar(EXPL,FULL,pRes=true) -> Cegar(PRED_CART,LAZY,WHOLE,false,2)", 
         //   false
         // )
+        Arguments.of(
+          "/c/partialResultTest/AllInterval-015.c",
+          "PredCart(100L, true) -> KInd()",
+          "Expl(pRes=true) -> PredCart()", 
+          true
+        )
         //------------------------
           
         //  INFO:: long partial res

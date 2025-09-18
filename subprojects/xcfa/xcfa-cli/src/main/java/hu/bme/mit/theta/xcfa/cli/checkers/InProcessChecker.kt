@@ -91,7 +91,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
                 partialResultOutputConfig =
                   config.outputConfig.partialResultOutputConfig.copy(tempFileLocation = partialResultJson),
               ),
-            backendConfig = config.backendConfig.copy(inProcess = false, timeoutMs = 0),
+            backendConfig = config.backendConfig.copy(inProcess = false, timeoutMs = config.backendConfig.timeoutMs),
           )
         CachingFileSerializer.serialize("config.json", config) { getGson().toJson(config) }
       } else {
@@ -113,7 +113,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
                 partialResult = partialResultJson,
               ),
             frontendConfig = config.frontendConfig.copy(inputType = InputType.JSON),
-            backendConfig = config.backendConfig.copy(inProcess = false, timeoutMs = 0),
+            backendConfig = config.backendConfig.copy(inProcess = false, timeoutMs = config.backendConfig.timeoutMs),
             outputConfig =
               config.outputConfig.copy(
                 resultFolder = tempDir.toFile(),
@@ -130,6 +130,8 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
           )
         CachingFileSerializer.serialize("config.json", config) { getGson(xcfa).toJson(config) }
       }
+    
+    config.backendConfig.timeoutMs = 0L; // TODO:
 
     val heapSize =
       "-Xmx${if(config.backendConfig.memlimit == 0L) 1420L else config.backendConfig.memlimit/1024/1024 }m"

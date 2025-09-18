@@ -34,7 +34,8 @@ import hu.bme.mit.theta.common.visualization.writer.JSONWriter;
 import hu.bme.mit.theta.common.visualization.writer.WebDebuggerLogger;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-
+import java.util.Timer;
+import java.util.TimerTask;
 /**
  * Counterexample-Guided Abstraction Refinement (CEGAR) loop implementation, that uses an Abstractor
  * to explore the abstract state space and a Refiner to check counterexamples and refine them if
@@ -49,19 +50,34 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
     private final Pr proof;
     private final ProofVisualizer<? super Pr> proofVisualizer;
     private final Boolean computePartialResult;
+    private final long timeoutMs; // 0 means no timeout  
 
     private CegarChecker(
             final Abstractor<P, Pr> abstractor,
             final Refiner<P, Pr, C> refiner,
             final Logger logger,
             final ProofVisualizer<? super Pr> proofVisualizer,
-            final Boolean computePartialResult) {
+            final Boolean computePartialResult,
+            final long timeoutMs) {
         this.abstractor = checkNotNull(abstractor);
         this.refiner = checkNotNull(refiner);
         this.logger = checkNotNull(logger);
         proof = abstractor.createProof();
         this.proofVisualizer = checkNotNull(proofVisualizer);
         this.computePartialResult = checkNotNull(computePartialResult);
+        this.timeoutMs = checkNotNull(timeoutMs);
+    }
+
+    public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
+            final Abstractor<P, Pr> abstractor,
+            final Refiner<P, Pr, C> refiner,
+            final Logger logger,
+            final ProofVisualizer<? super Pr> proofVisualizer,
+            final Boolean computePartialResult, 
+            final long timeoutMs) {
+      return new CegarChecker<>(
+        abstractor, refiner, logger, proofVisualizer, computePartialResult, timeoutMs
+      );
     }
 
     public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
@@ -69,34 +85,15 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             final Refiner<P, Pr, C> refiner,
             final ProofVisualizer<Pr> proofVisualizer,
             final Boolean computePartialResult) {
-        return create(
-                abstractor,
-                refiner,
-                NullLogger.getInstance(),
-                proofVisualizer,
-                computePartialResult);
+        return create(abstractor, refiner, NullLogger.getInstance(), proofVisualizer, computePartialResult, 0);
     }
 
-    public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
-            final Abstractor<P, Pr> abstractor,
-            final Refiner<P, Pr, C> refiner,
-            final Logger logger,
-            final ProofVisualizer<? super Pr> proofVisualizer,
-            final Boolean computePartialResult) {
-        return new CegarChecker<>(
-                abstractor, refiner, logger, proofVisualizer, computePartialResult);
-    }
 
     public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
             final Abstractor<P, Pr> abstractor,
             final Refiner<P, Pr, C> refiner,
             final ProofVisualizer<Pr> proofVisualizer) {
-        return create(
-                abstractor,
-                refiner,
-                NullLogger.getInstance(),
-                proofVisualizer,
-                false);
+        return create(abstractor, refiner, NullLogger.getInstance(), proofVisualizer, false, 0);
     }
 
     public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
@@ -104,14 +101,19 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             final Refiner<P, Pr, C> refiner,
             final Logger logger,
             final ProofVisualizer<? super Pr> proofVisualizer) {
-        return new CegarChecker<>(
-                abstractor, refiner, logger, proofVisualizer, false);
+        return create(abstractor, refiner, logger, proofVisualizer, false, 0);
     }
 
 
     public Pr getProof() {
         return proof;
     }
+
+    public static class CegarTimeoutException extends RuntimeException {
+        public CegarTimeoutException(String message) {
+            super(message);
+        }
+    }    
 
     private static class StatsHolder {
         long abstractorTime = 0;
@@ -124,91 +126,99 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
         logger.write(Level.INFO, "Configuration: %s%n", this);
         final Stopwatch stopwatch = Stopwatch.createStarted();
         final StatsHolder statsHolder = new StatsHolder();
-        final Supplier<CegarStatistics> getStats =
-                () -> {
-                    stopwatch.stop();
-                    return new CegarStatistics(
-                            stopwatch.elapsed(TimeUnit.MILLISECONDS),
-                            statsHolder.abstractorTime,
-                            statsHolder.refinerTime,
-                            statsHolder.iteration);
-                };
+        final Supplier<CegarStatistics> getStats = () -> {
+            stopwatch.stop();
+            return new CegarStatistics(
+                stopwatch.elapsed(TimeUnit.MILLISECONDS),
+                statsHolder.abstractorTime,
+                statsHolder.refinerTime,
+                statsHolder.iteration
+            );
+        };
         RefinerResult<P, C> refinerResult = null;
         AbstractorResult abstractorResult;
         P prec = initPrec;
         WebDebuggerLogger wdl = WebDebuggerLogger.getInstance();
+
+        final Timer timer = new Timer(true);
+        if (timeoutMs > 0) {
+            final Thread mainThread = Thread.currentThread();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    mainThread.interrupt();
+                }
+            }, timeoutMs);
+        }
+
         try {
-        do {
-            statsHolder.iteration++;
+          do {
+              statsHolder.iteration++;
 
-            logger.write(Level.MAINSTEP, "Iteration %d%n", statsHolder.iteration);
-            logger.write(Level.MAINSTEP, "| Checking abstraction...%n");
-            final long abstractorStartTime = stopwatch.elapsed(TimeUnit.MILLISECONDS);
-            abstractorResult = abstractor.check(proof, prec);
-            statsHolder.abstractorTime +=
-                    stopwatch.elapsed(TimeUnit.MILLISECONDS) - abstractorStartTime;
-            logger.write(
-                    Level.MAINSTEP, "| Checking abstraction done, result: %s%n", abstractorResult);
-
-            if (WebDebuggerLogger.enabled()) {
-                String argGraph =
-                        JSONWriter.getInstance().writeString(proofVisualizer.visualize(proof));
-                String precString = prec.toString();
-                wdl.addIteration(statsHolder.iteration, argGraph, precString);
-            }
-
-            if (abstractorResult.isUnsafe()) {
-                try {
-                    MonitorCheckpoint.Checkpoints.execute("CegarChecker.unsafeARG");
-                } catch (NotSolvableException e) {
-                    if (computePartialResult) {
-                        logger.write(
-                                Level.MAINSTEP, "----Infinit Loop Detected by CexMonitor----%n");
-                        abstractor.unroll(proof, prec);
-                        // abstractor.unroll(proof, initPrec); 
-                        logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
-                        return SafetyResult.partial(proof, getStats.get());
-                    } else {
-                        throw e;
-                    }
-                }
-
-                P lastPrec = prec;
-                logger.write(Level.MAINSTEP, "| Refining abstraction...%n");
-                final long refinerStartTime = stopwatch.elapsed(TimeUnit.MILLISECONDS);
-                refinerResult = refiner.refine(proof, prec);
-                statsHolder.refinerTime +=
-                        stopwatch.elapsed(TimeUnit.MILLISECONDS) - refinerStartTime;
-                logger.write(
-                        Level.MAINSTEP, "Refining abstraction done, result: %s%n", refinerResult);
-
-                if (refinerResult.isSpurious()) {
-                    prec = refinerResult.asSpurious().getRefinedPrec();
-                }
-
-                if (lastPrec.equals(prec)) {
-                    logger.write(
-                            Level.MAINSTEP,
-                            "! Precision did NOT change in this iteration"
-                                    + System.lineSeparator());
-                } else {
-                    logger.write(
-                            Level.MAINSTEP,
-                            "! Precision DID change in this iteration" + System.lineSeparator());
-                }
-            }
-
-        } while (!abstractorResult.isSafe() && !refinerResult.isUnsafe());
-        } catch (RuntimeException e) {
-           if (computePartialResult) {
+              logger.write(Level.MAINSTEP, "Iteration %d%n", statsHolder.iteration);
+              logger.write(Level.MAINSTEP, "| Checking abstraction...%n");
+              final long abstractorStartTime = stopwatch.elapsed(TimeUnit.MILLISECONDS);
+              abstractorResult = abstractor.check(proof, prec);
+              statsHolder.abstractorTime +=
+                      stopwatch.elapsed(TimeUnit.MILLISECONDS) - abstractorStartTime;
               logger.write(
-                      Level.MAINSTEP, "%n-------------Some Solver Error-------------%n");
+                      Level.MAINSTEP, "| Checking abstraction done, result: %s%n", abstractorResult);
+
+              if (WebDebuggerLogger.enabled()) {
+                  String argGraph =
+                          JSONWriter.getInstance().writeString(proofVisualizer.visualize(proof));
+                  String precString = prec.toString();
+                  wdl.addIteration(statsHolder.iteration, argGraph, precString);
+              }
+
+              if (abstractorResult.isUnsafe()) {
+                  MonitorCheckpoint.Checkpoints.execute("CegarChecker.unsafeARG");
+
+                  P lastPrec = prec;
+                  logger.write(Level.MAINSTEP, "| Refining abstraction...%n");
+                  final long refinerStartTime = stopwatch.elapsed(TimeUnit.MILLISECONDS);
+                  refinerResult = refiner.refine(proof, prec);
+                  statsHolder.refinerTime +=
+                          stopwatch.elapsed(TimeUnit.MILLISECONDS) - refinerStartTime;
+                  logger.write(
+                          Level.MAINSTEP, "Refining abstraction done, result: %s%n", refinerResult);
+
+                  if (refinerResult.isSpurious()) {
+                      prec = refinerResult.asSpurious().getRefinedPrec();
+                  }
+
+                  if (lastPrec.equals(prec)) {
+                      logger.write(
+                              Level.MAINSTEP,
+                              "! Precision did NOT change in this iteration"
+                                      + System.lineSeparator());
+                  } else {
+                      logger.write(
+                              Level.MAINSTEP,
+                              "! Precision DID change in this iteration" + System.lineSeparator());
+                  }
+              }
+
+          } while (!abstractorResult.isSafe() && !refinerResult.isUnsafe());
+        } catch (RuntimeException e) {
+          if (computePartialResult) {
+              if (e instanceof CegarTimeoutException) {
+                  logger.write(Level.MAINSTEP, "----------Timeout Exceeded (%d ms)----------%n", timeoutMs);
+              } else if (e instanceof NotSolvableException) {
+                  logger.write(Level.MAINSTEP, "----Infinite Loop Detected by CexMonitor----%n");
+              } else {
+                  logger.write(Level.MAINSTEP, "--------------Some Solver Error-------------%n");
+              }
+
               abstractor.unroll(proof, prec);
+              // abstractor.unroll(proof, initPrec);
               logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
               return SafetyResult.partial(proof, getStats.get());
           } else {
-              throw e;
+             throw e;
           }
+        } finally {
+            timer.cancel();
         }
 
         SafetyResult<Pr, C> cegarResult = null;
