@@ -117,9 +117,9 @@ fun getCegarChecker(
       cegarConfig.abstractorConfig.havocMemory,
     ) as ArgAbstractor<ExprState, ExprAction, Prec>
 
-  val ref: ExprTraceChecker<Refutation> =
+  val (ref_, refinementSolverInstance) =
     cegarConfig.refinerConfig.refinement.refiner(refinementSolverFactory, cegarConfig.cexMonitor)
-      as ExprTraceChecker<Refutation>
+  val ref = ref_ as ExprTraceChecker<Refutation>
   val precRefiner: PrecRefiner<ExprState, ExprAction, Prec, Refutation> =
     cegarConfig.abstractorConfig.domain.itpPrecRefiner(
       cegarConfig.refinerConfig.exprSplitter.exprSplitter
@@ -158,6 +158,12 @@ fun getCegarChecker(
         cegarConfig.refinerConfig.pruneStrategy,
         logger,
       )
+  
+  val interruptSolvers = {
+    abstractionSolverInstance.interrupt() 
+    refinementSolverInstance.interrupt();
+  }
+
 
   val cegarChecker: CegarChecker<Prec, ARG<ExprState, ExprAction>, Trace<ExprState, ExprAction>> =
     if (cegarConfig.porLevel == POR.AASPOR)
@@ -167,6 +173,7 @@ fun getCegarChecker(
         logger,
         !config.backendConfig.disablePartialResult,
         config.backendConfig.timeoutMs,
+        interruptSolvers
       )
     else
       ArgCegarChecker.create(
@@ -175,6 +182,7 @@ fun getCegarChecker(
         logger,
         !config.backendConfig.disablePartialResult,
         config.backendConfig.timeoutMs,
+        interruptSolvers
       )
   println("CEGARCHEKER: $cegarChecker")
   // initialize monitors

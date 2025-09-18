@@ -92,6 +92,11 @@ public class ItpSolverValidatorWrapper implements ItpSolver {
     }
 
     @Override
+    public void interrupt() {
+        solver.interrupt();
+    }
+
+    @Override
     public SolverStatus getStatus() {
         return solver.getStatus();
     }

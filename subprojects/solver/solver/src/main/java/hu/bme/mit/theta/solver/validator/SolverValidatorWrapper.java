@@ -68,6 +68,11 @@ public class SolverValidatorWrapper implements Solver {
     }
 
     @Override
+    public void interrupt() {
+        solver.interrupt();
+    }
+
+    @Override
     public SolverStatus getStatus() {
         return solver.getStatus();
     }

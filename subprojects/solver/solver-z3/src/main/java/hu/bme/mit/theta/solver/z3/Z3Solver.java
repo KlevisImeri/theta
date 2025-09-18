@@ -119,7 +119,7 @@ class Z3Solver implements UCSolver, Solver {
 
     @Override
     public SolverStatus check() {
-        return check(20*1000); // TODO:  do correclty
+        return check(0); // TODO:  do correclty
     }
 
 
@@ -172,6 +172,11 @@ class Z3Solver implements UCSolver, Solver {
         symbolTable.clear();
         transformationManager.reset();
         clearState();
+    }
+
+    @Override
+    public void interrupt() {
+        z3Solver.interrupt();
     }
 
     @Override

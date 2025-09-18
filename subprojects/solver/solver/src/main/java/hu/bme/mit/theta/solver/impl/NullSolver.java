@@ -61,6 +61,12 @@ public final class NullSolver implements Solver {
     }
 
     @Override
+    public void interrupt() {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
     public SolverStatus getStatus() {
         throw new UnsupportedOperationException();
     }

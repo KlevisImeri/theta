@@ -50,6 +50,10 @@ public interface SolverBase extends AutoCloseable {
 
     /** Reset the solver state. */
     void reset();
+    
+    default void interrupt() {
+      throw new UnsupportedOperationException("Interrupt not supported by this solver."); // WARN: BAD desing
+    }
 
     /**
      * Get the current status of the solver.

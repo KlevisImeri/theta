@@ -168,6 +168,11 @@ final class Z3Solver implements UCSolver, Solver {
     }
 
     @Override
+    public void interrupt() {
+        z3Context.interrupt();
+    }
+
+    @Override
     public SolverStatus getStatus() {
         checkState(status != null, "Solver status is unknown.");
         return status;

@@ -52,6 +52,7 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
     private final ProofVisualizer<? super Pr> proofVisualizer;
     private final Boolean computePartialResult;
     private final long timeoutMs; // 0 means no timeout  
+    private final Runnable interruptSolvers;
 
     private CegarChecker(
             final Abstractor<P, Pr> abstractor,
@@ -59,7 +60,9 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             final Logger logger,
             final ProofVisualizer<? super Pr> proofVisualizer,
             final Boolean computePartialResult,
-            final long timeoutMs) {
+            final long timeoutMs, 
+            final Runnable interruptSolvers
+    ) {
         this.abstractor = checkNotNull(abstractor);
         this.refiner = checkNotNull(refiner);
         this.logger = checkNotNull(logger);
@@ -67,6 +70,7 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
         this.proofVisualizer = checkNotNull(proofVisualizer);
         this.computePartialResult = checkNotNull(computePartialResult);
         this.timeoutMs = checkNotNull(timeoutMs);
+        this.interruptSolvers = checkNotNull(interruptSolvers);
     }
 
     public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
@@ -75,9 +79,11 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             final Logger logger,
             final ProofVisualizer<? super Pr> proofVisualizer,
             final Boolean computePartialResult, 
-            final long timeoutMs) {
+            final long timeoutMs,
+            final Runnable interruptSolvers
+    ) {
       return new CegarChecker<>(
-        abstractor, refiner, logger, proofVisualizer, computePartialResult, timeoutMs
+        abstractor, refiner, logger, proofVisualizer, computePartialResult, timeoutMs, interruptSolvers
       );
     }
 
@@ -86,7 +92,9 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             final Refiner<P, Pr, C> refiner,
             final ProofVisualizer<Pr> proofVisualizer,
             final Boolean computePartialResult) {
-        return create(abstractor, refiner, NullLogger.getInstance(), proofVisualizer, computePartialResult, 0);
+      return create(
+        abstractor, refiner, NullLogger.getInstance(), proofVisualizer, computePartialResult, 0, () -> {}
+      );
     }
 
 
@@ -94,7 +102,7 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             final Abstractor<P, Pr> abstractor,
             final Refiner<P, Pr, C> refiner,
             final ProofVisualizer<Pr> proofVisualizer) {
-        return create(abstractor, refiner, NullLogger.getInstance(), proofVisualizer, false, 0);
+        return create(abstractor, refiner, NullLogger.getInstance(), proofVisualizer, false, 0, () -> {});
     }
 
     public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
@@ -102,7 +110,7 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             final Refiner<P, Pr, C> refiner,
             final Logger logger,
             final ProofVisualizer<? super Pr> proofVisualizer) {
-        return create(abstractor, refiner, logger, proofVisualizer, false, 0);
+        return create(abstractor, refiner, logger, proofVisualizer, false, 0, () -> {});
     }
 
 
@@ -143,7 +151,8 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    mainThread.interrupt();
+                    interruptSolvers.run();
+                    // mainThread.interrupt();
                 }
             }, timeoutMs);
         }

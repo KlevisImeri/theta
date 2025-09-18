@@ -141,18 +141,18 @@ class ReusePartialResultsTest {
         //   "Cegar(EXPL,FULL,pRes=true) -> Cegar(PRED_CART,LAZY,WHOLE,false,2)", 
         //   false
         // )
-        Arguments.of(
-          "/c/partialResultTest/cohendiv-ll_valuebound5.c",
-          "PredCart(100, true) -> KInd()",
-          "Expl(pRes=true) -> PredCart()", 
-          true
-        ),
-        // Arguments.of( //for TIMEOUT
-        //   "/c/partialResultTest/AllInterval-015.c",
-        //   "PredCart(20L, true) -> KInd()",
+        // Arguments.of(
+        //   "/c/partialResultTest/cohendiv-ll_valuebound5.c",
+        //   "PredCart(100, true) -> KInd()",
         //   "Expl(pRes=true) -> PredCart()", 
         //   true
-        // )
+        // ),
+        Arguments.of( //for TIMEOUT
+          "/c/partialResultTest/AllInterval-015.c",
+          "PredCart(20, true) -> KInd()",
+          "Expl(pRes=true) -> PredCart()", 
+          true
+        )
 
         //------------------------
           

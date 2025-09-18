@@ -131,7 +131,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
         CachingFileSerializer.serialize("config.json", config) { getGson(xcfa).toJson(config) }
       }
     
-    config.backendConfig.timeoutMs = 0L; // TODO:
+    config.backendConfig.timeoutMs *= 2; // INFO: If unrolling takes more then just checking then also the unroll is running forever
 
     val heapSize =
       "-Xmx${if(config.backendConfig.memlimit == 0L) 1420L else config.backendConfig.memlimit/1024/1024 }m"

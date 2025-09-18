@@ -224,6 +224,11 @@ final class JavaSMTItpSolver implements ItpSolver, Solver {
     }
 
     @Override
+    public void interrupt() {
+        solver.interrupt();
+    }
+
+    @Override
     public SolverStatus getStatus() {
         return solver.getStatus();
     }

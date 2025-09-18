@@ -43,6 +43,7 @@ import hu.bme.mit.theta.core.decl.VarDecl
 import hu.bme.mit.theta.core.type.booltype.BoolExprs
 import hu.bme.mit.theta.core.utils.ExprUtils
 import hu.bme.mit.theta.solver.Solver
+import hu.bme.mit.theta.solver.SolverBase
 import hu.bme.mit.theta.solver.SolverFactory
 import hu.bme.mit.theta.xcfa.analysis.*
 import hu.bme.mit.theta.xcfa.analysis.coi.ConeOfInfluence
@@ -237,122 +238,146 @@ enum class Domain(
 }
 
 enum class Refinement(
-  val refiner:
-    (solverFactory: SolverFactory, monitorOption: CexMonitorOptions) -> ExprTraceChecker<
-        out Refutation
-      >,
-  val stopCriterion: StopCriterion<XcfaState<PtrState<ExprState>>, XcfaAction>,
+    val refiner: (solverFactory: SolverFactory, monitorOption: CexMonitorOptions) -> Pair<ExprTraceChecker<out Refutation>, SolverBase>,
+    val stopCriterion: StopCriterion<XcfaState<PtrState<ExprState>>, XcfaAction>,
 ) {
-
-  FW_BIN_ITP(
-    refiner = { s, _ ->
-      ExprTraceFwBinItpChecker.create(BoolExprs.True(), BoolExprs.True(), s.createItpSolver())
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
-  BW_BIN_ITP(
-    refiner = { s, _ ->
-      ExprTraceBwBinItpChecker.create(BoolExprs.True(), BoolExprs.True(), s.createItpSolver())
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
-  SEQ_ITP(
-    refiner = { s, _ ->
-      ExprTraceSeqItpChecker.create(BoolExprs.True(), BoolExprs.True(), s.createItpSolver())
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
-  MULTI_SEQ(
-    refiner = { s, m ->
-      if (m == CexMonitorOptions.CHECK) error("CexMonitor is not implemented for MULTI_SEQ")
-      ExprTraceSeqItpChecker.create(BoolExprs.True(), BoolExprs.True(), s.createItpSolver())
-    },
-    stopCriterion = StopCriterions.fullExploration(),
-  ),
-  UNSAT_CORE(
-    refiner = { s, _ ->
-      ExprTraceUnsatCoreChecker.create(BoolExprs.True(), BoolExprs.True(), s.createUCSolver())
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
-  UCB(
-    refiner = { s, _ ->
-      ExprTraceUCBChecker.create(BoolExprs.True(), BoolExprs.True(), s.createUCSolver())
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
-  NWT_SP(
-    refiner = { s, _ ->
-      ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), s.createUCSolver())
-        .withoutIT()
-        .withSP()
-        .withoutLV()
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
-  NWT_WP(
-    refiner = { s, _ ->
-      ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), s.createUCSolver())
-        .withoutIT()
-        .withWP()
-        .withoutLV()
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
-  NWT_SP_LV(
-    refiner = { s, _ ->
-      ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), s.createUCSolver())
-        .withoutIT()
-        .withSP()
-        .withLV()
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
-  NWT_WP_LV(
-    refiner = { s, _ ->
-      ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), s.createUCSolver())
-        .withoutIT()
-        .withWP()
-        .withLV()
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
-  NWT_IT_WP(
-    refiner = { s, _ ->
-      ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), s.createUCSolver())
-        .withIT()
-        .withWP()
-        .withoutLV()
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
-  NWT_IT_SP(
-    refiner = { s, _ ->
-      ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), s.createUCSolver())
-        .withIT()
-        .withSP()
-        .withoutLV()
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
-  NWT_IT_WP_LV(
-    refiner = { s, _ ->
-      ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), s.createUCSolver())
-        .withIT()
-        .withWP()
-        .withLV()
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
-  NWT_IT_SP_LV(
-    refiner = { s, _ ->
-      ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), s.createUCSolver())
-        .withIT()
-        .withSP()
-        .withLV()
-    },
-    stopCriterion = StopCriterions.firstCex(),
-  ),
+    FW_BIN_ITP(
+        refiner = { s, _ ->
+            val solver = s.createItpSolver()
+            val checker = ExprTraceFwBinItpChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
+    BW_BIN_ITP(
+        refiner = { s, _ ->
+            val solver = s.createItpSolver()
+            val checker = ExprTraceBwBinItpChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
+    SEQ_ITP(
+        refiner = { s, _ ->
+            val solver = s.createItpSolver()
+            val checker = ExprTraceSeqItpChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
+    MULTI_SEQ(
+        refiner = { s, m ->
+            if (m == CexMonitorOptions.CHECK) error("CexMonitor is not implemented for MULTI_SEQ")
+            val solver = s.createItpSolver()
+            val checker = ExprTraceSeqItpChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.fullExploration(),
+    ),
+    UNSAT_CORE(
+        refiner = { s, _ ->
+            val solver = s.createUCSolver()
+            val checker = ExprTraceUnsatCoreChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
+    UCB(
+        refiner = { s, _ ->
+            val solver = s.createUCSolver()
+            val checker = ExprTraceUCBChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
+    NWT_SP(
+        refiner = { s, _ ->
+            val solver = s.createUCSolver()
+            val checker = ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+                .withoutIT()
+                .withSP()
+                .withoutLV()
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
+    NWT_WP(
+        refiner = { s, _ ->
+            val solver = s.createUCSolver()
+            val checker = ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+                .withoutIT()
+                .withWP()
+                .withoutLV()
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
+    NWT_SP_LV(
+        refiner = { s, _ ->
+            val solver = s.createUCSolver()
+            val checker = ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+                .withoutIT()
+                .withSP()
+                .withLV()
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
+    NWT_WP_LV(
+        refiner = { s, _ ->
+            val solver = s.createUCSolver()
+            val checker = ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+                .withoutIT()
+                .withWP()
+                .withLV()
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
+    NWT_IT_WP(
+        refiner = { s, _ ->
+            val solver = s.createUCSolver()
+            val checker = ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+                .withIT()
+                .withWP()
+                .withoutLV()
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
+    NWT_IT_SP(
+        refiner = { s, _ ->
+            val solver = s.createUCSolver()
+            val checker = ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+                .withIT()
+                .withSP()
+                .withoutLV()
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
+    NWT_IT_WP_LV(
+        refiner = { s, _ ->
+            val solver = s.createUCSolver()
+            val checker = ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+                .withIT()
+                .withWP()
+                .withLV()
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
+    NWT_IT_SP_LV(
+        refiner = { s, _ ->
+            val solver = s.createUCSolver()
+            val checker = ExprTraceNewtonChecker.create(BoolExprs.True(), BoolExprs.True(), solver)
+                .withIT()
+                .withSP()
+                .withLV()
+            Pair(checker, solver)
+        },
+        stopCriterion = StopCriterions.firstCex(),
+    ),
 }
 
 enum class ExprSplitterOptions(val exprSplitter: ExprSplitter) {

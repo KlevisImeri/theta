@@ -174,6 +174,11 @@ final class JavaSMTSolver implements UCSolver, Solver {
     @Override
     public void reset() {
         throw new JavaSMTSolverException("Cannot reset JavaSMT right now.");
+    }    
+    
+    @Override
+    public void interrupt() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
