@@ -15,6 +15,7 @@
  */
 package hu.bme.mit.theta.xcfa.analysis
 
+import hu.bme.mit.theta.analysis.algorithm.abortIfTimedOut;
 import com.google.common.base.Preconditions
 import hu.bme.mit.theta.analysis.Action
 import hu.bme.mit.theta.analysis.Prec

@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3legacy.FuncDecl;
 import com.microsoft.z3legacy.Status;
+import com.microsoft.z3legacy.Params;
 import hu.bme.mit.theta.common.container.Containers;
 import hu.bme.mit.theta.core.decl.ConstDecl;
 import hu.bme.mit.theta.core.decl.Decl;
@@ -110,10 +111,27 @@ final class Z3Solver implements UCSolver, Solver {
 
     @Override
     public SolverStatus check() {
+        return check(0); // TODO:  do correclty
+    }
+
+
+    public SolverStatus check(final int timeoutMillis) {
+        Params p = z3Context.mkParams();
+        if (timeoutMillis > 0) {
+            p.add("timeout", timeoutMillis);
+        }
+        z3Solver.setParameters(p); 
         final Status z3Status = z3Solver.check();
         status = transformStatus(z3Status);
+
+        if (timeoutMillis > 0) {
+            Params resetParams = z3Context.mkParams();
+            resetParams.add("timeout", 0);
+            z3Solver.setParameters(resetParams);
+        }
         return status;
     }
+
 
     private SolverStatus transformStatus(final Status z3Status) {
         switch (z3Status) {

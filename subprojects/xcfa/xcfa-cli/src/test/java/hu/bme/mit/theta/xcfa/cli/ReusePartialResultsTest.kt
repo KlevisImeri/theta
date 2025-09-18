@@ -142,11 +142,18 @@ class ReusePartialResultsTest {
         //   false
         // )
         Arguments.of(
-          "/c/partialResultTest/AllInterval-015.c",
-          "PredCart(100L, true) -> KInd()",
+          "/c/partialResultTest/cohendiv-ll_valuebound5.c",
+          "PredCart(100, true) -> KInd()",
           "Expl(pRes=true) -> PredCart()", 
           true
-        )
+        ),
+        // Arguments.of( //for TIMEOUT
+        //   "/c/partialResultTest/AllInterval-015.c",
+        //   "PredCart(20L, true) -> KInd()",
+        //   "Expl(pRes=true) -> PredCart()", 
+        //   true
+        // )
+
         //------------------------
           
         //  INFO:: long partial res

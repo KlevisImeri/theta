@@ -35,6 +35,7 @@ import hu.bme.mit.theta.core.utils.indexings.VarIndexingFactory;
 import hu.bme.mit.theta.solver.Solver;
 import java.util.Collection;
 import java.util.List;
+import static hu.bme.mit.theta.analysis.algorithm.AlgorithmTimeoutExceptionKt.abortIfTimedOut;
 
 public final class ExplStmtTransFunc implements TransFunc<ExplState, StmtAction, ExplPrec> {
 
@@ -64,6 +65,7 @@ public final class ExplStmtTransFunc implements TransFunc<ExplState, StmtAction,
         boolean triedSolver = false;
 
         for (int i = 0; i < stmts.size(); i++) {
+            abortIfTimedOut("ExplStmtTransFunc getSuccStates");
             final Stmt stmt = stmts.get(i);
             final ApplyResult applyResult = StmtApplier.apply(stmt, val, triedSolver);
 

@@ -16,6 +16,7 @@
 package hu.bme.mit.theta.analysis.algorithm.arg;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static hu.bme.mit.theta.analysis.algorithm.AlgorithmTimeoutExceptionKt.abortIfTimedOut;
 
 import hu.bme.mit.theta.analysis.*;
 import java.util.ArrayList;
@@ -64,11 +65,13 @@ public final class ArgBuilder<S extends State, A extends Action, P extends Prec>
     public Collection<ArgNode<S, A>> init(final ARG<S, A> arg, final P prec) {
         checkNotNull(arg);
         checkNotNull(prec);
+        abortIfTimedOut("ArgBuilder ini");
 
         final Collection<ArgNode<S, A>> newInitNodes = new ArrayList<>();
 
         final Collection<? extends S> initStates = analysis.getInitFunc().getInitStates(prec);
         for (final S initState : initStates) {
+            abortIfTimedOut("ArgBuilder init loop");
             if (excludeBottom && initState.isBottom()) {
                 continue;
             }
@@ -86,6 +89,8 @@ public final class ArgBuilder<S extends State, A extends Action, P extends Prec>
     public Collection<ArgNode<S, A>> expand(final ArgNode<S, A> node, final P prec) {
         checkNotNull(node);
         checkNotNull(prec);
+        abortIfTimedOut("ArgBuilder expand");
+
         final Collection<ArgNode<S, A>> newSuccNodes = new ArrayList<>();
         final S state = node.getState();
         final Collection<A> exploredActions =
@@ -94,6 +99,7 @@ public final class ArgBuilder<S extends State, A extends Action, P extends Prec>
                 lts.getEnabledActionsFor(state, exploredActions, prec);
         final TransFunc<S, ? super A, ? super P> transFunc = analysis.getTransFunc();
         for (final A action : actions) {
+             abortIfTimedOut("ArgBuilder expand loop");
             final Collection<? extends S> succStates = transFunc.getSuccStates(state, action, prec);
             for (final S succState : succStates) {
                 if (excludeBottom && succState.isBottom()) {

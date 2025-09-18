@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import static hu.bme.mit.theta.analysis.algorithm.AlgorithmTimeoutExceptionKt.abortIfTimedOut;
 
 /** Strategies for performing predicate abstraction over an expression. */
 public class PredAbstractors {
@@ -151,6 +152,7 @@ public class PredAbstractors {
                                     PathUtils.unfold(preds.get(i), precIndexing)));
                 }
                 while (solver.check().isSat()) {
+                    abortIfTimedOut("PredAbstractors BooleanAbstractor");
                     final Valuation model = solver.getModel();
                     final Set<Expr<BoolType>> newStatePreds = Containers.createSet();
                     final List<Expr<BoolType>> feedback = new LinkedList<>();
@@ -207,12 +209,14 @@ public class PredAbstractors {
 
             try (WithPushPop wp = new WithPushPop(solver)) {
                 solver.add(PathUtils.unfold(expr, exprIndexing));
+                abortIfTimedOut("PredAbstractors CartesianAbstractor");
                 solver.check();
                 if (solver.getStatus().isUnsat()) {
                     return Collections.emptySet();
                 }
 
                 for (final Expr<BoolType> pred : prec.getPreds()) {
+                    abortIfTimedOut("PredAbstractors CartesianAbstractor loop");
                     final boolean ponEntailed;
                     final boolean negEntailed;
                     try (WithPushPop wp1 = new WithPushPop(solver)) {

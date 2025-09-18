@@ -251,7 +251,7 @@ class XcfaPredAnalysisTest {
     val lts = XcfaAasporLts(xcfa, mutableMapOf())
 
     val abstractor =
-      getXcfaAbstractor(
+      getXcfaAbstractor
         analysis,
         PriorityWaitlist.create(
           ArgNodeComparators.combine(ArgNodeComparators.targetFirst(), ArgNodeComparators.bfs())

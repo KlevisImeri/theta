@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Stopwatch;
 import hu.bme.mit.theta.analysis.Cex;
 import hu.bme.mit.theta.analysis.Prec;
+import hu.bme.mit.theta.analysis.algorithm.AlgorithmTimeoutException;
 import hu.bme.mit.theta.analysis.algorithm.Proof;
 import hu.bme.mit.theta.analysis.algorithm.SafetyChecker;
 import hu.bme.mit.theta.analysis.algorithm.SafetyResult;
@@ -109,11 +110,6 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
         return proof;
     }
 
-    public static class CegarTimeoutException extends RuntimeException {
-        public CegarTimeoutException(String message) {
-            super(message);
-        }
-    }    
 
     private static class StatsHolder {
         long abstractorTime = 0;
@@ -141,6 +137,7 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
         WebDebuggerLogger wdl = WebDebuggerLogger.getInstance();
 
         final Timer timer = new Timer(true);
+        System.out.println("TimeoutMs In Cegar:" + timeoutMs);
         if (timeoutMs > 0) {
             final Thread mainThread = Thread.currentThread();
             timer.schedule(new TimerTask() {
@@ -202,7 +199,7 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
           } while (!abstractorResult.isSafe() && !refinerResult.isUnsafe());
         } catch (RuntimeException e) {
           if (computePartialResult) {
-              if (e instanceof CegarTimeoutException) {
+              if (e instanceof AlgorithmTimeoutException) {
                   logger.write(Level.MAINSTEP, "----------Timeout Exceeded (%d ms)----------%n", timeoutMs);
               } else if (e instanceof NotSolvableException) {
                   logger.write(Level.MAINSTEP, "----Infinite Loop Detected by CexMonitor----%n");
