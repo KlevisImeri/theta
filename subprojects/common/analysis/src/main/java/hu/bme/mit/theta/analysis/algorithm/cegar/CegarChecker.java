@@ -37,6 +37,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Counterexample-Guided Abstraction Refinement (CEGAR) loop implementation, that uses an Abstractor
  * to explore the abstract state space and a Refiner to check counterexamples and refine them if
@@ -146,11 +148,13 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
 
         final Timer timer = new Timer(true);
         System.out.println("TimeoutMs In Cegar:" + timeoutMs);
+        final AtomicBoolean solverInterrupted = new AtomicBoolean(false);
         if (timeoutMs > 0) {
             final Thread mainThread = Thread.currentThread();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
+                    solverInterrupted.set(true);
                     interruptSolvers.run();
                     // mainThread.interrupt();
                 }
@@ -209,11 +213,13 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
         } catch (RuntimeException e) {
           if (computePartialResult) {
               if (e instanceof AlgorithmTimeoutException) {
-                  logger.write(Level.MAINSTEP, "----------Timeout Exceeded (%d ms)----------%n", timeoutMs);
+                  logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Main Thread Interrupted (%d ms)----------%n", timeoutMs);
               } else if (e instanceof NotSolvableException) {
-                  logger.write(Level.MAINSTEP, "----Infinite Loop Detected by CexMonitor----%n");
+                  logger.write(Level.MAINSTEP, "%n----Infinite Loop Detected by CexMonitor----%n");
+              } else if (solverInterrupted.get()) {
+                  logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", timeoutMs);
               } else {
-                  logger.write(Level.MAINSTEP, "--------------Some Solver Error-------------%n");
+                  logger.write(Level.MAINSTEP, "%n--------------Some Solver Error-------------%n");
               }
 
               abstractor.unroll(proof, prec);
@@ -231,7 +237,17 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
         final CegarStatistics stats = getStats.get();
 
         assert abstractorResult.isSafe() || refinerResult.isUnsafe();
-
+        
+        if (solverInterrupted.get()) { 
+            // WARN: Temporaty fix to bad fast-unreachcahll result
+            // Probably the problem is that calling interrupt when the solver is not checking
+            // solverInterrupted should be inside the solver so you have 
+            // check(){ if(solverInterrupted.get()) return AlgorithmTimeoutException()}
+            logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", timeoutMs);
+            abstractor.unroll(proof, prec);
+            logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
+            cegarResult = SafetyResult.partial(proof, stats); // FIX: cant get stats.get() beacuse cat stop the timer two times
+        } else 
         if (abstractorResult.isSafe()) {
             cegarResult = SafetyResult.safe(proof, stats);
         } else if (refinerResult.isUnsafe()) {

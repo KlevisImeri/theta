@@ -22,6 +22,9 @@ import hu.bme.mit.theta.common.logging.Logger
 import hu.bme.mit.theta.common.logging.Logger.Level.*
 import hu.bme.mit.theta.xcfa.model.XcfaLocation
 import java.io.File
+import hu.bme.mit.theta.termui.TermUI.yellow
+import hu.bme.mit.theta.termui.TermUI.red
+
 
 data class LocationInvariants(
   private val locationInvariants: Map<XcfaLocation, Collection<ExprState>>
@@ -43,6 +46,10 @@ data class LocationInvariants(
         }
 
     return "${this::class.simpleName?.substringBefore('@')?.substringAfterLast('.')}($formattedInvariants\n)"
+  }
+
+  fun isEmpty(): Boolean {
+    return getPartitions().isEmpty();
   }
 
   fun merge(other: LocationInvariants): LocationInvariants {
@@ -78,11 +85,16 @@ data class LocationInvariants(
             gson.fromJson(fileReader, LocationInvariants::class.java)
           }
         logger.write(INFO, "Successfully loaded LocationInvariants from ${file.absolutePath}\n")
-        invariants
+        if(invariants.isEmpty()) {
+          logger.write(INFO, yellow("[WARN] LocationInvariants are empty map. Returning null!\n"))
+          null
+        } else {
+          invariants
+        }
       } catch (e: Exception) {
         logger.write(
           INFO,
-          "[Error] Could not parse LocationInvariants file '${file.absolutePath}'. Reason: ${e.message}\n",
+          red("[Error] Could not parse LocationInvariants file '${file.absolutePath}'. Reason: ${e.message}\n"),
         )
         null
       }

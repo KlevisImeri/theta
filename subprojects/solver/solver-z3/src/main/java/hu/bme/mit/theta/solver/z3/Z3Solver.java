@@ -119,24 +119,8 @@ class Z3Solver implements UCSolver, Solver {
 
     @Override
     public SolverStatus check() {
-        return check(0); // TODO:  do correclty
-    }
-
-
-    public SolverStatus check(final long timeoutMillis) {
-        Params p = z3Context.mkParams();
-        if (timeoutMillis > 0) {
-            p.add("timeout", timeoutMillis);
-        }
-        z3Solver.setParameters(p); 
         final Status z3Status = z3Solver.check();
         status = transformStatus(z3Status);
-
-        if (timeoutMillis > 0) {
-            Params resetParams = z3Context.mkParams();
-            resetParams.add("timeout", 0);
-            z3Solver.setParameters(resetParams);
-        }
         return status;
     }
 

@@ -39,6 +39,7 @@ import hu.bme.mit.theta.xcfa.cli.checkers.InProcessChecker
 import hu.bme.mit.theta.xcfa.cli.params.*
 import hu.bme.mit.theta.termui.TermUI.red
 import java.nio.file.Paths
+import hu.bme.mit.theta.xcfa.passes.LbePass
 
 class ReusePartialResultsTest {
   companion object {
@@ -147,14 +148,37 @@ class ReusePartialResultsTest {
         //   "Expl(pRes=true) -> PredCart()", 
         //   true
         // ),
-        Arguments.of( //for TIMEOUT
-          "/c/partialResultTest/AllInterval-015.c",
-          "PredCart(20, true) -> KInd()",
-          "Expl(pRes=true) -> PredCart()", 
+        // Arguments.of( 
+        //   "/c/partialResultTest/AllInterval-015.c",
+        //   "PredCart(20, true) -> KInd()",
+        //   "Expl(pRes=true) -> PredCart()", 
+        //   true
+        // )
+        Arguments.of( 
+          //"/c/partialResultTest/functions_1-1.c",
+          // "/c/partialResultTest/array_1-1.c",
+          "/c/partialResultTest/invert_string-3.c",
+          "PredCart(100, true) -> KInd()", 
+          "PredCart(100)",
           true
         )
 
+        // Arguments.of( 
+        //   "/c/partialResultTest/AllInterval-015.c",
+        //   "PredCart(20)",
+        //   "Kind()", 
+        //   true
+        // )
+
+
+
         //------------------------
+        // Arguments.of( 
+        //   "/c/partialResultTest/ExplPred.c",
+        //   "Expl(pRes=true) -> PredCart()",
+        //   "PredCart(20, true) -> KInd()",
+        //   true
+        // )
           
         //  INFO:: long partial res
         // Arguments.of("/c/partialResultTest/egcd-ll_unwindbound2.c", true), 
@@ -229,16 +253,18 @@ fun createDefaultPortfolioConfig(
    return XcfaConfig<SpecFrontendConfig, SpecBackendConfig>(
             inputConfig = InputConfig(input = File(ReusePartialResultsTest::class.java.getResource(cFile)!!.path)),
             debugConfig =
-              DebugConfig(
+              DebugConfig( //WARN: wont work cause you have to implement json parsing
                 stacktrace = true,
                 // logLevel = Logger.Level.MAINSTEP,
-                // logLevel = Logger.Level.INFO,
-                logLevel = Logger.Level.VERBOSE,
+                // logLevel = Logger.Level.SUBSTEP,
+                logLevel = Logger.Level.INFO,
+                // logLevel = Logger.Level.VERBOSE,
               ),
             frontendConfig =
               FrontendConfig(
                 specConfig =
-                  CFrontendConfig(architecture = ArchitectureType.ILP32)
+                  CFrontendConfig(architecture = ArchitectureType.ILP32),
+                // lbeLevel = LbePass.LbeLevel.NO_LBE // WARN:
               ),
             backendConfig =
               BackendConfig(
@@ -246,12 +272,12 @@ fun createDefaultPortfolioConfig(
                 specConfig = PortfolioConfig(portfolio = portfolioName),
               ),
             outputConfig = OutputConfig(
-              enableOutput = true,
+              enableOutput = true, // FIX: if enableOutput==false and PartialResultOutputConfig(enable=true) you get error 
               resultFolder = Paths.get("./output").toFile(),
               cOutputConfig = COutputConfig(disable=true),
               chcOutputConfig = ChcOutputConfig(disable=true),
               witnessConfig = WitnessConfig(disable=true),
-              xcfaOutputConfig = XcfaOutputConfig(disable=false),
+              xcfaOutputConfig = XcfaOutputConfig(disable=true),
               partialResultOutputConfig = PartialResultOutputConfig(enable=false),
               argConfig = ArgConfig(disable=true)
             ),

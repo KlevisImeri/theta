@@ -167,7 +167,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
         } else {
           logger.write(
             Logger.Level.RESULT,
-            "Config timed out but started writing result, trying to wait an additional 10%...",
+            "Config timed out but started writing result, trying to wait an additional 10% ...",
           )
           val retCode = process.waitFor(config.backendConfig.timeoutMs / 10, TimeUnit.MILLISECONDS)
           if (retCode != 0) {
@@ -231,7 +231,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
           //   safetyResult = SafetyResult.partial<EmptyProof, EmptyCex>(EmptyProof.getInstance())
           // }
           xcfa!!
-          println("config.backendConfig.inProcess: ${config.backendConfig.inProcess}")
+          // println("config.backendConfig.inProcess: ${config.backendConfig.inProcess}")
           var tempLoc = LocationInvariants()
           LocationInvariants.fromFile(partialResultJson, getGson(xcfa), logger)?.let {
             loadedInvariants ->
