@@ -153,6 +153,7 @@ fun Expl(sec: Long = timeoutSecDefault, pRes: Boolean = false) =
     pruneStrategy = FULL,
     sec = sec, 
     pRes = pRes,
+    // maxEnum = 4
   )
 
 fun KInd(sec: Long = timeoutSecDefault, pRes: Boolean = false) =

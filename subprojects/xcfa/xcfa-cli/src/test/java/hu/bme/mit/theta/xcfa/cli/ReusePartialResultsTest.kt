@@ -155,11 +155,15 @@ class ReusePartialResultsTest {
         //   true
         // )
         Arguments.of( 
-          //"/c/partialResultTest/functions_1-1.c",
+          // "/c/partialResultTest/functions_1-1.c",
           // "/c/partialResultTest/array_1-1.c",
-          "/c/partialResultTest/invert_string-3.c",
-          "PredCart(100, true) -> KInd()", 
-          "PredCart(100)",
+          // "/c/partialResultTest/invert_string-3.c",
+          // "/c/partialResultTest/test_locks_9.c",
+          // "/c/partialResultTest/s3_srvr_1b.cil.c",        
+          // "/c/partialResultTest/test_locks_13.c",
+          "/c/partialResultTest/test_locks_12.c",
+          "PredCart(100, true) -> KInd()",
+          "Expl(100, true) -> PredCart()",
           true
         )
 

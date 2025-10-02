@@ -1,3 +1,12 @@
+Further analyses:
+- You can have pred explosokn
+- When i get flase 
+
+tru tru
+whatever tru
+tru whatever
+Why does predicate state explosion happen 
+
 ### 17-09-2025
 - Understand the BoundedConfig parameters
 - Talk bout the current results 
@@ -8,7 +17,6 @@
 InitPrec and normal prec 
 how may itrations to run 
 and from what analysis to what
-
 
 
 - Add explicit state example 

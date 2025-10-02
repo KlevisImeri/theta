@@ -30,6 +30,8 @@ import hu.bme.mit.theta.analysis.reachedset.Partition
 import hu.bme.mit.theta.analysis.waitlist.Waitlist
 import hu.bme.mit.theta.common.logging.Logger
 import java.util.function.Function
+import hu.bme.mit.theta.analysis.utils.ArgVisualizer;
+import hu.bme.mit.theta.common.visualization.writer.GraphvizWriter;
 
 class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
   argBuilder: ArgBuilder<S, A, P>,
@@ -40,7 +42,7 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
 ) : BasicArgAbstractor<S, A, P>(argBuilder, projection, waitlist, stopCriterion, logger) {
 
   override fun check(arg: ARG<S, A>, prec: P): AbstractorResult {
-    logger.write(Logger.Level.DETAIL, "|  |  Precision: %s%n", prec)
+    logger.write(Logger.Level.INFO, "|  |  Precision: %s%n", prec)
 
     if (!arg.isInitialized) {
       logger.write(Logger.Level.SUBSTEP, "|  |  (Re)initializing ARG...")
@@ -67,7 +69,7 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
     reachedSet.addAll(arg.nodes)
     waitlist.addAll(arg.incompleteNodes)
 
-    if (!stopCriterion.canStop(arg)) {
+    if (!stopCriterion.canStop(arg)) {  // FIX: very time consuming
       while (!waitlist.isEmpty) {
         val node = waitlist.remove()
         var newNodes: Collection<ArgNode<S, A>>? = emptyList()
@@ -79,8 +81,19 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
         }
         if (!node.isSubsumed && !node.isTarget) {
           newNodes = argBuilder.expand(node, prec)
+
+          val g = ArgVisualizer.getDefault().visualize(arg)
+          println(GraphvizWriter.getInstance().writeString(g))
+
           reachedSet.addAll(newNodes)
           waitlist.addAll(newNodes)
+          logger.write(
+            Logger.Level.INFO,
+            "|  |  Expanded: %d new, ARG now %d nodes, %d incomplete%n",
+            newNodes.size,
+            arg.nodes.count(),
+            arg.incompleteNodes.count()
+          )
         }
         if (stopCriterion.canStop(arg, newNodes)) break
       }

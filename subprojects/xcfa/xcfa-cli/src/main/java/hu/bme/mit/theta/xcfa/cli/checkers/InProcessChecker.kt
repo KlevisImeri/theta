@@ -163,6 +163,10 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
       if (retCode == Int.MIN_VALUE) {
         if (processHandler.safetyResult == null) {
           process.destroy(true)
+          logger.write(
+            Logger.Level.RESULT,
+            "The process run out of time so it got destroied!\n",
+          )
           throw ErrorCodeException(ExitCodes.TIMEOUT.code)
         } else {
           logger.write(

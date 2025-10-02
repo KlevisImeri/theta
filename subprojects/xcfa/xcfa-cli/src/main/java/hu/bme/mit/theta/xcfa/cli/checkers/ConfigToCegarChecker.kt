@@ -160,8 +160,9 @@ fun getCegarChecker(
       )
   
   val interruptSolvers = {
-    abstractionSolverInstance.interrupt() 
+    abstractionSolverInstance.interrupt();
     refinementSolverInstance.interrupt();
+    // abstractionSolverInstance.reset();
   }
 
 

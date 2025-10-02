@@ -218,12 +218,19 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
                   logger.write(Level.MAINSTEP, "%n----Infinite Loop Detected by CexMonitor----%n");
               } else if (solverInterrupted.get()) {
                   logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", timeoutMs);
+                  e = new AlgorithmTimeoutException(String.format("Timeout Exceeded: Solver Interrupted after %d ms", timeoutMs));
               } else {
                   logger.write(Level.MAINSTEP, "%n--------------Some Solver Error-------------%n");
               }
-
-              abstractor.unroll(proof, prec);
-              // abstractor.unroll(proof, initPrec);
+              
+              try {
+                abstractor.unroll(proof, prec);
+                // abstractor.unroll(proof, initPrec);
+              } catch (RuntimeException e2) {
+                logger.write(Level.MAINSTEP, "Could not unroll abstractor because "+ e2.getMessage() +" !%n");
+                // return SafetyResult.unknown(getStats.get());  // FIX: Should throw the error (stm needs it) but i need the states
+                throw e;
+              }
               logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
               return SafetyResult.partial(proof, getStats.get());
           } else {
