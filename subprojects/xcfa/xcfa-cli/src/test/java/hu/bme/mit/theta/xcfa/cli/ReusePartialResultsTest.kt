@@ -161,8 +161,10 @@ class ReusePartialResultsTest {
           // "/c/partialResultTest/test_locks_9.c",
           // "/c/partialResultTest/s3_srvr_1b.cil.c",        
           // "/c/partialResultTest/test_locks_13.c",
-          "/c/partialResultTest/test_locks_12.c",
-          "PredCart(100, true) -> KInd()",
+          // "/c/partialResultTest/test_locks_12.c",
+          "/c/partialResultTest/diamond_2-2.c",
+          "PredCart()",
+          // "PredCart(100, true) -> KInd()",
           "Expl(100, true) -> PredCart()",
           true
         )

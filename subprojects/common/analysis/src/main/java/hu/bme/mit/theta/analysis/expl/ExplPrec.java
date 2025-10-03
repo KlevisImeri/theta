@@ -110,4 +110,9 @@ public final class ExplPrec implements Prec {
     public Collection<VarDecl<?>> getUsedVars() {
         return vars;
     }
+
+    @Override
+    public int getSize() {
+        return vars.size();
+    }
 }

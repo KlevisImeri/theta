@@ -39,4 +39,9 @@ public final class UnitPrec implements Prec {
     public Collection<VarDecl<?>> getUsedVars() {
         return Set.of();
     }
+
+    @Override
+    public int getSize() {
+        return 0;
+    }
 }

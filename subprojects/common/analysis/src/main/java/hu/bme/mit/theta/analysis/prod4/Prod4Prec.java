@@ -112,4 +112,9 @@ public final class Prod4Prec<P1 extends Prec, P2 extends Prec, P3 extends Prec, 
                         prec4.getUsedVars().stream())
                 .collect(Collectors.toSet());
     }
+
+    @Override
+    public int getSize() {
+        return prec1.getSize() + prec2.getSize() + prec3.getSize() + prec4.getSize();
+    }
 }

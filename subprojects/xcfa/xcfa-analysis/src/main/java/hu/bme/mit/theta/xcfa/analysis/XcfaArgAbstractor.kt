@@ -42,7 +42,8 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
 ) : BasicArgAbstractor<S, A, P>(argBuilder, projection, waitlist, stopCriterion, logger) {
 
   override fun check(arg: ARG<S, A>, prec: P): AbstractorResult {
-    logger.write(Logger.Level.INFO, "|  |  Precision: %s%n", prec)
+    // logger.write(Logger.Level.INFO, "|  |  Precision: %s%n", prec)
+    logger.write(Logger.Level.INFO, "|  |  PrecisionSize: %d%n", prec.getSize())
 
     if (!arg.isInitialized) {
       logger.write(Logger.Level.SUBSTEP, "|  |  (Re)initializing ARG...")
@@ -60,7 +61,7 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
       arg.unsafeNodes.count(),
     )
     logger.write(Logger.Level.SUBSTEP, "|  |  ${stopCriterion}...%n")
-    logger.write(Logger.Level.SUBSTEP, "|  |  Building ARG...")
+    logger.write(Logger.Level.SUBSTEP, "|  |  Building ARG...%n")
 
     val reachedSet: Partition<ArgNode<S, A>, *> =
       Partition.of { n: ArgNode<S, A> -> projection.apply(n.state) }
@@ -82,8 +83,8 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
         if (!node.isSubsumed && !node.isTarget) {
           newNodes = argBuilder.expand(node, prec)
 
-          val g = ArgVisualizer.getDefault().visualize(arg)
-          println(GraphvizWriter.getInstance().writeString(g))
+          // val g = ArgVisualizer.getDefault().visualize(arg)
+          // println(GraphvizWriter.getInstance().writeString(g))
 
           reachedSet.addAll(newNodes)
           waitlist.addAll(newNodes)

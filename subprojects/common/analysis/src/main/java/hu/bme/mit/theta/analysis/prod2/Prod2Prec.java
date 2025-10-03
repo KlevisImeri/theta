@@ -84,4 +84,9 @@ public final class Prod2Prec<P1 extends Prec, P2 extends Prec> implements Prec {
         return Streams.concat(prec1.getUsedVars().stream(), prec2.getUsedVars().stream())
                 .collect(Collectors.toSet());
     }
+
+    @Override
+    public int getSize() {
+        return prec1.getSize() + prec2.getSize();
+    }
 }

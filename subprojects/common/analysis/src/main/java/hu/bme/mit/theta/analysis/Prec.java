@@ -22,4 +22,8 @@ import java.util.Collection;
 public interface Prec {
 
     Collection<VarDecl<?>> getUsedVars();
+     
+    default int getSize() {
+        throw new UnsupportedOperationException("This precision does not support the getSize() method.");
+    }
 }

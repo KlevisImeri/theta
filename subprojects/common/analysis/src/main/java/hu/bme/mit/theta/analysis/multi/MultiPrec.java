@@ -32,4 +32,9 @@ public record MultiPrec<LPrec extends Prec, RPrec extends Prec, DataPrec extends
     public String toString() {
         return "MultiPrec{" + "dataPrec=" + dataPrec + '}';
     }
+
+    @Override
+    public int getSize() {
+        return dataPrec.getSize();
+    }
 }

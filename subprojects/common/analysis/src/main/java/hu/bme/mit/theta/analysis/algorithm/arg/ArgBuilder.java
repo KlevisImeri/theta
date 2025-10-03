@@ -96,7 +96,7 @@ public final class ArgBuilder<S extends State, A extends Action, P extends Prec>
         final Collection<A> exploredActions =
                 node.getOutEdges().map(ArgEdge::getAction).collect(Collectors.toSet());
         final Collection<? extends A> actions =
-                lts.getEnabledActionsFor(state, exploredActions, prec);
+                lts.getEnabledActionsFor(state, exploredActions, prec); // WARN: Appranlty this can also take time
         final TransFunc<S, ? super A, ? super P> transFunc = analysis.getTransFunc();
         for (final A action : actions) {
              abortIfTimedOut("ArgBuilder expand loop");

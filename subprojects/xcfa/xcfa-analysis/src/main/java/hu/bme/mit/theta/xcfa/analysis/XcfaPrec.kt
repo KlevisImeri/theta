@@ -25,6 +25,10 @@ data class XcfaPrec<P : Prec>(val p: P, val noPop: MutableList<XcfaState<*>> = m
     return p.usedVars
   }
 
+  override fun getSize(): Int {
+    return p.size
+  }
+
   fun refine(runningPrec: P): XcfaPrec<P> {
     return if (this.p == runningPrec) {
       this

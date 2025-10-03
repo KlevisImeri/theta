@@ -38,7 +38,7 @@ import java.util.function.Supplier;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
-import hu.bme.mit.theta.analysis.algorithm.predictor.ExpRlsPredictor1D
+
 /**
  * Counterexample-Guided Abstraction Refinement (CEGAR) loop implementation, that uses an Abstractor
  * to explore the abstract state space and a Refiner to check counterexamples and refine them if
@@ -52,38 +52,42 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
     private final Logger logger;
     private final Pr proof;
     private final ProofVisualizer<? super Pr> proofVisualizer;
-    private final CegarConfig CegarConfig;
-
+    private final Boolean computePartialResult;
+    private final long timeoutMs; // 0 means no timeout  
+    private final Runnable interruptSolvers;
 
     private CegarChecker(
             final Abstractor<P, Pr> abstractor,
             final Refiner<P, Pr, C> refiner,
             final Logger logger,
             final ProofVisualizer<? super Pr> proofVisualizer,
-            final CegarConfig cegarConfig;
-
+            final Boolean computePartialResult,
+            final long timeoutMs, 
+            final Runnable interruptSolvers
     ) {
         this.abstractor = checkNotNull(abstractor);
         this.refiner = checkNotNull(refiner);
         this.logger = checkNotNull(logger);
         proof = abstractor.createProof();
         this.proofVisualizer = checkNotNull(proofVisualizer);
-        this.cegarConfig = checkNotNull(cegarConfig);
+        this.computePartialResult = checkNotNull(computePartialResult);
+        this.timeoutMs = checkNotNull(timeoutMs);
+        this.interruptSolvers = checkNotNull(interruptSolvers);
     }
     
     static data class CegarConfig {
-        final Boolean computePartialResult = false,
-        final long softTimeoutMs = 0,
-        final long hardTimeoutMs = 750, 
+        final Boolean computePartialResult, 
+        final long timeoutMs,
         final Runnable afterTimeOut = () -> {}; // default does nothing
-        final bool iterationTimeHeuristic = false; // it mean the new iteration weight this much more 
-        final bool forgettingFactor =  95;
-        final bool emableUnrollingTimeHeuristic = 0; // worst case guess how much time the unrolling would take
+        final 
+    
         init {
             check if timeoutMs > 0 but afterTimeOut is empty 
             warn the user that probalby this should not be emty funtion
         }
- 
+
+
+        
     }
 
     public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
@@ -93,10 +97,10 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
             final ProofVisualizer<? super Pr> proofVisualizer,
             final Boolean computePartialResult, 
             final long timeoutMs,
-            final Runnable afterTimeOut
+            final Runnable interruptSolvers
     ) {
       return new CegarChecker<>(
-        abstractor, refiner, logger, proofVisualizer, computePartialResult, timeoutMs, afterTimeOut
+        abstractor, refiner, logger, proofVisualizer, computePartialResult, timeoutMs, interruptSolvers
       );
     }
 
@@ -136,11 +140,9 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
         long abstractorTime = 0;
         long refinerTime = 0;
         int iteration = 0;
-        array<int> iterationTimes = {};
     }
 
-
-     @Override
+    @Override
     public SafetyResult<Pr, C> check(final P initPrec) {
         logger.write(Level.INFO, "Configuration: %s%n", this);
         final Stopwatch stopwatch = Stopwatch.createStarted();
@@ -159,26 +161,21 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
         P prec = initPrec;
         WebDebuggerLogger wdl = WebDebuggerLogger.getInstance();
 
-        final Timer timer = new Timer(true); // WARN: needs optimization 
+        final Timer timer = new Timer(true);
         System.out.println("TimeoutMs In Cegar:" + timeoutMs);
-        final AtomicBoolean solverInterrupted = new AtomicBoolean(false);
+
         if (timeoutMs > 0) {
             final Thread mainThread = Thread.currentThread();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     solverInterrupted.set(true);
-                    afterTimeOut.run();
+                    interruptSolvers.run();
                     // mainThread.interrupt();
                 }
-            }, softTimeoutMs);
+            }, timeoutMs);
         }
 
-        Time startIterationTime = Clock.now();
-        Time iterationTime = startIterationTime;
-        RLSPredictor1D  exponentialPredictor = new RLSPredictor1D(forgettingFactor);
-        double predictedTime = 1sec;
-        long realArgSize = 0;
         try {
           do {
               statsHolder.iteration++;
@@ -199,20 +196,13 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
                   wdl.addIteration(statsHolder.iteration, argGraph, precString);
               }
 
-              P lastPrec = prec;
               if (abstractorResult.isUnsafe()) {
                   MonitorCheckpoint.Checkpoints.execute("CegarChecker.unsafeARG");
 
+                  P lastPrec = prec;
                   logger.write(Level.MAINSTEP, "| Refining abstraction...%n");
                   final long refinerStartTime = stopwatch.elapsed(TimeUnit.MILLISECONDS);
                   refinerResult = refiner.refine(proof, prec);
-
-                  if(iterationTimeHeuristic and enableUnrollingTimeHeuristic proof instanceof of ARG<*,*>) {
-                    val numberOfNewNodes = ((proof as ARG<*,*>).size() -realArgSize);
-                    val precisionSizeChange = prec.size()-lastPrec.size();
-                    realArgSize = realArgSize * exponentialPredictor.weight^precisionSizeChange + numberOfNewNodes; 
-                  }
-
                   statsHolder.refinerTime +=
                           stopwatch.elapsed(TimeUnit.MILLISECONDS) - refinerStartTime;
                   logger.write(
@@ -233,63 +223,36 @@ public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
                               "! Precision DID change in this iteration" + System.lineSeparator());
                   }
               }
-              Time newIterationTime = Click.now();
-              Time iterationTimeDiff = newIterationTime - iteratoinTime;
-              logger.write(Level.MAINSTEP, "Iteration took ${iterationTimeDiff to sec} to run! \n");
-              statsHolder.iterationTimes.add(iterationTimeDiff);
-              exponentialPredictor.update(predictedTime, newIterationTime);
-              if(iterationTimeHeuristic) {
-                 
-                if itTimes.size() != 1 {
-                  predictedTime = exponentialPredictor.predict(newIterationTime);
-                  val estimatedTimeForNextIteration = (startIterationTime - newIterationTime) + predictedTime;
-                  if(enableUnrollingTimeHeuristic) { // TODO:
-                    val totalSizeOfArg = exponentialPredictor.weight^step.prec()-1;
-                    val nubmerOfNodesLeftToDiscover = totalSizeOfArg-realArgSize;
-                    estimatedTimeForNextIteration += nubmerOfNodesLeftToDiscover * timforNode; 
-                  }
-                  
-                  if estimatedTimeForNextIteration > hardTimeoutMs {
-                    try {
-                      abstractor.unroll(proof, lastPrec);
-                    } catch (RuntimeException e2) {
-                      logger.write(Level.MAINSTEP, "Could not unroll abstractor because "+ e2.getMessage() +" !%n");
-                      throw e;
-                    }
-                    return SafetyResult.partial(proof, getStats.get()); 
-                  }
-                }
-              }
-              iterationTimes = newIterationTime;
+
           } while (!abstractorResult.isSafe() && !refinerResult.isUnsafe());
         } catch (RuntimeException e) {
-         if (computePartialResult) {
-            if (e instanceof AlgorithmTimeoutException) {
-                logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Main Thread Interrupted (%d ms)----------%n", timeoutMs);
-            } else if (e instanceof NotSolvableException) {
-                logger.write(Level.MAINSTEP, "%n----Infinite Loop Detected by CexMonitor----%n");
-            } else if (solverInterrupted.get()) {
-                logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", timeoutMs);
-                e = new AlgorithmTimeoutException(String.format("Timeout Exceeded: Solver Interrupted after %d ms", timeoutMs));
-            } else {
-                logger.write(Level.MAINSTEP, "%n--------------Some Solver Error-------------%n");
-            }
-            
-            try {
-              abstractor.unroll(proof, prec);
-              // abstractor.unroll(proof, initPrec);
-            } catch (RuntimeException e2) {
-              logger.write(Level.MAINSTEP, "Could not unroll abstractor because "+ e2.getMessage() +" !%n");
-              // return SafetyResult.unknown(getStats.get());  // FIX: Should throw the error (stm needs it) but i need the states
-              throw e;
-            }
-            logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
-            return SafetyResult.partial(proof, getStats.get());
+          if (computePartialResult) {
+              if (e instanceof AlgorithmTimeoutException) {
+                  logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Main Thread Interrupted (%d ms)----------%n", timeoutMs);
+              } else if (e instanceof NotSolvableException) {
+                  logger.write(Level.MAINSTEP, "%n----Infinite Loop Detected by CexMonitor----%n");
+              } else if (solverInterrupted.get()) {
+                  logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", timeoutMs);
+                  e = new AlgorithmTimeoutException(String.format("Timeout Exceeded: Solver Interrupted after %d ms", timeoutMs));
+              } else {
+                  logger.write(Level.MAINSTEP, "%n--------------Some Solver Error-------------%n");
+              }
+              
+              try {
+                abstractor.unroll(proof, prec);
+                // abstractor.unroll(proof, initPrec);
+              } catch (RuntimeException e2) {
+                logger.write(Level.MAINSTEP, "Could not unroll abstractor because "+ e2.getMessage() +" !%n");
+                // return SafetyResult.unknown(getStats.get());  // FIX: Should throw the error (stm needs it) but i need the states
+                throw e;
+              }
+              logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
+              return SafetyResult.partial(proof, getStats.get());
+          } else {
+             throw e;
           }
         } finally {
-          if (timeoutMs > 0) {
             timer.cancel();
-          }
         }
 
         SafetyResult<Pr, C> cegarResult = null;
