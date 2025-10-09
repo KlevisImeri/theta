@@ -101,9 +101,9 @@ object TermUI {
     fun reverse(text: String) = "${REVERSE}$text${RESET}"
 
     // Combined styles example
-    fun error(text: String) = "${BOLD}${RED}$text${RESET}"
-    fun warning(text: String) = "${BOLD}${YELLOW}$text${RESET}"
-    fun success(text: String) = "${BOLD}${GREEN}$text${RESET}"
-    fun info(text: String) = "${BOLD}${BLUE}$text${RESET}"
+    fun error(text: String) = "${BOLD}${RED}[ERROR]: $text${RESET}"
+    fun warn(text: String) = "${BOLD}${YELLOW}[WARN]: $text${RESET}"
+    fun success(text: String) = "${BOLD}${GREEN}[SUCCESS]: $text${RESET}"
+    fun info(text: String) = "${BOLD}${BLUE}[INFO]: $text${RESET}"
 }
 

@@ -42,6 +42,10 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
 ) : BasicArgAbstractor<S, A, P>(argBuilder, projection, waitlist, stopCriterion, logger) {
 
   override fun check(arg: ARG<S, A>, prec: P): AbstractorResult {
+    return check(arg, prec, {})
+  }
+
+  override fun check(arg: ARG<S, A>, prec: P, inject: () -> Unit): AbstractorResult {
     // logger.write(Logger.Level.INFO, "|  |  Precision: %s%n", prec)
     logger.write(Logger.Level.INFO, "|  |  PrecisionSize: %d%n", prec.getSize())
 
@@ -71,6 +75,10 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
     waitlist.addAll(arg.incompleteNodes)
 
     if (!stopCriterion.canStop(arg)) {  // FIX: very time consuming
+      var expansionCounter = 0
+      var expansionCounterLimit = 5;
+      var injectCnt = 1;
+
       while (!waitlist.isEmpty) {
         val node = waitlist.remove()
         var newNodes: Collection<ArgNode<S, A>>? = emptyList()
@@ -88,19 +96,31 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
 
           reachedSet.addAll(newNodes)
           waitlist.addAll(newNodes)
-          logger.write(
-            Logger.Level.INFO,
-            "|  |  Expanded: %d new, ARG now %d nodes, %d incomplete%n",
-            newNodes.size,
-            arg.nodes.count(),
-            arg.incompleteNodes.count()
-          )
+          
+          if(injectCnt==20){
+            inject();
+            injectCnt = 1;
+          };
+          injectCnt++;
+          
+          // if(expansionCounter == expansionCounterLimit) {
+          //   logger.write(
+          //     Logger.Level.INFO,
+          //     "|  |  Expanded: %d new, ARG now %d nodes, %d incomplete%n",
+          //     newNodes.size,
+          //     arg.nodes.count(),
+          //     arg.incompleteNodes.count()
+          //   )
+          //   expansionCounterLimit*=2;
+          //   expansionCounter=0;
+          // }
+          // expansionCounter++
         }
         if (stopCriterion.canStop(arg, newNodes)) break
       }
     }
 
-    logger.write(Logger.Level.SUBSTEP, "done%n")
+    // logger.write(Logger.Level.SUBSTEP, "| Done%n")
     logger.write(
       Logger.Level.INFO,
       "|  |  Finished ARG: %d nodes, %d incomplete, %d unsafe%n",

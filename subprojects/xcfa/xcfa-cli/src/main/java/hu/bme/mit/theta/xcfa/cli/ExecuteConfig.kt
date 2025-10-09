@@ -81,6 +81,7 @@ fun runConfig(
   // println("RunConfig");
   // println(config)
   // println("disablePartialResult: ${config.backendConfig.disablePartialResult}")
+  if(config.backendConfig.softTimeoutMs == 0L) config.backendConfig.softTimeoutMs = config.backendConfig.timeoutMs;
 
   propagateInputOptions(config, logger, uniqueLogger)
 

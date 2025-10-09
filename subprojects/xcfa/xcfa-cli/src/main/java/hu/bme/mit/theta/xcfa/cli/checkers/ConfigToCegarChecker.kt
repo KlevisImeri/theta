@@ -55,6 +55,7 @@ import hu.bme.mit.theta.core.type.booltype.BoolExprs.True;
 import hu.bme.mit.theta.analysis.utils.ArgVisualizer;
 import java.io.FileWriter
 import hu.bme.mit.theta.common.visualization.writer.GraphvizWriter;
+import hu.bme.mit.theta.analysis.algorithm.cegar.CegarChecker.Companion.CegarParams
 
 fun getCegarChecker(
   xcfa: XCFA,
@@ -158,13 +159,18 @@ fun getCegarChecker(
         cegarConfig.refinerConfig.pruneStrategy,
         logger,
       )
-  
-  val interruptSolvers = {
-    abstractionSolverInstance.interrupt();
-    refinementSolverInstance.interrupt();
-    // abstractionSolverInstance.reset();
-  }
 
+  val baseCegarParams = CegarParams(
+      computePartialResult = !config.backendConfig.disablePartialResult,
+      softTimeoutMs = config.backendConfig.softTimeoutMs,
+      hardTimeoutMs = config.backendConfig.timeoutMs,
+      afterTimeOut = {
+        abstractionSolverInstance.interrupt();
+        refinementSolverInstance.interrupt();
+        // abstractionSolverInstance.reset();
+      },
+      iterationTimeHeuristic = cegarConfig.iterationTimeHeuristic,
+  )
 
   val cegarChecker: CegarChecker<Prec, ARG<ExprState, ExprAction>, Trace<ExprState, ExprAction>> =
     if (cegarConfig.porLevel == POR.AASPOR)
@@ -172,18 +178,14 @@ fun getCegarChecker(
         abstractor,
         AasporRefiner.create(refiner, cegarConfig.refinerConfig.pruneStrategy, ignoredVarRegistry),
         logger,
-        !config.backendConfig.disablePartialResult,
-        config.backendConfig.timeoutMs,
-        interruptSolvers
+        baseCegarParams
       )
     else
       ArgCegarChecker.create(
         abstractor,
         refiner,
         logger,
-        !config.backendConfig.disablePartialResult,
-        config.backendConfig.timeoutMs,
-        interruptSolvers
+        baseCegarParams
       )
   println("CEGARCHEKER: $cegarChecker")
   // initialize monitors
@@ -198,7 +200,7 @@ fun getCegarChecker(
     override fun check(
       prec: XcfaPrec<*>?
     ): SafetyResult<LocationInvariants, Trace<XcfaState<PtrState<*>>, XcfaAction>> {
-      val ret = cegarChecker.check(prec)
+      val ret = cegarChecker.check(prec as Prec)
       if (ret.isSafe || ret.isPartial) {
         val arg =
           if (ret.isSafe) {

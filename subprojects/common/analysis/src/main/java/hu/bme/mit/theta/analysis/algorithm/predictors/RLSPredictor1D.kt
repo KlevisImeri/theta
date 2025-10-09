@@ -15,7 +15,10 @@
  */
 package hu.bme.mit.theta.analysis.algorithm.predictors
 
-class RlsPredictor1D(private val forgettingFactor: Double) {
+class RlsPredictor1D(
+  private val forgettingFactor: Double,
+  private val initialWeight: Double = 0.0 
+) {
     /**
      * A guide to tuning the `forgettingFactor` (λ). This value controls the memory
      * of the RLS filter, balancing stability against responsiveness. It must be
@@ -26,7 +29,7 @@ class RlsPredictor1D(private val forgettingFactor: Double) {
      * | High (e.g., 0.99)      | Long   | High      | Low            | Stable, slowly changing, or noisy systems   |
      * | Low (e.g., 0.90)       | Short  | Low       | High           | Dynamic systems that change behavior quickly|
      */
-    var weight: Double = 0.0
+    var weight: Double = initialWeight
         private set
     private var covariance: Double = 1000.0 // High initial uncertainty
 

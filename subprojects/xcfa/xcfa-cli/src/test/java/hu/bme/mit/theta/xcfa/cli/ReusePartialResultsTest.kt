@@ -159,13 +159,18 @@ class ReusePartialResultsTest {
           // "/c/partialResultTest/array_1-1.c",
           // "/c/partialResultTest/invert_string-3.c",
           // "/c/partialResultTest/test_locks_9.c",
-          // "/c/partialResultTest/s3_srvr_1b.cil.c",        
+          // "/c/partialResultTest/s3_srvr_1b.cil.c",
           // "/c/partialResultTest/test_locks_13.c",
           // "/c/partialResultTest/test_locks_12.c",
-          "/c/partialResultTest/diamond_2-2.c",
-          "PredCart()",
-          // "PredCart(100, true) -> KInd()",
-          "Expl(100, true) -> PredCart()",
+          // "/c/partialResultTest/diamond_2-2.c",
+          // "/c/partialResultTest/nested_1-1.c",
+          // "/c/partialResultTest/Problem03_label44.c",
+          "/c/partialResultTest/Problem03_label27.c",
+          // "/c/partialResultTest/gr2006.c",
+          // "PredCart()",
+          "PredCart(900, true, true) -> KInd()",
+          // "PredCart(100, true, true) -> KInd()",
+          "Expl(100, true, true) -> PredCart()",
           true
         )
 

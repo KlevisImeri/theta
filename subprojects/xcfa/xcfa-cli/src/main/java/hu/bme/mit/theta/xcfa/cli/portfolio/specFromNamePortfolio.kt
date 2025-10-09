@@ -55,7 +55,9 @@ import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig.ArchitectureT
 import hu.bme.mit.theta.termui.TermUI.lightBlue
 import hu.bme.mit.theta.analysis.expr.refinement.PruneStrategy.LAZY
 
-var timeoutSecDefault = 900L; //sv-comp max time in seconds
+var timeoutSecDefault = 700L; 
+var hardTimeoutSecDefault = 900L; 
+
 
 fun specFromNamePortfolio(
     xcfa: XCFA,
@@ -66,7 +68,8 @@ fun specFromNamePortfolio(
     logger: Logger,
     uniqueLogger: Logger,
 ): STM {
-    timeoutSecDefault = portfolioConfig.backendConfig.timeoutMs / 1000L
+    // timeoutSecDefault = portfolioConfig.backendConfig.softTimeoutMs / 1000L
+    // hardTimeoutSecDefault = portfolioConfig.backendConfig.timeoutMs / 1000L
     // if(portfolioConfig.backendConfig.timeoutMs != 0L) {
     //   timeoutSecDefault = portfolioConfig.backendConfig.timeoutMs
     // } else {
@@ -137,23 +140,27 @@ fun specFromNamePortfolio(
     return stm 
 }
 
-fun PredCart(sec: Long = timeoutSecDefault, pRes: Boolean = false) =
+fun PredCart(sec: Long = timeoutSecDefault, pRes: Boolean = false, itTimeHeu:Boolean = false, hardtimeout: Long = hardTimeoutSecDefault) =
   Cegar(
     domain = PRED_CART,
     pruneStrategy = LAZY,
     sec = sec,
     pRes = pRes,
     exprSplitter = CONJUNCTS,
-    maxEnum = 2
+    maxEnum = 2,
+    itTimeHeu = itTimeHeu,
+    hardtimeout = hardtimeout,
   )
 
-fun Expl(sec: Long = timeoutSecDefault, pRes: Boolean = false) =
+fun Expl(sec: Long = timeoutSecDefault, pRes: Boolean = false, itTimeHeu:Boolean = false, hardtimeout: Long = hardTimeoutSecDefault) =
   Cegar(
     domain = EXPL,
-    pruneStrategy = FULL,
+    pruneStrategy = LAZY,
     sec = sec, 
     pRes = pRes,
-    // maxEnum = 4
+    maxEnum = 3, // WARN: have to decide
+    itTimeHeu = itTimeHeu,
+    hardtimeout = hardtimeout,
   )
 
 fun KInd(sec: Long = timeoutSecDefault, pRes: Boolean = false) =
@@ -166,12 +173,14 @@ fun KInd(sec: Long = timeoutSecDefault, pRes: Boolean = false) =
 
 fun Cegar(
       domain: Domain = EXPL,
-      pruneStrategy: PruneStrategy = FULL,
+      pruneStrategy: PruneStrategy = LAZY,
       exprSplitter: ExprSplitterOptions = WHOLE, // NOTE: only for pred abstraction
       pRes: Boolean = true,
       maxEnum: Int = 1,
+      itTimeHeu: Boolean = false,
       // TODO: decide what should be the right order
       sec: Long = timeoutSecDefault,
+      hardtimeout: Long = hardTimeoutSecDefault,
       inProcess: Boolean = true,
       parseInProcess: Boolean = false,
       memlimit: Long = 0L,
@@ -195,7 +204,8 @@ fun Cegar(
       return BackendConfig(
           backend = CEGAR,
           solverHome = solverHome,
-          timeoutMs = sec * 1000L,
+          softTimeoutMs = sec * 1000L,
+          timeoutMs = hardtimeout * 1000L,
           inProcess = inProcess,
           parseInProcess = parseInProcess,
           memlimit = memlimit,
@@ -206,6 +216,7 @@ fun Cegar(
               porLevel = porLevel,
               porRandomSeed = porRandomSeed,
               coi = coi,
+              iterationTimeHeuristic = itTimeHeu,
               cexMonitor = cexMonitor,
               abstractorConfig = CegarAbstractorConfig(
                   abstractionSolver = abstractionSolver,
@@ -231,7 +242,8 @@ fun Cegar(
     reversed: Boolean = false,
     cegar: Boolean = false,
     initPrec: InitPrec = InitPrec.EMPTY,
-    
+    hardtimeout: Long = hardTimeoutSecDefault,
+
     // BMC configuration
     disableBmc: Boolean = false,
     nonLfPath: Boolean = false,
@@ -261,7 +273,8 @@ fun Cegar(
     BackendConfig(
         backend = Backend.BOUNDED,
         solverHome = solverHome,
-        timeoutMs = sec * 1000L, 
+        softTimeoutMs = sec * 1000L,
+        timeoutMs = hardtimeout * 1000L, 
         inProcess = inProcess,
         parseInProcess = parseInProcess,
         memlimit = memlimit,

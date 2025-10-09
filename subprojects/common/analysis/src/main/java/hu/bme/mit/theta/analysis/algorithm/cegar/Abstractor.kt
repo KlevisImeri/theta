@@ -13,23 +13,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package hu.bme.mit.theta.analysis.algorithm.cegar;
+package hu.bme.mit.theta.analysis.algorithm.cegar
 
-import hu.bme.mit.theta.analysis.Prec;
-import hu.bme.mit.theta.analysis.algorithm.Proof;
+import hu.bme.mit.theta.analysis.Prec
+import hu.bme.mit.theta.analysis.algorithm.Proof
 
 /**
- * Common interface for the abstractor component. It can create an initial witness and check a
- * witness with a given precision.
+ * Common interface for the abstractor component. It can create an initial witness
+ * and check a witness with a given precision.
  */
-public interface Abstractor<P extends Prec, Pr extends Proof> {
+interface Abstractor<P : Prec, Pr : Proof> {
 
     /** Create initial witness */
-    Pr createProof();
+    fun createProof(): Pr
 
-    /** Check witness with given precision */
-    AbstractorResult check(Pr witness, P prec);
+    /** Check witness with given precision and injection */
+    fun check(witness: Pr, prec: P): AbstractorResult;
+
+    /** Check witness with given precision and injection */
+    fun check(witness: Pr, prec: P, inject: () -> Unit): AbstractorResult {
+      return check(witness, prec)
+    }
+
 
     /** Explores the whole witness */
-    void unroll(Pr witness, P prec);
+    fun unroll(witness: Pr, prec: P)
 }

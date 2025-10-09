@@ -190,6 +190,8 @@ data class BackendConfig<T : SpecBackendConfig>(
     description = "Timeout for verification, use 0 for no timeout",
   )
   var timeoutMs: Long = 0,
+  @Parameter(names = ["--soft-timeout-ms"]) 
+  var softTimeoutMs: Long = 0,
   @Parameter(names = ["--in-process"], description = "Run analysis in process")
   var inProcess: Boolean = false,
   @Parameter(
@@ -206,7 +208,6 @@ data class BackendConfig<T : SpecBackendConfig>(
   var memlimit: Long = 0L,
   @Parameter(names = ["--disable-partial-results"]) 
   var disablePartialResult: Boolean = false,
-
   override var specConfig: T? = null,
 ) : SpecializableConfig<T> {
 
@@ -255,6 +256,12 @@ data class CegarConfig(
     description = "Option to enable(CHECK)/disable(DISABLE) the CexMonitor",
   )
   var cexMonitor: CexMonitorOptions = CexMonitorOptions.CHECK,
+  @Parameter(
+    names = ["--enable-iteration-time-heuristic"], 
+    description = "Enables the iteration time heuristic"
+  )
+  var iterationTimeHeuristic: Boolean = false,
+
   val abstractorConfig: CegarAbstractorConfig = CegarAbstractorConfig(),
   val refinerConfig: CegarRefinerConfig = CegarRefinerConfig(),
 ) : SpecBackendConfig {

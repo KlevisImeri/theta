@@ -3,7 +3,6 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
- *  You may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
@@ -17,31 +16,26 @@
 package hu.bme.mit.theta.analysis.algorithm.predictors
 
 import kotlin.math.exp
-import kotlin.math.log
+import kotlin.math.ln
 
-class ExpRLSPredictor(forgettingFactor: Double) {
-
-    private val linearPredictor = RlsPredictor1D(forgettingFactor)
+class ExpRLSPredictor1D(
+  private val forgettingFactor: Double,
+  private val initialWeight: Double = 0.0 
+) {
+    private val linearPredictor = RlsPredictor1D(forgettingFactor, initialWeight) 
 
     val weight: Double
         get() = linearPredictor.weight
-    
-    var predictTidPoint();
 
     fun predict(feature: Double): Double {
-        val logFeature = log(feature, E)
+        val logFeature = ln(feature)
         val logPrediction = linearPredictor.predict(logFeature)
         return exp(logPrediction)
     }
 
     fun update(feature: Double, actualValue: Double) {
-        val logFeature = log(feature, E)
-        val logActualValue = log(actualValue, E)
+        val logFeature = ln(feature)
+        val logActualValue = ln(actualValue)
         linearPredictor.update(logFeature, logActualValue)
-    }
-
-
-    private companion object {
-        private const val E = Math.E
     }
 }
