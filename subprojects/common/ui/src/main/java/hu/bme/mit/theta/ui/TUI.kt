@@ -1,6 +1,6 @@
-package hu.bme.mit.theta.termui;
+package hu.bme.mit.theta.ui;
 
-object TermUI {
+object TUI {
     const val RESET = "\u001b[0m"
     
     // Regular colors

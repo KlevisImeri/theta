@@ -22,8 +22,8 @@ import hu.bme.mit.theta.common.logging.Logger
 import hu.bme.mit.theta.common.logging.Logger.Level.*
 import hu.bme.mit.theta.xcfa.model.XcfaLocation
 import java.io.File
-import hu.bme.mit.theta.termui.TermUI.yellow
-import hu.bme.mit.theta.termui.TermUI.red
+import hu.bme.mit.theta.ui.TUI.yellow
+import hu.bme.mit.theta.ui.TUI.red
 
 
 data class LocationInvariants(

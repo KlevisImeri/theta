@@ -69,7 +69,10 @@ import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 import hu.bme.mit.theta.xcfa.cli.checkers.InProcessChecker
 import hu.bme.mit.theta.xcfa.cli.utils.CachingFileSerializer
-import hu.bme.mit.theta.termui.TermUI.yellow
+import hu.bme.mit.theta.ui.TUI.yellow
+import hu.bme.mit.theta.ui.GUI.rlj
+import hu.bme.mit.theta.ui.GUI
+import com.raylib.java.core.Color
 
 fun runConfig(
   config: XcfaConfig<*, *>,
@@ -78,15 +81,32 @@ fun runConfig(
   throwDontExit: Boolean,
   partialResult: LocationInvariants? = null,
 ): SafetyResult<*, *> {
+  if (XcfaConfig.UI) {
+    GUI.start();
+    GUI.draw {
+      rlj.text.DrawText("Congrats! You created your first window!", 190, 200, 20, Color.LIGHTGRAY);
+    }
+    val res = internalRunConfig(config, logger, uniqueLogger, throwDontExit, partialResult)
+    return res;
+  } else {
+    return internalRunConfig(config, logger, uniqueLogger, throwDontExit, partialResult)
+  }
+}
+
+private fun internalRunConfig(
+  config: XcfaConfig<*, *>,
+  logger: Logger,
+  uniqueLogger: Logger,
+  throwDontExit: Boolean,
+  partialResult: LocationInvariants? = null,
+): SafetyResult<*, *>  {
   // println("RunConfig");
   // println(config)
   // println("disablePartialResult: ${config.backendConfig.disablePartialResult}")
   if(config.backendConfig.softTimeoutMs == 0L) config.backendConfig.softTimeoutMs = config.backendConfig.timeoutMs;
 
   propagateInputOptions(config, logger, uniqueLogger)
-
   registerAllSolverManagers(config.backendConfig.solverHome, logger)
-
   validateInputOptions(config, logger, uniqueLogger)
 
   val (xcfa, mcm, parseContext) =
@@ -94,18 +114,13 @@ fun runConfig(
       logger.writeln(INFO, "Not parsing input because a worker process will handle it later.")
       Triple(null, null, null)
     } else {
-
       val (xcfa, mcm, parseContext) = frontend(config, logger, uniqueLogger, partialResult)
-
       preVerificationLogging(xcfa, mcm, parseContext, config, logger, uniqueLogger)
-
       Triple(xcfa, mcm, parseContext)
     }
 
   val result = backend(xcfa, mcm, parseContext, config, logger, uniqueLogger, throwDontExit)
-
   postVerificationLogging(xcfa, result, mcm, parseContext, config, logger, uniqueLogger)
-  
   cleanUp(config, logger)
 
   return result

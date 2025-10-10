@@ -37,7 +37,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import hu.bme.mit.theta.xcfa.cli.checkers.InProcessChecker
 import hu.bme.mit.theta.xcfa.cli.params.*
-import hu.bme.mit.theta.termui.TermUI.red
+import hu.bme.mit.theta.ui.TUI.red
 import java.nio.file.Paths
 import hu.bme.mit.theta.xcfa.passes.LbePass
 

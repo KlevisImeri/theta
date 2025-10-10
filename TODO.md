@@ -1,3 +1,7 @@
+- Fix Locaion invariants (false)
+not being parsed by LTS
+
+
 Further analyses:
 - You can have pred explosokn
 - When i get flase 

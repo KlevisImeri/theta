@@ -52,10 +52,9 @@ import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 import hu.bme.mit.theta.solver.smtlib.SmtLibSolverManager
 import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig.ArchitectureType;
-import hu.bme.mit.theta.termui.TermUI.lightBlue
+import hu.bme.mit.theta.ui.TUI.lightBlue
 import hu.bme.mit.theta.analysis.expr.refinement.PruneStrategy.LAZY
 
-var timeoutSecDefault = 700L; 
 var hardTimeoutSecDefault = 900L; 
 
 
@@ -140,7 +139,7 @@ fun specFromNamePortfolio(
     return stm 
 }
 
-fun PredCart(sec: Long = timeoutSecDefault, pRes: Boolean = false, itTimeHeu:Boolean = false, hardtimeout: Long = hardTimeoutSecDefault) =
+fun PredCart(sec: Long = hardTimeoutSecDefault, pRes: Boolean = false, itTimeHeu:Boolean = false, hardtimeout: Long = hardTimeoutSecDefault) =
   Cegar(
     domain = PRED_CART,
     pruneStrategy = LAZY,
@@ -152,7 +151,7 @@ fun PredCart(sec: Long = timeoutSecDefault, pRes: Boolean = false, itTimeHeu:Boo
     hardtimeout = hardtimeout,
   )
 
-fun Expl(sec: Long = timeoutSecDefault, pRes: Boolean = false, itTimeHeu:Boolean = false, hardtimeout: Long = hardTimeoutSecDefault) =
+fun Expl(sec: Long = hardTimeoutSecDefault, pRes: Boolean = false, itTimeHeu:Boolean = false, hardtimeout: Long = hardTimeoutSecDefault) =
   Cegar(
     domain = EXPL,
     pruneStrategy = LAZY,
@@ -163,7 +162,7 @@ fun Expl(sec: Long = timeoutSecDefault, pRes: Boolean = false, itTimeHeu:Boolean
     hardtimeout = hardtimeout,
   )
 
-fun KInd(sec: Long = timeoutSecDefault, pRes: Boolean = false) =
+fun KInd(sec: Long = hardTimeoutSecDefault, pRes: Boolean = false) =
   Bounded(
     sec = sec,
     disableInterpolation = true,
@@ -179,7 +178,7 @@ fun Cegar(
       maxEnum: Int = 1,
       itTimeHeu: Boolean = false,
       // TODO: decide what should be the right order
-      sec: Long = timeoutSecDefault,
+      sec: Long = hardTimeoutSecDefault,
       hardtimeout: Long = hardTimeoutSecDefault,
       inProcess: Boolean = true,
       parseInProcess: Boolean = false,
@@ -264,7 +263,7 @@ fun Cegar(
     
     // General backend configuration
     solverHome: String = SmtLibSolverManager.HOME.toAbsolutePath().toString(),
-    sec: Long = timeoutSecDefault,
+    sec: Long = hardTimeoutSecDefault,
     inProcess: Boolean = true,
     parseInProcess: Boolean = false,
     memlimit: Long = 0L,

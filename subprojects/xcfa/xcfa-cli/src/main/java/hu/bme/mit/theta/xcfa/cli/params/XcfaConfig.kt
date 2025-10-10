@@ -62,6 +62,12 @@ data class XcfaConfig<F : SpecFrontendConfig, B : SpecBackendConfig>(
   val outputConfig: OutputConfig = OutputConfig(),
   val debugConfig: DebugConfig = DebugConfig(),
 ) : Config {
+  companion object {
+    // TODO: is has to become build time constant
+    // you can do this by generating this code from 
+    // during build time and inserting here
+    const val UI = true; 
+  }
 
   override fun getObjects(): Set<Config> {
     return inputConfig.getObjects() union

@@ -17,3 +17,8 @@ plugins {
     id("java-common")
     id("kotlin-common")
 }
+
+dependencies {
+    api("com.github.CreedVI:Raylib-J:0.5.2")
+}
+

@@ -40,7 +40,11 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import hu.bme.mit.theta.analysis.algorithm.predictors.ExpRLSPredictor1D
 import kotlin.concurrent.schedule
-import hu.bme.mit.theta.termui.TermUI.warn
+import hu.bme.mit.theta.ui.TUI.warn
+import hu.bme.mit.theta.ui.GUI.rlj
+import hu.bme.mit.theta.ui.GUI
+import com.raylib.java.core.Color
+import com.raylib.java.core.input.Keyboard
 
 class StateSpaceExplosionException : RuntimeException("State space explosion predicted by heuristic")
 
@@ -238,6 +242,14 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
                 lastLastPrec = lastPrec
                 lastPrec = prec
                 iterationTime = newIterationTime
+
+                GUI.draw {
+                  rlj.text.DrawText("Your iteration is ${statsHolder.iteration}!", 190, 200, 20, Color.RED);
+                }
+
+                while (!rlj.core.IsKeyPressed(Keyboard.KEY_ENTER)) {
+                  Thread.sleep(10)
+                }
             } while (!abstractorResult.isSafe && refinerResult?.isUnsafe != true)
         } catch (e: RuntimeException) {
             if (cegarParams.computePartialResult) {
@@ -266,7 +278,7 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
                     }
                     solverInterrupted.get() -> {
                         logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", cegarParams.softTimeoutMs)
-                        throw AlgorithmTimeoutException("Timeout Exceeded: Solver Interrupted after ${cegarParams.softTimeoutMs} ms")
+                        // throw AlgorithmTimeoutException("Timeout Exceeded: Solver Interrupted after ${cegarParams.softTimeoutMs} ms")
                     }
                     else -> {
                         logger.write(Level.MAINSTEP, "%n--------------Some Solver Error-------------%n")
