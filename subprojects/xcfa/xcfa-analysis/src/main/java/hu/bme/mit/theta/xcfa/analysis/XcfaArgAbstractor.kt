@@ -32,6 +32,7 @@ import hu.bme.mit.theta.common.logging.Logger
 import java.util.function.Function
 import hu.bme.mit.theta.analysis.utils.ArgVisualizer;
 import hu.bme.mit.theta.common.visualization.writer.GraphvizWriter;
+import hu.bme.mit.theta.ui.DEBUG
 
 class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
   argBuilder: ArgBuilder<S, A, P>,
@@ -90,7 +91,9 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
         }
         if (!node.isSubsumed && !node.isTarget) {
           newNodes = argBuilder.expand(node, prec)
-
+          
+          // println(prec);
+          // DEBUG.type(arg);
           // val g = ArgVisualizer.getDefault().visualize(arg)
           // println(GraphvizWriter.getInstance().writeString(g))
 
@@ -130,6 +133,10 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
     )
 
     waitlist.clear() // Optimization
+
+    val g = ArgVisualizer.getDefault().visualize(arg)
+    println(GraphvizWriter.getInstance().writeString(g))
+
 
     return if (arg.isSafe) {
       Preconditions.checkState(arg.isComplete, "Returning incomplete ARG as safe")

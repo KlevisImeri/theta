@@ -63,11 +63,12 @@ class ASGAbstractor<S : ExprState, A : ExprAction, P : Prec>(
   override fun unroll(
     ASG: ASG<S, A>,
     prec: P,
-  ) { // WARN: it can be wrong just approximate implementation
+  ): AbstractorResult { // WARN: it can be wrong just approximate implementation
     val tmpAcceptancePredicate = acceptancePredicate
     acceptancePredicate =
       AcceptancePredicate<S, A>(statePredicate = { _ -> false }, actionPredicate = { _ -> false })
-    check(ASG, prec)
+    var res = check(ASG, prec)
     acceptancePredicate = tmpAcceptancePredicate
+    return res;
   }
 }

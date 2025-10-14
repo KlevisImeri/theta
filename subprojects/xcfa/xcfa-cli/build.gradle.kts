@@ -50,6 +50,10 @@ dependencies {
     testImplementation(kotlin("script-runtime"))
 }
 
+tasks.withType<Test> {
+  testLogging.showStandardStreams = true
+}
+
 application {
     mainClass.set("hu.bme.mit.theta.xcfa.cli.XcfaCli")
 }

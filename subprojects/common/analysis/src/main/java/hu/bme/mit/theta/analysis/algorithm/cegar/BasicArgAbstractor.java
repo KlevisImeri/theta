@@ -146,11 +146,12 @@ public class BasicArgAbstractor<S extends State, A extends Action, P extends Pre
     }
 
     @Override
-    public void unroll(final ARG<S, A> arg, final P prec) {
+    public AbstractorResult unroll(final ARG<S, A> arg, final P prec) {
         StopCriterion<S, A> tmpStopCriterion = stopCriterion;
         stopCriterion = StopCriterions.fullExploration();
-        check(arg, prec);
+        var res = check(arg, prec);
         stopCriterion = tmpStopCriterion;
+        return res;
     }
 
     @Override

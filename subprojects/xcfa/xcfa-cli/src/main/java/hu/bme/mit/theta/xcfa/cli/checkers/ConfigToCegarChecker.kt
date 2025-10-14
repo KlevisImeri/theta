@@ -187,7 +187,7 @@ fun getCegarChecker(
         logger,
         baseCegarParams
       )
-  println("CEGARCHEKER: $cegarChecker")
+  // println("CEGARCHEKER: $cegarChecker")
   // initialize monitors
   MonitorCheckpoint.reset()
   if (cegarConfig.cexMonitor == CexMonitorOptions.CHECK) {
@@ -208,12 +208,6 @@ fun getCegarChecker(
           } else {
             ret.asPartial().proof
           }
-        
-
-        // logger.info("Printing ARG to file...")
-        // val g = ArgVisualizer.getDefault().visualize(arg as ARG)
-        // val outputFile = config.outputConfig.resultFolder.resolve("Arg.dot")
-        // outputFile.writeText(GraphvizWriter.getInstance().writeString(g))
 
         val locmap =
           xcfa.procedures

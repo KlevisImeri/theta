@@ -35,7 +35,6 @@ interface Abstractor<P : Prec, Pr : Proof> {
       return check(witness, prec)
     }
 
-
     /** Explores the whole witness */
-    fun unroll(witness: Pr, prec: P)
+    fun unroll(witness: Pr, prec: P): AbstractorResult;
 }

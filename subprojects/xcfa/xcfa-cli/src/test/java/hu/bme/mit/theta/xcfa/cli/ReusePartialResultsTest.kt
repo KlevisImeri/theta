@@ -155,6 +155,7 @@ class ReusePartialResultsTest {
         //   true
         // )
         Arguments.of( 
+          "/c/partialResultTest/unsafe-program-example.c",
           // "/c/partialResultTest/functions_1-1.c",
           // "/c/partialResultTest/array_1-1.c",
           // "/c/partialResultTest/invert_string-3.c",
@@ -165,13 +166,14 @@ class ReusePartialResultsTest {
           // "/c/partialResultTest/diamond_2-2.c",
           // "/c/partialResultTest/nested_1-1.c",
           // "/c/partialResultTest/Problem03_label44.c",
-          "/c/partialResultTest/Problem03_label27.c",
+          // "/c/partialResultTest/Problem03_label27.c",
           // "/c/partialResultTest/gr2006.c",
           // "PredCart()",
           "PredCart(900, true, true) -> KInd()",
+          "PredCart(900, true, true) -> KInd()",
           // "PredCart(100, true, true) -> KInd()",
-          "Expl(100, true, true) -> PredCart()",
-          true
+          // "Expl(100, true, true) -> PredCart()",
+          false
         )
 
         // Arguments.of( 

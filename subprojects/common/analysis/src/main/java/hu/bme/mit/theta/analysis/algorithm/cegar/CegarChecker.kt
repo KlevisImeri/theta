@@ -43,8 +43,12 @@ import kotlin.concurrent.schedule
 import hu.bme.mit.theta.ui.TUI.warn
 import hu.bme.mit.theta.ui.GUI.rlj
 import hu.bme.mit.theta.ui.GUI
+import hu.bme.mit.theta.ui.DEBUG
 import com.raylib.java.core.Color
 import com.raylib.java.core.input.Keyboard
+import hu.bme.mit.theta.analysis.utils.ArgVisualizer;
+import java.io.FileWriter
+import hu.bme.mit.theta.common.visualization.writer.GraphvizWriter;
 
 class StateSpaceExplosionException : RuntimeException("State space explosion predicted by heuristic")
 
@@ -162,10 +166,26 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
             throw StateSpaceExplosionException();
           }
         }
-
+        
+        if(GUI.enabled) GUI.start();
         try {
             do {
                 statsHolder.iteration++
+
+                if(GUI.enabled) {
+                  abstractorResult = abstractor.unroll(proof, prec)
+
+                  GUI.draw {
+                    rlj.text.DrawText("Your iteration is ${statsHolder.iteration}!", 190, 200, 20, Color.RED);
+                  }
+
+                
+                  while (!rlj.core.IsKeyPressed(Keyboard.KEY_ENTER)) {
+                    Thread.sleep(10)
+                  }
+
+                  continue;
+                }
 
                 logger.write(Level.MAINSTEP, "Iteration %d%n", statsHolder.iteration)
                 logger.write(Level.MAINSTEP, "| Checking abstraction...%n")
@@ -243,13 +263,6 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
                 lastPrec = prec
                 iterationTime = newIterationTime
 
-                GUI.draw {
-                  rlj.text.DrawText("Your iteration is ${statsHolder.iteration}!", 190, 200, 20, Color.RED);
-                }
-
-                while (!rlj.core.IsKeyPressed(Keyboard.KEY_ENTER)) {
-                  Thread.sleep(10)
-                }
             } while (!abstractorResult.isSafe && refinerResult?.isUnsafe != true)
         } catch (e: RuntimeException) {
             if (cegarParams.computePartialResult) {

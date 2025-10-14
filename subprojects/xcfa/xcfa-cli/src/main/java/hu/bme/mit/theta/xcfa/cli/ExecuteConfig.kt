@@ -74,26 +74,26 @@ import hu.bme.mit.theta.ui.GUI.rlj
 import hu.bme.mit.theta.ui.GUI
 import com.raylib.java.core.Color
 
-fun runConfig(
-  config: XcfaConfig<*, *>,
-  logger: Logger,
-  uniqueLogger: Logger,
-  throwDontExit: Boolean,
-  partialResult: LocationInvariants? = null,
-): SafetyResult<*, *> {
-  if (XcfaConfig.UI) {
-    GUI.start();
-    GUI.draw {
-      rlj.text.DrawText("Congrats! You created your first window!", 190, 200, 20, Color.LIGHTGRAY);
-    }
-    val res = internalRunConfig(config, logger, uniqueLogger, throwDontExit, partialResult)
-    return res;
-  } else {
-    return internalRunConfig(config, logger, uniqueLogger, throwDontExit, partialResult)
-  }
-}
+// fun runConfig(
+//   config: XcfaConfig<*, *>,
+//   logger: Logger,
+//   uniqueLogger: Logger,
+//   throwDontExit: Boolean,
+//   partialResult: LocationInvariants? = null,
+// ): SafetyResult<*, *> {
+//   if (GUI.enabled && config.backendConfig.inProcess) {
+//     GUI.start();
+//     GUI.draw {
+//       rlj.text.DrawText("Starting the Execute Config!", 190, 200, 20, Color.LIGHTGRAY);
+//     }
+//     val res = internalRunConfig(config, logger, uniqueLogger, throwDontExit, partialResult)
+//     return res;
+//   } else {
+//     return internalRunConfig(config, logger, uniqueLogger, throwDontExit, partialResult)
+//   }
+// }
 
-private fun internalRunConfig(
+fun runConfig(
   config: XcfaConfig<*, *>,
   logger: Logger,
   uniqueLogger: Logger,

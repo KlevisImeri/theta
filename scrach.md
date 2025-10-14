@@ -1,331 +1,141 @@
-/*
- *  Copyright 2025 Budapest University of Technology and Economics
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-package hu.bme.mit.theta.analysis.algorithm.cegar;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.base.Stopwatch;
-import hu.bme.mit.theta.analysis.Cex;
-import hu.bme.mit.theta.analysis.Prec;
-import hu.bme.mit.theta.analysis.algorithm.AlgorithmTimeoutException;
-import hu.bme.mit.theta.analysis.algorithm.Proof;
-import hu.bme.mit.theta.analysis.algorithm.SafetyChecker;
-import hu.bme.mit.theta.analysis.algorithm.SafetyResult;
-import hu.bme.mit.theta.analysis.runtimemonitor.MonitorCheckpoint;
-import hu.bme.mit.theta.analysis.utils.ProofVisualizer;
-import hu.bme.mit.theta.common.Utils;
-import hu.bme.mit.theta.common.exception.NotSolvableException;
-import hu.bme.mit.theta.common.logging.Logger;
-import hu.bme.mit.theta.common.logging.Logger.Level;
-import hu.bme.mit.theta.common.logging.NullLogger;
-import hu.bme.mit.theta.common.visualization.writer.JSONWriter;
-import hu.bme.mit.theta.common.visualization.writer.WebDebuggerLogger;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
-import hu.bme.mit.theta.analysis.algorithm.predictor.ExpRlsPredictor1D
-/**
- * Counterexample-Guided Abstraction Refinement (CEGAR) loop implementation, that uses an Abstractor
- * to explore the abstract state space and a Refiner to check counterexamples and refine them if
- * needed. It also provides certain statistics about its execution.
- */
-public final class CegarChecker<P extends Prec, Pr extends Proof, C extends Cex>
-        implements SafetyChecker<Pr, C, P> {
-
-    private final Abstractor<P, Pr> abstractor;
-    private final Refiner<P, Pr, C> refiner;
-    private final Logger logger;
-    private final Pr proof;
-    private final ProofVisualizer<? super Pr> proofVisualizer;
-    private final CegarConfig CegarConfig;
+ digraph arg {
+ 	label="";
+ 		node_0 [label="{0=XcfaProcessState{main_init {init} initialized=false}} {PtrState(innerState=(PredState), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_1 [label="{0=XcfaProcessState{main_init {init} initialized=true}} {PtrState(innerState=(PredState), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_2 [label="{0=XcfaProcessState{__loc_146  initialized=true}} {PtrState(innerState=(PredState), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_3 [label="{0=XcfaProcessState{main_final {final} initialized=true}} {PtrState(innerState=(PredState), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_27 [label="{0=XcfaProcessState{__loc_180  initialized=true}} {PtrState(innerState=(PredState (<= (+ T0::_::main::v (* -1 T0::_::main::s)) 0)\l           (<= T0::_::main::s 65025)\l           (not (>= (+ T0::_::main::s (* -1 (div T0::_::main::s 256))) 1))\l           (>= T0::_::main::s 0)\l           (<= 0 (+ (* -1 T0::_::main::v) T0::_::main::s))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_29 [label="{0=XcfaProcessState{__loc_180  initialized=true}} {PtrState(innerState=(PredState (<= (+ T0::_::main::v (* -1 T0::_::main::s)) 0)\l           (<= T0::_::main::s 65025)\l           (>= T0::_::main::s 0)\l           (<= 0 (+ (* -1 T0::_::main::v) T0::_::main::s))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_34 [label="{0=XcfaProcessState{__loc_212  initialized=true}} {PtrState(innerState=(PredState (<= (+ T0::_::main::v (* -1 T0::_::main::s)) 0)\l           (<= T0::_::main::s 65025)\l           (>= T0::_::main::s 0)\l           (<= 0 (+ (* -1 T0::_::main::v) T0::_::main::s))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_37 [label="{0=XcfaProcessState{__loc_234  initialized=true}} {PtrState(innerState=(PredState (<= (+ T0::_::main::v (* -1 T0::_::main::s)) 0)\l           (<= T0::_::main::s 65025)\l           (>= T0::_::main::s 0)\l           (<= 0 (+ (* -1 T0::_::main::v) T0::_::main::s))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_38 [label="{0=XcfaProcessState{main_error {error} initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",peripheries=2,style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_39 [label="{0=XcfaProcessState{main_final {final} initialized=true}} {PtrState(innerState=(PredState (<= (+ T0::_::main::v (* -1 T0::_::main::s)) 0)\l           (<= T0::_::main::s 65025)\l           (>= T0::_::main::s 0)\l           (<= 0 (+ (* -1 T0::_::main::v) T0::_::main::s))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_36 [label="{0=XcfaProcessState{main_error {error} initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",peripheries=2,style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_35 [label="{0=XcfaProcessState{__loc_180  initialized=true}} {PtrState(innerState=(PredState (<= T0::_::main::s 65025) (>= T0::_::main::s 0)), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_40 [label="{0=XcfaProcessState{__loc_212  initialized=true}} {PtrState(innerState=(PredState (<= T0::_::main::s 65025) (>= T0::_::main::s 0)), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_43 [label="{0=XcfaProcessState{__loc_234  initialized=true}} {PtrState(innerState=(PredState (<= (+ T0::_::main::v (* -1 T0::_::main::s)) 0)\l           (<= T0::_::main::s 65025)\l           (>= T0::_::main::s 0)\l           (<= 0 (+ (* -1 T0::_::main::v) T0::_::main::s))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_42 [label="{0=XcfaProcessState{main_error {error} initialized=true}} {PtrState(innerState=(PredState (not (<= (+ T0::_::main::v (* -1 T0::_::main::s)) 0))\l           (<= T0::_::main::s 65025)\l           (>= T0::_::main::s 0)\l           (not (<= 0 (+ (* -1 T0::_::main::v) T0::_::main::s)))), nextCnt=0), mutex={0=0}}\l",peripheries=2,style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_41 [label="{0=XcfaProcessState{__loc_180  initialized=true}} {PtrState(innerState=(PredState (<= T0::_::main::s 65025) (>= T0::_::main::s 0)), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_28 [label="{0=XcfaProcessState{__loc_212  initialized=true}} {PtrState(innerState=(PredState (<= (+ T0::_::main::v (* -1 T0::_::main::s)) 0)\l           (<= T0::_::main::s 65025)\l           (not (>= (+ T0::_::main::s (* -1 (div T0::_::main::s 256))) 1))\l           (>= T0::_::main::s 0)\l           (<= 0 (+ (* -1 T0::_::main::v) T0::_::main::s))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_30 [label="{0=XcfaProcessState{main_error {error} initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",peripheries=2,style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_31 [label="{0=XcfaProcessState{__loc_234  initialized=true}} {PtrState(innerState=(PredState (<= (+ T0::_::main::v (* -1 T0::_::main::s)) 0)\l           (<= T0::_::main::s 65025)\l           (not (>= (+ T0::_::main::s (* -1 (div T0::_::main::s 256))) 1))\l           (>= T0::_::main::s 0)\l           (<= 0 (+ (* -1 T0::_::main::v) T0::_::main::s))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_32 [label="{0=XcfaProcessState{main_error {error} initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",peripheries=2,style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_33 [label="{0=XcfaProcessState{main_final {final} initialized=true}} {PtrState(innerState=(PredState (<= (+ T0::_::main::v (* -1 T0::_::main::s)) 0)\l           (<= T0::_::main::s 65025)\l           (not (>= (+ T0::_::main::s (* -1 (div T0::_::main::s 256))) 1))\l           (>= T0::_::main::s 0)\l           (<= 0 (+ (* -1 T0::_::main::v) T0::_::main::s))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		phantom_init0 [label="\n",style="solid,filled",fillcolor="#FFFFFF",color="#FFFFFF",shape=ellipse];
+ 	node_0 -> node_1 [label="0: main_init {init} -> main_init {init} [[skip]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_1 -> node_2 [label="0: main_init {init} -> __loc_146  [[(havoc T0::_::call___VERIFIER_nondet_uchar_ret4), (assume (and (>= T0::_::call___VERIFIER_nondet_uchar_ret4 0) (<= T0::_::call___VERIFIER_nondet_uchar_ret4 255))), (assign T0::_::main::n (mod T0::_::call___VERIFIER_nondet_uchar_ret4 256))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_2 -> node_3 [label="0: __loc_146  -> main_final {final} [[(assume (= T0::_::main::n 0)), (assign T0::_::main_ret 0)]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_2 -> node_27 [label="0: __loc_146  -> __loc_180  [[(assume (not (= T0::_::main::n 0))), (assign T0::_::main::v 0), (assign T0::_::main::s 0), (assign T0::_::main::i 0)]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_27 -> node_29 [label="0: __loc_180  -> __loc_180  [[(assume (< (mod T0::_::main::i 4294967296) (mod T0::_::main::n 4294967296))), (havoc T0::_::call___VERIFIER_nondet_uchar_ret5), (assume (and (>= T0::_::call___VERIFIER_nondet_uchar_ret5 0) (<= T0::_::call___VERIFIER_nondet_uchar_ret5 255))), (assign T0::_::main::v (mod T0::_::call___VERIFIER_nondet_uchar_ret5 256)), (assign T0::_::main::s (mod (+ (mod T0::_::main::s 256) (mod T0::_::main::v 256)) 256)), (assign T0::_::main::i (mod (+ T0::_::main::i 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_27 -> node_28 [label="0: __loc_180  -> __loc_212  [[(assume (not (< (mod T0::_::main::i 4294967296) (mod T0::_::main::n 4294967296))))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_29 -> node_34 [label="0: __loc_180  -> __loc_212  [[(assume (not (< (mod T0::_::main::i 4294967296) (mod T0::_::main::n 4294967296))))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_29 -> node_35 [label="0: __loc_180  -> __loc_180  [[(assume (< (mod T0::_::main::i 4294967296) (mod T0::_::main::n 4294967296))), (havoc T0::_::call___VERIFIER_nondet_uchar_ret5), (assume (and (>= T0::_::call___VERIFIER_nondet_uchar_ret5 0) (<= T0::_::call___VERIFIER_nondet_uchar_ret5 255))), (assign T0::_::main::v (mod T0::_::call___VERIFIER_nondet_uchar_ret5 256)), (assign T0::_::main::s (mod (+ (mod T0::_::main::s 256) (mod T0::_::main::v 256)) 256)), (assign T0::_::main::i (mod (+ T0::_::main::i 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_34 -> node_37 [label="0: __loc_212  -> __loc_234  [[(assume (not (< T0::_::main::s T0::_::main::v)))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_34 -> node_36 [label="0: __loc_212  -> main_error {error} [[(assume (< T0::_::main::s T0::_::main::v))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_37 -> node_38 [label="0: __loc_234  -> main_error {error} [[(assume (> T0::_::main::s 65025))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_37 -> node_39 [label="0: __loc_234  -> main_final {final} [[(assume (not (> T0::_::main::s 65025))), (assign T0::_::main_ret 0)]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_35 -> node_40 [label="0: __loc_180  -> __loc_212  [[(assume (not (< (mod T0::_::main::i 4294967296) (mod T0::_::main::n 4294967296))))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_35 -> node_41 [label="0: __loc_180  -> __loc_180  [[(assume (< (mod T0::_::main::i 4294967296) (mod T0::_::main::n 4294967296))), (havoc T0::_::call___VERIFIER_nondet_uchar_ret5), (assume (and (>= T0::_::call___VERIFIER_nondet_uchar_ret5 0) (<= T0::_::call___VERIFIER_nondet_uchar_ret5 255))), (assign T0::_::main::v (mod T0::_::call___VERIFIER_nondet_uchar_ret5 256)), (assign T0::_::main::s (mod (+ (mod T0::_::main::s 256) (mod T0::_::main::v 256)) 256)), (assign T0::_::main::i (mod (+ T0::_::main::i 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_40 -> node_43 [label="0: __loc_212  -> __loc_234  [[(assume (not (< T0::_::main::s T0::_::main::v)))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_40 -> node_42 [label="0: __loc_212  -> main_error {error} [[(assume (< T0::_::main::s T0::_::main::v))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_28 -> node_30 [label="0: __loc_212  -> main_error {error} [[(assume (< T0::_::main::s T0::_::main::v))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_28 -> node_31 [label="0: __loc_212  -> __loc_234  [[(assume (not (< T0::_::main::s T0::_::main::v)))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_31 -> node_32 [label="0: __loc_234  -> main_error {error} [[(assume (> T0::_::main::s 65025))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_31 -> node_33 [label="0: __loc_234  -> main_final {final} [[(assume (not (> T0::_::main::s 65025))), (assign T0::_::main_ret 0)]]\l",color="#000000",style=solid,fontname="courier"];
+ 	phantom_init0 -> node_0 [label="\n",color="#000000",style=solid];
+ }
 
 
-    private CegarChecker(
-            final Abstractor<P, Pr> abstractor,
-            final Refiner<P, Pr, C> refiner,
-            final Logger logger,
-            final ProofVisualizer<? super Pr> proofVisualizer,
-            final CegarConfig cegarConfig;
-
-    ) {
-        this.abstractor = checkNotNull(abstractor);
-        this.refiner = checkNotNull(refiner);
-        this.logger = checkNotNull(logger);
-        proof = abstractor.createProof();
-        this.proofVisualizer = checkNotNull(proofVisualizer);
-        this.cegarConfig = checkNotNull(cegarConfig);
-    }
-    
-    static data class CegarConfig {
-        final Boolean computePartialResult = false,
-        final long softTimeoutMs = 0,
-        final long hardTimeoutMs = 750, 
-        final Runnable afterTimeOut = () -> {}; // default does nothing
-        final bool iterationTimeHeuristic = false; // it mean the new iteration weight this much more 
-        final bool forgettingFactor =  95;
-        final bool emableUnrollingTimeHeuristic = 0; // worst case guess how much time the unrolling would take
-        init {
-            check if timeoutMs > 0 but afterTimeOut is empty 
-            warn the user that probalby this should not be emty funtion
-        }
- 
-    }
-
-    public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
-            final Abstractor<P, Pr> abstractor,
-            final Refiner<P, Pr, C> refiner,
-            final Logger logger,
-            final ProofVisualizer<? super Pr> proofVisualizer,
-            final Boolean computePartialResult, 
-            final long timeoutMs,
-            final Runnable afterTimeOut
-    ) {
-      return new CegarChecker<>(
-        abstractor, refiner, logger, proofVisualizer, computePartialResult, timeoutMs, afterTimeOut
-      );
-    }
-
-    public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
-            final Abstractor<P, Pr> abstractor,
-            final Refiner<P, Pr, C> refiner,
-            final ProofVisualizer<Pr> proofVisualizer,
-            final Boolean computePartialResult) {
-      return create(
-        abstractor, refiner, NullLogger.getInstance(), proofVisualizer, computePartialResult, 0, () -> {}
-      );
-    }
 
 
-    public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
-            final Abstractor<P, Pr> abstractor,
-            final Refiner<P, Pr, C> refiner,
-            final ProofVisualizer<Pr> proofVisualizer) {
-        return create(abstractor, refiner, NullLogger.getInstance(), proofVisualizer, false, 0, () -> {});
-    }
+XcfaPrec(p=PtrPrec(innerPrec=(PredPrec 
+        (>= (mod main::x 4294967296) 268435455) 
+        (>= (mod main::y 4294967296) 10) 
+        (>= main::y 0) 
+        (<= main::y 0) 
+        (or (not (<= (+ (* -1 main::y) 
+        (* 4294967296 (div main::y 4294967296))) -10)) 
+        (<= 4294967296 (+ main::y (* -4294967296 (div main::y 4294967296))))) 
+        (= 0 main::x) (= (mod (+ 1 (mod main::x 4294967296)) 4294967296) 
+        (mod (+ 1 (mod main::y 4294967296)) 4294967296)) 
+        (>= (mod (+ 1 (mod main::x 4294967296)) 4294967296) 10) 
+        (>= (mod main::x 4294967296) 10))
+, set=[], smth=0), noPop=[])
 
-    public static <P extends Prec, Pr extends Proof, C extends Cex> CegarChecker<P, Pr, C> create(
-            final Abstractor<P, Pr> abstractor,
-            final Refiner<P, Pr, C> refiner,
-            final Logger logger,
-            final ProofVisualizer<? super Pr> proofVisualizer) {
-        return create(abstractor, refiner, logger, proofVisualizer, false, 0, () -> {});
-    }
-
-
-    public Pr getProof() {
-        return proof;
-    }
-
-
-    private static class StatsHolder {
-        long abstractorTime = 0;
-        long refinerTime = 0;
-        int iteration = 0;
-        array<int> iterationTimes = {};
-    }
-
-
-     @Override
-    public SafetyResult<Pr, C> check(final P initPrec) {
-        logger.write(Level.INFO, "Configuration: %s%n", this);
-        final Stopwatch stopwatch = Stopwatch.createStarted();
-        final StatsHolder statsHolder = new StatsHolder();
-        final Supplier<CegarStatistics> getStats = () -> {
-            stopwatch.stop();
-            return new CegarStatistics(
-                stopwatch.elapsed(TimeUnit.MILLISECONDS),
-                statsHolder.abstractorTime,
-                statsHolder.refinerTime,
-                statsHolder.iteration
-            );
-        };
-        RefinerResult<P, C> refinerResult = null;
-        AbstractorResult abstractorResult;
-        P prec = initPrec;
-        WebDebuggerLogger wdl = WebDebuggerLogger.getInstance();
-
-        final Timer timer = new Timer(true); // WARN: needs optimization 
-        System.out.println("TimeoutMs In Cegar:" + timeoutMs);
-        final AtomicBoolean solverInterrupted = new AtomicBoolean(false);
-        if (timeoutMs > 0) {
-            final Thread mainThread = Thread.currentThread();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    solverInterrupted.set(true);
-                    afterTimeOut.run();
-                    // mainThread.interrupt();
-                }
-            }, softTimeoutMs);
-        }
-
-        Time startIterationTime = Clock.now();
-        Time iterationTime = startIterationTime;
-        RLSPredictor1D  exponentialPredictor = new RLSPredictor1D(forgettingFactor);
-        double predictedTime = 1sec;
-        long realArgSize = 0;
-        try {
-          do {
-              statsHolder.iteration++;
-
-              logger.write(Level.MAINSTEP, "Iteration %d%n", statsHolder.iteration);
-              logger.write(Level.MAINSTEP, "| Checking abstraction...%n");
-              final long abstractorStartTime = stopwatch.elapsed(TimeUnit.MILLISECONDS);
-              abstractorResult = abstractor.check(proof, prec);
-              statsHolder.abstractorTime +=
-                      stopwatch.elapsed(TimeUnit.MILLISECONDS) - abstractorStartTime;
-              logger.write(
-                      Level.MAINSTEP, "| Checking abstraction done, result: %s%n", abstractorResult);
-
-              if (WebDebuggerLogger.enabled()) {
-                  String argGraph =
-                          JSONWriter.getInstance().writeString(proofVisualizer.visualize(proof));
-                  String precString = prec.toString();
-                  wdl.addIteration(statsHolder.iteration, argGraph, precString);
-              }
-
-              P lastPrec = prec;
-              if (abstractorResult.isUnsafe()) {
-                  MonitorCheckpoint.Checkpoints.execute("CegarChecker.unsafeARG");
-
-                  logger.write(Level.MAINSTEP, "| Refining abstraction...%n");
-                  final long refinerStartTime = stopwatch.elapsed(TimeUnit.MILLISECONDS);
-                  refinerResult = refiner.refine(proof, prec);
-
-                  if(iterationTimeHeuristic and enableUnrollingTimeHeuristic proof instanceof of ARG<*,*>) {
-                    val numberOfNewNodes = ((proof as ARG<*,*>).size() -realArgSize);
-                    val precisionSizeChange = prec.size()-lastPrec.size();
-                    realArgSize = realArgSize * exponentialPredictor.weight^precisionSizeChange + numberOfNewNodes; 
-                  }
-
-                  statsHolder.refinerTime +=
-                          stopwatch.elapsed(TimeUnit.MILLISECONDS) - refinerStartTime;
-                  logger.write(
-                          Level.MAINSTEP, "Refining abstraction done, result: %s%n", refinerResult);
-
-                  if (refinerResult.isSpurious()) {
-                      prec = refinerResult.asSpurious().getRefinedPrec();
-                  }
-
-                  if (lastPrec.equals(prec)) {
-                      logger.write(
-                              Level.MAINSTEP,
-                              "! Precision did NOT change in this iteration"
-                                      + System.lineSeparator());
-                  } else {
-                      logger.write(
-                              Level.MAINSTEP,
-                              "! Precision DID change in this iteration" + System.lineSeparator());
-                  }
-              }
-              Time newIterationTime = Click.now();
-              Time iterationTimeDiff = newIterationTime - iteratoinTime;
-              logger.write(Level.MAINSTEP, "Iteration took ${iterationTimeDiff to sec} to run! \n");
-              statsHolder.iterationTimes.add(iterationTimeDiff);
-              exponentialPredictor.update(predictedTime, newIterationTime);
-              if(iterationTimeHeuristic) {
-                 
-                if itTimes.size() != 1 {
-                  predictedTime = exponentialPredictor.predict(newIterationTime);
-                  val estimatedTimeForNextIteration = (startIterationTime - newIterationTime) + predictedTime;
-                  if(enableUnrollingTimeHeuristic) { // TODO:
-                    val totalSizeOfArg = exponentialPredictor.weight^step.prec()-1;
-                    val nubmerOfNodesLeftToDiscover = totalSizeOfArg-realArgSize;
-                    estimatedTimeForNextIteration += nubmerOfNodesLeftToDiscover * timforNode; 
-                  }
-                  
-                  if estimatedTimeForNextIteration > hardTimeoutMs {
-                    try {
-                      abstractor.unroll(proof, lastPrec);
-                    } catch (RuntimeException e2) {
-                      logger.write(Level.MAINSTEP, "Could not unroll abstractor because "+ e2.getMessage() +" !%n");
-                      throw e;
-                    }
-                    return SafetyResult.partial(proof, getStats.get()); 
-                  }
-                }
-              }
-              iterationTimes = newIterationTime;
-          } while (!abstractorResult.isSafe() && !refinerResult.isUnsafe());
-        } catch (RuntimeException e) {
-         if (computePartialResult) {
-            if (e instanceof AlgorithmTimeoutException) {
-                logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Main Thread Interrupted (%d ms)----------%n", timeoutMs);
-            } else if (e instanceof NotSolvableException) {
-                logger.write(Level.MAINSTEP, "%n----Infinite Loop Detected by CexMonitor----%n");
-            } else if (solverInterrupted.get()) {
-                logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", timeoutMs);
-                e = new AlgorithmTimeoutException(String.format("Timeout Exceeded: Solver Interrupted after %d ms", timeoutMs));
-            } else {
-                logger.write(Level.MAINSTEP, "%n--------------Some Solver Error-------------%n");
-            }
-            
-            try {
-              abstractor.unroll(proof, prec);
-              // abstractor.unroll(proof, initPrec);
-            } catch (RuntimeException e2) {
-              logger.write(Level.MAINSTEP, "Could not unroll abstractor because "+ e2.getMessage() +" !%n");
-              // return SafetyResult.unknown(getStats.get());  // FIX: Should throw the error (stm needs it) but i need the states
-              throw e;
-            }
-            logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
-            return SafetyResult.partial(proof, getStats.get());
-          }
-        } finally {
-          if (timeoutMs > 0) {
-            timer.cancel();
-          }
-        }
-
-        SafetyResult<Pr, C> cegarResult = null;
-        final CegarStatistics stats = getStats.get();
-
-        assert abstractorResult.isSafe() || refinerResult.isUnsafe();
-        
-        if (solverInterrupted.get()) { 
-            // WARN: Temporaty fix to bad fast-unreachcahll result
-            // Probably the problem is that calling interrupt when the solver is not checking
-            // solverInterrupted should be inside the solver so you have 
-            // check(){ if(solverInterrupted.get()) return AlgorithmTimeoutException()}
-            logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", timeoutMs);
-            abstractor.unroll(proof, prec);
-            logger.write(Level.MAINSTEP, "Abstractor unrolled successfully!%n");
-            cegarResult = SafetyResult.partial(proof, stats); // FIX: cant get stats.get() beacuse cat stop the timer two times
-        } else 
-        if (abstractorResult.isSafe()) {
-            cegarResult = SafetyResult.safe(proof, stats);
-        } else if (refinerResult.isUnsafe()) {
-            cegarResult = SafetyResult.unsafe(refinerResult.asUnsafe().getCex(), proof, stats);
-        }
-
-        assert cegarResult != null;
-        logger.write(Level.RESULT, "%s%n", cegarResult);
-        logger.write(Level.INFO, "%s%n", stats);
-        return cegarResult;
-    }
-
-    @Override
-    public String toString() {
-        return Utils.lispStringBuilder(getClass().getSimpleName())
-                .add(abstractor)
-                .add(refiner)
-                .toString();
-    }
-}
-
-can you take this an turn  it into koltin. Please pu tth whole code into a block so I can edit this
+digraph arg {
+ 	label="";
+ 		node_0 [label="{0=XcfaProcessState{main_init {init} initialized=false}} {PtrState(innerState=(PredState), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_1 [label="{0=XcfaProcessState{main_init {init} initialized=true}} {PtrState(innerState=(PredState), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_36 [label="{0=XcfaProcessState{__loc_71  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (not (>= (mod T0::_::main::y 4294967296) 10))\l           (>= T0::_::main::y 0)\l           (<= T0::_::main::y 0)\l           (or\l             (not\l               (<=\l                 (+ (* -1 T0::_::main::y) (* 4294967296 (div T0::_::main::y 4294967296)))\l                 -10))\l             (<=\l               4294967296\l               (+ T0::_::main::y (* -4294967296 (div T0::_::main::y 4294967296)))))\l           (= 0 T0::_::main::x)\l           (=\l             (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296)\l             (mod (+ 1 (mod T0::_::main::y 4294967296)) 4294967296))\l           (not (>= (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296) 10))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_38 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (not (>= (mod T0::_::main::y 4294967296) 10))\l           (>= T0::_::main::y 0)\l           (<= T0::_::main::y 0)\l           (or\l             (not\l               (<=\l                 (+ (* -1 T0::_::main::y) (* 4294967296 (div T0::_::main::y 4294967296)))\l                 -10))\l             (<=\l               4294967296\l               (+ T0::_::main::y (* -4294967296 (div T0::_::main::y 4294967296)))))\l           (= 0 T0::_::main::x)\l           (=\l             (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296)\l             (mod (+ 1 (mod T0::_::main::y 4294967296)) 4294967296))\l           (not (>= (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296) 10))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_39 [label="{0=XcfaProcessState{__loc_71  initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_40 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (not (>= (mod T0::_::main::y 4294967296) 10))\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (or\l             (not\l               (<=\l                 (+ (* -1 T0::_::main::y) (* 4294967296 (div T0::_::main::y 4294967296)))\l                 -10))\l             (<=\l               4294967296\l               (+ T0::_::main::y (* -4294967296 (div T0::_::main::y 4294967296)))))\l           (= 0 T0::_::main::x)\l           (not\l             (=\l               (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296)\l               (mod (+ 1 (mod T0::_::main::y 4294967296)) 4294967296)))\l           (not (>= (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296) 10))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_42 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (= 0 T0::_::main::x)\l           (not\l             (=\l               (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296)\l               (mod (+ 1 (mod T0::_::main::y 4294967296)) 4294967296)))\l           (not (>= (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296) 10))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_43 [label="{0=XcfaProcessState{__loc_71  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (>= (mod T0::_::main::y 4294967296) 10)\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (not\l             (or\l               (not\l                 (<=\l                   (+ (* -1 T0::_::main::y) (* 4294967296 (div T0::_::main::y 4294967296)))\l                   -10))\l               (<=\l                 4294967296\l                 (+ T0::_::main::y (* -4294967296 (div T0::_::main::y 4294967296))))))\l           (not (= 0 T0::_::main::x))\l           (not\l             (=\l               (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296)\l               (mod (+ 1 (mod T0::_::main::y 4294967296)) 4294967296)))\l           (not (>= (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296) 10))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_46 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (not (>= (mod T0::_::main::y 4294967296) 10))\l           (>= T0::_::main::y 0)\l           (<= T0::_::main::y 0)\l           (or\l             (not\l               (<=\l                 (+ (* -1 T0::_::main::y) (* 4294967296 (div T0::_::main::y 4294967296)))\l                 -10))\l             (<=\l               4294967296\l               (+ T0::_::main::y (* -4294967296 (div T0::_::main::y 4294967296)))))\l           (not (= 0 T0::_::main::x))\l           (not (>= (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296) 10))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_47 [label="{0=XcfaProcessState{__loc_71  initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_48 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (not (>= (mod T0::_::main::y 4294967296) 10))\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (or\l             (not\l               (<=\l                 (+ (* -1 T0::_::main::y) (* 4294967296 (div T0::_::main::y 4294967296)))\l                 -10))\l             (<=\l               4294967296\l               (+ T0::_::main::y (* -4294967296 (div T0::_::main::y 4294967296)))))\l           (not (= 0 T0::_::main::x))\l           (not (>= (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296) 10))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_50 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (not (= 0 T0::_::main::x))\l           (not (>= (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296) 10))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_51 [label="{0=XcfaProcessState{__loc_71  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (>= (mod T0::_::main::y 4294967296) 10)\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (not\l             (or\l               (not\l                 (<=\l                   (+ (* -1 T0::_::main::y) (* 4294967296 (div T0::_::main::y 4294967296)))\l                   -10))\l               (<=\l                 4294967296\l                 (+ T0::_::main::y (* -4294967296 (div T0::_::main::y 4294967296))))))\l           (not (= 0 T0::_::main::x))\l           (not\l             (=\l               (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296)\l               (mod (+ 1 (mod T0::_::main::y 4294967296)) 4294967296)))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_53 [label="{0=XcfaProcessState{__loc_32118  initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_54 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (not (>= (mod T0::_::main::y 4294967296) 10))\l           (>= T0::_::main::y 0)\l           (<= T0::_::main::y 0)\l           (or\l             (not\l               (<=\l                 (+ (* -1 T0::_::main::y) (* 4294967296 (div T0::_::main::y 4294967296)))\l                 -10))\l             (<=\l               4294967296\l               (+ T0::_::main::y (* -4294967296 (div T0::_::main::y 4294967296)))))\l           (not (= 0 T0::_::main::x))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_56 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (not (>= (mod T0::_::main::y 4294967296) 10))\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (or\l             (not\l               (<=\l                 (+ (* -1 T0::_::main::y) (* 4294967296 (div T0::_::main::y 4294967296)))\l                 -10))\l             (<=\l               4294967296\l               (+ T0::_::main::y (* -4294967296 (div T0::_::main::y 4294967296)))))\l           (not (= 0 T0::_::main::x))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_57 [label="{0=XcfaProcessState{__loc_71  initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_58 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (not (= 0 T0::_::main::x))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_60 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (not (= 0 T0::_::main::x))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_59 [label="{0=XcfaProcessState{__loc_71  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (>= (mod T0::_::main::y 4294967296) 10)\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (not\l             (or\l               (not\l                 (<=\l                   (+ (* -1 T0::_::main::y) (* 4294967296 (div T0::_::main::y 4294967296)))\l                   -10))\l               (<=\l                 4294967296\l                 (+ T0::_::main::y (* -4294967296 (div T0::_::main::y 4294967296))))))\l           (not (= 0 T0::_::main::x))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_61 [label="{0=XcfaProcessState{__loc_32118  initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_62 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (not (>= (mod T0::_::main::y 4294967296) 10))\l           (>= T0::_::main::y 0)\l           (<= T0::_::main::y 0)\l           (or\l             (not\l               (<=\l                 (+ (* -1 T0::_::main::y) (* 4294967296 (div T0::_::main::y 4294967296)))\l                 -10))\l             (<=\l               4294967296\l               (+ T0::_::main::y (* -4294967296 (div T0::_::main::y 4294967296)))))\l           (not (= 0 T0::_::main::x))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_63 [label="{0=XcfaProcessState{__loc_71  initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_64 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (not (>= (mod T0::_::main::y 4294967296) 10))\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (or\l             (not\l               (<=\l                 (+ (* -1 T0::_::main::y) (* 4294967296 (div T0::_::main::y 4294967296)))\l                 -10))\l             (<=\l               4294967296\l               (+ T0::_::main::y (* -4294967296 (div T0::_::main::y 4294967296)))))\l           (not (= 0 T0::_::main::x))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_65 [label="{0=XcfaProcessState{__loc_71  initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_66 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (not (= 0 T0::_::main::x))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_55 [label="{0=XcfaProcessState{__loc_71  initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_52 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (not (= 0 T0::_::main::x))\l           (not (>= (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296) 10))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_49 [label="{0=XcfaProcessState{__loc_71  initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_45 [label="{0=XcfaProcessState{__loc_32118  initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_44 [label="{0=XcfaProcessState{__loc_87  initialized=true}} {PtrState(innerState=(PredState (not (>= (mod T0::_::main::x 4294967296) 268435455))\l           (>= T0::_::main::y 0)\l           (not (<= T0::_::main::y 0))\l           (= 0 T0::_::main::x)\l           (not\l             (=\l               (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296)\l               (mod (+ 1 (mod T0::_::main::y 4294967296)) 4294967296)))\l           (not (>= (mod (+ 1 (mod T0::_::main::x 4294967296)) 4294967296) 10))\l           (not (>= (mod T0::_::main::x 4294967296) 10))), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_41 [label="{0=XcfaProcessState{__loc_71  initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		node_37 [label="{0=XcfaProcessState{__loc_32118  initialized=true}} {PtrState(innerState=(PredState false), nextCnt=0), mutex={0=0}}\l",style="solid,filled",fontname="courier",fillcolor="#FFFFFF",color="#000000",shape=rectangle];
+ 		phantom_init0 [label="\n",style="solid,filled",fillcolor="#FFFFFF",color="#FFFFFF",shape=ellipse];
+ 	node_0 -> node_1 [label="0: main_init {init} -> main_init {init} [[skip]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_1 -> node_36 [label="0: main_init {init} -> __loc_71  [[(assign T0::_::main::x 0), (assign T0::_::main::y 0)]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_36 -> node_38 [label="0: __loc_71  -> __loc_87  [[(assume (< (mod T0::_::main::x 4294967296) 268435455)), (assign T0::_::main::y 0)]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_36 -> node_37 [label="0: __loc_71  -> __loc_32118  [[(assume (not (< (mod T0::_::main::x 4294967296) 268435455))), (assign T0::_::__VERIFIER_assert::cond (ite (>= (mod (ite (= (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod T0::_::main::x 4294967296) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod 2 4294967296) 0) (- (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296)) (+ (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296))))) 4294967296) 2147483648) (- (mod (ite (= (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod T0::_::main::x 4294967296) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod 2 4294967296) 0) (- (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296)) (+ (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296))))) 4294967296) 4294967296) (mod (ite (= (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod T0::_::main::x 4294967296) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod 2 4294967296) 0) (- (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296)) (+ (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296))))) 4294967296)))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_38 -> node_39 [label="0: __loc_87  -> __loc_71  [[(assume (not (< (mod T0::_::main::y 4294967296) 10))), (assign T0::_::main::x (mod (+ T0::_::main::x 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_38 -> node_40 [label="0: __loc_87  -> __loc_87  [[(assume (< (mod T0::_::main::y 4294967296) 10)), (assign T0::_::main::y (mod (+ T0::_::main::y 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_39 -> node_36 [label="\n",color="#000000",style=dashed,weight="0"];
+ 	node_40 -> node_42 [label="0: __loc_87  -> __loc_87  [[(assume (< (mod T0::_::main::y 4294967296) 10)), (assign T0::_::main::y (mod (+ T0::_::main::y 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_40 -> node_41 [label="0: __loc_87  -> __loc_71  [[(assume (not (< (mod T0::_::main::y 4294967296) 10))), (assign T0::_::main::x (mod (+ T0::_::main::x 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_42 -> node_43 [label="0: __loc_87  -> __loc_71  [[(assume (not (< (mod T0::_::main::y 4294967296) 10))), (assign T0::_::main::x (mod (+ T0::_::main::x 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_42 -> node_44 [label="0: __loc_87  -> __loc_87  [[(assume (< (mod T0::_::main::y 4294967296) 10)), (assign T0::_::main::y (mod (+ T0::_::main::y 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_43 -> node_46 [label="0: __loc_71  -> __loc_87  [[(assume (< (mod T0::_::main::x 4294967296) 268435455)), (assign T0::_::main::y 0)]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_43 -> node_45 [label="0: __loc_71  -> __loc_32118  [[(assume (not (< (mod T0::_::main::x 4294967296) 268435455))), (assign T0::_::__VERIFIER_assert::cond (ite (>= (mod (ite (= (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod T0::_::main::x 4294967296) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod 2 4294967296) 0) (- (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296)) (+ (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296))))) 4294967296) 2147483648) (- (mod (ite (= (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod T0::_::main::x 4294967296) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod 2 4294967296) 0) (- (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296)) (+ (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296))))) 4294967296) 4294967296) (mod (ite (= (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod T0::_::main::x 4294967296) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod 2 4294967296) 0) (- (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296)) (+ (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296))))) 4294967296)))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_46 -> node_47 [label="0: __loc_87  -> __loc_71  [[(assume (not (< (mod T0::_::main::y 4294967296) 10))), (assign T0::_::main::x (mod (+ T0::_::main::x 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_46 -> node_48 [label="0: __loc_87  -> __loc_87  [[(assume (< (mod T0::_::main::y 4294967296) 10)), (assign T0::_::main::y (mod (+ T0::_::main::y 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_47 -> node_36 [label="\n",color="#000000",style=dashed,weight="0"];
+ 	node_48 -> node_50 [label="0: __loc_87  -> __loc_87  [[(assume (< (mod T0::_::main::y 4294967296) 10)), (assign T0::_::main::y (mod (+ T0::_::main::y 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_48 -> node_49 [label="0: __loc_87  -> __loc_71  [[(assume (not (< (mod T0::_::main::y 4294967296) 10))), (assign T0::_::main::x (mod (+ T0::_::main::x 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_50 -> node_51 [label="0: __loc_87  -> __loc_71  [[(assume (not (< (mod T0::_::main::y 4294967296) 10))), (assign T0::_::main::x (mod (+ T0::_::main::x 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_50 -> node_52 [label="0: __loc_87  -> __loc_87  [[(assume (< (mod T0::_::main::y 4294967296) 10)), (assign T0::_::main::y (mod (+ T0::_::main::y 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_51 -> node_53 [label="0: __loc_71  -> __loc_32118  [[(assume (not (< (mod T0::_::main::x 4294967296) 268435455))), (assign T0::_::__VERIFIER_assert::cond (ite (>= (mod (ite (= (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod T0::_::main::x 4294967296) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod 2 4294967296) 0) (- (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296)) (+ (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296))))) 4294967296) 2147483648) (- (mod (ite (= (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod T0::_::main::x 4294967296) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod 2 4294967296) 0) (- (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296)) (+ (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296))))) 4294967296) 4294967296) (mod (ite (= (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod T0::_::main::x 4294967296) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod 2 4294967296) 0) (- (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296)) (+ (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296))))) 4294967296)))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_51 -> node_54 [label="0: __loc_71  -> __loc_87  [[(assume (< (mod T0::_::main::x 4294967296) 268435455)), (assign T0::_::main::y 0)]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_54 -> node_56 [label="0: __loc_87  -> __loc_87  [[(assume (< (mod T0::_::main::y 4294967296) 10)), (assign T0::_::main::y (mod (+ T0::_::main::y 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_54 -> node_55 [label="0: __loc_87  -> __loc_71  [[(assume (not (< (mod T0::_::main::y 4294967296) 10))), (assign T0::_::main::x (mod (+ T0::_::main::x 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_56 -> node_57 [label="0: __loc_87  -> __loc_71  [[(assume (not (< (mod T0::_::main::y 4294967296) 10))), (assign T0::_::main::x (mod (+ T0::_::main::x 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_56 -> node_58 [label="0: __loc_87  -> __loc_87  [[(assume (< (mod T0::_::main::y 4294967296) 10)), (assign T0::_::main::y (mod (+ T0::_::main::y 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_57 -> node_36 [label="\n",color="#000000",style=dashed,weight="0"];
+ 	node_58 -> node_60 [label="0: __loc_87  -> __loc_87  [[(assume (< (mod T0::_::main::y 4294967296) 10)), (assign T0::_::main::y (mod (+ T0::_::main::y 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_58 -> node_59 [label="0: __loc_87  -> __loc_71  [[(assume (not (< (mod T0::_::main::y 4294967296) 10))), (assign T0::_::main::x (mod (+ T0::_::main::x 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_59 -> node_61 [label="0: __loc_71  -> __loc_32118  [[(assume (not (< (mod T0::_::main::x 4294967296) 268435455))), (assign T0::_::__VERIFIER_assert::cond (ite (>= (mod (ite (= (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod T0::_::main::x 4294967296) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod 2 4294967296) 0) (- (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296)) (+ (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296))))) 4294967296) 2147483648) (- (mod (ite (= (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod T0::_::main::x 4294967296) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod 2 4294967296) 0) (- (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296)) (+ (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296))))) 4294967296) 4294967296) (mod (ite (= (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod T0::_::main::x 4294967296) 0) (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (ite (>= (mod 2 4294967296) 0) (- (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296)) (+ (mod (mod T0::_::main::x 4294967296) (mod 2 4294967296)) (mod 2 4294967296))))) 4294967296)))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_59 -> node_62 [label="0: __loc_71  -> __loc_87  [[(assume (< (mod T0::_::main::x 4294967296) 268435455)), (assign T0::_::main::y 0)]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_62 -> node_63 [label="0: __loc_87  -> __loc_71  [[(assume (not (< (mod T0::_::main::y 4294967296) 10))), (assign T0::_::main::x (mod (+ T0::_::main::x 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_62 -> node_64 [label="0: __loc_87  -> __loc_87  [[(assume (< (mod T0::_::main::y 4294967296) 10)), (assign T0::_::main::y (mod (+ T0::_::main::y 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_63 -> node_36 [label="\n",color="#000000",style=dashed,weight="0"];
+ 	node_64 -> node_65 [label="0: __loc_87  -> __loc_71  [[(assume (not (< (mod T0::_::main::y 4294967296) 10))), (assign T0::_::main::x (mod (+ T0::_::main::x 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_64 -> node_66 [label="0: __loc_87  -> __loc_87  [[(assume (< (mod T0::_::main::y 4294967296) 10)), (assign T0::_::main::y (mod (+ T0::_::main::y 1) 4294967296))]]\l",color="#000000",style=solid,fontname="courier"];
+ 	node_55 -> node_36 [label="\n",color="#000000",style=dashed,weight="0"];
+ 	node_49 -> node_36 [label="\n",color="#000000",style=dashed,weight="0"];
+ 	node_41 -> node_36 [label="\n",color="#000000",style=dashed,weight="0"];
+ 	phantom_init0 -> node_0 [label="\n",color="#000000",style=solid];
+ }

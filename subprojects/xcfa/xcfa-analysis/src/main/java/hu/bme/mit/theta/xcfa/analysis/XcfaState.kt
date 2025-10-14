@@ -329,12 +329,14 @@ data class XcfaProcessState(
     return copy(locs = deque, paramsInitialized = true)
   }
 
-  override fun toString(): String =
-    when (locs.size) {
-      0 -> ""
-      1 -> locs.peek()!!.toString() + " initialized=$paramsInitialized"
-      else -> "${locs.peek()!!} [${locs.size}], initilized=$paramsInitialized"
-    }
+  override fun toString(): String {
+      val content = when (locs.size) {
+          0 -> "EMPTY"
+          1 -> "${locs.peek()!!} initialized=$paramsInitialized"
+          else -> "${locs.peek()!!} [${locs.size}], initialized=$paramsInitialized"
+      }
+      return "XcfaProcessState{$content}" // WARN: Include the type it took me a while to debug
+  }
 
   fun enterFunction(
     xcfaProcedure: XcfaProcedure,
