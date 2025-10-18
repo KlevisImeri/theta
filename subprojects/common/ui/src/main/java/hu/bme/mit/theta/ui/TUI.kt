@@ -101,9 +101,10 @@ object TUI {
     fun reverse(text: String) = "${REVERSE}$text${RESET}"
 
     // Combined styles example
-    fun error(text: String) = "${BOLD}${RED}[ERROR]: $text${RESET}"
-    fun warn(text: String) = "${BOLD}${YELLOW}[WARN]: $text${RESET}"
-    fun success(text: String) = "${BOLD}${GREEN}[SUCCESS]: $text${RESET}"
-    fun info(text: String) = "${BOLD}${BLUE}[INFO]: $text${RESET}"
+    fun error(text: String) = "${BOLD}${RED}[ERROR] $text${RESET}"
+    fun warn(text: String) = "${BOLD}${YELLOW}[WARN] $text${RESET}"
+    fun success(text: String) = "${BOLD}${GREEN}[SUCCESS] $text${RESET}"
+    fun info(text: String) = "${BOLD}${BLUE}[INFO] $text${RESET}"
+    fun debug(text: String) = "${DIM}${LIGHT_WHITE}[DEBUG] $text${RESET}" 
 }
 

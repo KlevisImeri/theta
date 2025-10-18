@@ -36,5 +36,4 @@ dependencies {
     testImplementation(project(mapOf("path" to ":theta-xsts")))
     testImplementation(project(mapOf("path" to ":theta-cfa-analysis")))
     testImplementation(project(mapOf("path" to ":theta-cfa")))
-    implementation(project(":theta-xcfa-analysis"))
 }

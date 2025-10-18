@@ -56,6 +56,11 @@ import hu.bme.mit.theta.analysis.utils.ArgVisualizer;
 import java.io.FileWriter
 import hu.bme.mit.theta.common.visualization.writer.GraphvizWriter;
 import hu.bme.mit.theta.analysis.algorithm.cegar.CegarChecker.Companion.CegarParams
+import hu.bme.mit.theta.xcfa.cli.utils.ArgPredCartStateSpace2DVisualizer
+import hu.bme.mit.theta.analysis.algorithm.Proof
+import hu.bme.mit.theta.analysis.pred.PredPrec
+import hu.bme.mit.theta.analysis.ptr.PtrPrec
+
 
 fun getCegarChecker(
   xcfa: XCFA,
@@ -160,6 +165,16 @@ fun getCegarChecker(
         logger,
       )
 
+  fun getVisualizer(proof: Proof, prec: Prec): (() -> Unit) {
+    if (proof is ARG<*, *> && prec is XcfaPrec<*>) {
+      val arg = proof
+      val precPred = (prec.p as PtrPrec<*>).innerPrec as PredPrec //TODO: for more cases
+      val argVisualizer = ArgPredCartStateSpace2DVisualizer(proof, precPred);
+      return { argVisualizer.draw() }
+    } 
+    return {}
+  }
+
   val baseCegarParams = CegarParams(
       computePartialResult = !config.backendConfig.disablePartialResult,
       softTimeoutMs = config.backendConfig.softTimeoutMs,
@@ -170,6 +185,7 @@ fun getCegarChecker(
         // abstractionSolverInstance.reset();
       },
       iterationTimeHeuristic = cegarConfig.iterationTimeHeuristic,
+      getVisualizer = ::getVisualizer
   )
 
   val cegarChecker: CegarChecker<Prec, ARG<ExprState, ExprAction>, Trace<ExprState, ExprAction>> =

@@ -428,22 +428,34 @@ data class XcfaProcessState(
 
   companion object {
 
+    // fun createLookup(
+    //   proc: XcfaProcedure,
+    //   threadPrefix: String,
+    //   procPrefix: String,
+    // ): Map<VarDecl<*>, VarDecl<*>> =
+    //   listOf(proc.params.map { it.first }, proc.vars)
+    //     .flatten()
+    //     .associateWith {
+    //       val sj = StringJoiner("::")
+    //       if (threadPrefix != "") sj.add(threadPrefix) else sj.add("_")
+    //       if (procPrefix != "") sj.add(procPrefix) else sj.add("_")
+    //       sj.add(it.name)
+    //       val name = sj.toString()
+    //       if (name != it.name) Var(sj.toString(), it.type) else it
+    //     }
+    //     .filter { it.key != it.value }
     fun createLookup(
-      proc: XcfaProcedure,
-      threadPrefix: String,
-      procPrefix: String,
+        proc: XcfaProcedure,
+        threadPrefix: String,
+        procPrefix: String,
     ): Map<VarDecl<*>, VarDecl<*>> =
-      listOf(proc.params.map { it.first }, proc.vars)
-        .flatten()
-        .associateWith {
-          val sj = StringJoiner("::")
-          if (threadPrefix != "") sj.add(threadPrefix) else sj.add("_")
-          if (procPrefix != "") sj.add(procPrefix) else sj.add("_")
-          sj.add(it.name)
-          val name = sj.toString()
-          if (name != it.name) Var(sj.toString(), it.type) else it
-        }
-        .filter { it.key != it.value }
+        listOf(proc.params.map { it.first }, proc.vars)
+            .flatten()
+            .associateWith { originalVar ->
+                // Always return the original variable unchanged
+                originalVar
+            }
+            .filter { it.key != it.value } // This will be empty since key == value always
   }
 }
 

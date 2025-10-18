@@ -134,8 +134,8 @@ class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
 
     waitlist.clear() // Optimization
 
-    val g = ArgVisualizer.getDefault().visualize(arg)
-    println(GraphvizWriter.getInstance().writeString(g))
+    // val g = ArgVisualizer.getDefault().visualize(arg)
+    // println(GraphvizWriter.getInstance().writeString(g))
 
 
     return if (arg.isSafe) {

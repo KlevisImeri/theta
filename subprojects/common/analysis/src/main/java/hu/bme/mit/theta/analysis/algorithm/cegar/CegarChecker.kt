@@ -49,6 +49,8 @@ import com.raylib.java.core.input.Keyboard
 import hu.bme.mit.theta.analysis.utils.ArgVisualizer;
 import java.io.FileWriter
 import hu.bme.mit.theta.common.visualization.writer.GraphvizWriter;
+import hu.bme.mit.theta.analysis.algorithm.arg.ARG
+import java.util.concurrent.CountDownLatch
 
 class StateSpaceExplosionException : RuntimeException("State space explosion predicted by heuristic")
 
@@ -97,6 +99,7 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
             val iterationTimeHeuristic: Boolean = false,
             val forgettingFactor: Double = 0.96,
             val explosionMultiplier: Int = 10,
+            val getVisualizer: (Proof,Prec) -> (() -> Unit) = {_,_ -> {}} 
         )
 
         @JvmOverloads
@@ -167,25 +170,13 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
           }
         }
         
-        if(GUI.enabled) GUI.start();
+        if(GUI.enabled) { 
+          GUI.start();
+        }
         try {
             do {
                 statsHolder.iteration++
 
-                if(GUI.enabled) {
-                  abstractorResult = abstractor.unroll(proof, prec)
-
-                  GUI.draw {
-                    rlj.text.DrawText("Your iteration is ${statsHolder.iteration}!", 190, 200, 20, Color.RED);
-                  }
-
-                
-                  while (!rlj.core.IsKeyPressed(Keyboard.KEY_ENTER)) {
-                    Thread.sleep(10)
-                  }
-
-                  continue;
-                }
 
                 logger.write(Level.MAINSTEP, "Iteration %d%n", statsHolder.iteration)
                 logger.write(Level.MAINSTEP, "| Checking abstraction...%n")
@@ -262,6 +253,24 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
                 lastLastPrec = lastPrec
                 lastPrec = prec
                 iterationTime = newIterationTime
+
+                if(GUI.enabled) {
+                  val tempProof = abstractor.createProof();
+                  abstractorResult = abstractor.unroll(tempProof, prec)
+                  val drawfn = cegarParams.getVisualizer(tempProof, prec);
+                  val mainthread = Thread.currentThread()
+                  val latch = CountDownLatch(1)
+                  
+                  GUI.draw {
+                    // rlj.text.DrawText("Your iteration is ${statsHolder.iteration}!", 10, 10, 20, Color.BLACK);
+                    drawfn();
+                    if(rlj.core.IsKeyPressed(Keyboard.KEY_ENTER)){
+                      latch.countDown()
+                    } 
+                  }
+
+                  latch.await();
+                }
 
             } while (!abstractorResult.isSafe && refinerResult?.isUnsafe != true)
         } catch (e: RuntimeException) {
