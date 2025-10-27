@@ -51,6 +51,7 @@ import java.io.FileWriter
 import hu.bme.mit.theta.common.visualization.writer.GraphvizWriter;
 import hu.bme.mit.theta.analysis.algorithm.arg.ARG
 import java.util.concurrent.CountDownLatch
+import hu.bme.mit.theta.ui.DEBUG.debug
 
 class StateSpaceExplosionException : RuntimeException("State space explosion predicted by heuristic")
 
@@ -252,6 +253,7 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
                 }
                 lastLastPrec = lastPrec
                 lastPrec = prec
+                debug("$prec")
                 iterationTime = newIterationTime
 
                 if(GUI.enabled) {
@@ -271,6 +273,8 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
 
                   latch.await();
                 }
+                
+                if(cegarParams.computePartialResult && statsHolder.iteration==1) throw NotSolvableException(); // WARN: REMOVE
 
             } while (!abstractorResult.isSafe && refinerResult?.isUnsafe != true)
         } catch (e: RuntimeException) {

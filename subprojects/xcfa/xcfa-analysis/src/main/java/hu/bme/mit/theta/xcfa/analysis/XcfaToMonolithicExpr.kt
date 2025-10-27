@@ -54,6 +54,7 @@ import hu.bme.mit.theta.xcfa.model.*
 import java.math.BigInteger
 import java.util.*
 import org.kframework.mpfr.BigFloat
+import hu.bme.mit.theta.ui.DEBUG.debug
 
 private val LitExpr<*>.value: Int
   get() =
@@ -89,7 +90,7 @@ fun XCFA.toMonolithicExpr(
   Preconditions.checkArgument(this.initProcedures.size == 1)
   val proc = this.initProcedures.stream().findFirst().orElse(null).first
   Preconditions.checkArgument(
-    proc.edges.map { it.getFlatLabels() }.flatten().none { it !is StmtLabel }
+    proc.edges.map { it.getFlatLabels() }.flatten().none { it !is StmtLabel && it !is NopLabel }
   )
   //  Preconditions.checkArgument(proc.errorLoc.isPresent)
 

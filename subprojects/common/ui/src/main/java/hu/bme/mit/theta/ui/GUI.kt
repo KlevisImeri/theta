@@ -14,7 +14,7 @@ import com.raylib.java.core.input.Mouse.MouseButton.MOUSE_BUTTON_LEFT
 
 
 object GUI {
-  const val enabled = true;
+  const val enabled = false;
 
   val rlj: Raylib by lazy { Raylib() }
 

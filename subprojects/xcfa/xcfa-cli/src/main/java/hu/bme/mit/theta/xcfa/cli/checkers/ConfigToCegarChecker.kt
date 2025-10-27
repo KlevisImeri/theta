@@ -60,14 +60,16 @@ import hu.bme.mit.theta.xcfa.cli.utils.ArgPredCartStateSpace2DVisualizer
 import hu.bme.mit.theta.analysis.algorithm.Proof
 import hu.bme.mit.theta.analysis.pred.PredPrec
 import hu.bme.mit.theta.analysis.ptr.PtrPrec
-
+import hu.bme.mit.theta.xcfa.model.MetadataLabelCustomizer
+import hu.bme.mit.theta.xcfa.model.toDot
 
 fun getCegarChecker(
   xcfa: XCFA,
   mcm: MCM,
   config: XcfaConfig<*, *>,
   logger: Logger,
-): SafetyChecker<LocationInvariants, Trace<XcfaState<PtrState<*>>, XcfaAction>, XcfaPrec<*>> {
+): SafetyChecker<LocationInvariants, Trace<XcfaState<PtrState<*>>, XcfaAction>, XcfaPrec<*>> {        // println(updatedXcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
+  // println(xcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
   val cegarConfig = config.backendConfig.specConfig as CegarConfig
   if (
     config.inputConfig.property == ErrorDetection.DATA_RACE &&
@@ -289,6 +291,9 @@ fun getCegarChecker(
               val exprs = exprStates.map { it.toExpr() } // TODO:  what about if you "true inside the exprstate" what about if you have "and true"
               if (exprs.any { it is TrueExpr }) {
                   emptyList<PredState>()
+              } else if(exprs.size==1) { 
+                  val simplifiedExpr = abstractionSolverInstance.simplify(exprs[0])
+                  listOf(PredState.of(simplifiedExpr))
               } else {
                   val simplifiedExpr = abstractionSolverInstance.simplify(OrExpr.of(exprs))
                   listOf(PredState.of(simplifiedExpr))

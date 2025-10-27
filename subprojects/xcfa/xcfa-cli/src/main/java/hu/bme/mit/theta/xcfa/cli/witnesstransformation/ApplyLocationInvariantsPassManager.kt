@@ -25,9 +25,10 @@ class ApplyLocationInvariantsPassManager(parseContext: ParseContext, witness: Lo
     listOf(
       ApplyLocationInvariantsPass(parseContext, witness),
       NormalizePass(),
-      EliminateSelfLoops(),
+      // EliminateSelfLoops(),
       DeterministicPass(),
       // LbePass(parseContext)
+      // EmptyEdgeRemovalPass(),
     )
     // listOf(
     //   // formatting

@@ -93,6 +93,9 @@ import com.raylib.java.core.Color
 //   }
 // }
 
+// FIX: Xcfa shoudl be prited even if an erro is through 
+// postverficaion shoudl be caalled even if an error is throuwn
+
 fun runConfig(
   config: XcfaConfig<*, *>,
   logger: Logger,
@@ -498,7 +501,12 @@ private fun postVerificationLogging(
   logger: Logger,
   uniqueLogger: Logger,
 ) {
-  if (config.outputConfig.enableOutput && safetyResult.isPartial && !config.backendConfig.inProcess && config.backendConfig.inPortfolio) {
+  if (
+    config.outputConfig.enableOutput && 
+    safetyResult.isPartial && 
+    !config.backendConfig.inProcess && 
+    config.backendConfig.inPortfolio
+   ) {
     val locInvNew = safetyResult.asPartial().proof
     if (locInvNew !is LocationInvariants) {
       logger.write(
@@ -542,8 +550,8 @@ private fun postVerificationLogging(
         } else {
           locInvNew
         }
-        // println(finalInvariants)
-        println(finalInvariants.toString().lineSequence().take(10).joinToString("\n"))
+        println(finalInvariants)
+        // println(finalInvariants.toString().lineSequence().take(10).joinToString("\n"))
 
         finalInvariants.toJsonFile(partialResultTempFile, gson, logger)
         

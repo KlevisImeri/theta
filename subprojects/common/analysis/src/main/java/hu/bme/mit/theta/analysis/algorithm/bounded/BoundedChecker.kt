@@ -40,6 +40,7 @@ import hu.bme.mit.theta.solver.Solver
 import hu.bme.mit.theta.solver.utils.WithPushPop
 import java.util.*
 import kotlin.collections.plus
+import hu.bme.mit.theta.ui.DEBUG.debug
 
 /**
  * A checker for bounded model checking.
@@ -94,6 +95,7 @@ constructor(
   private var iteration = 0
 
   init {
+    debug("$monolithicExpr")
     check(bmcSolver != itpSolver || bmcSolver == null) { "Use distinct solvers for BMC and IMC!" }
     check(bmcSolver != indSolver || bmcSolver == null) { "Use distinct solvers for BMC and KInd!" }
     check(itpSolver != indSolver || itpSolver == null) { "Use distinct solvers for IMC and KInd!" }
@@ -205,6 +207,7 @@ constructor(
 
     return WithPushPop(bmcSolver).use {
       bmcSolver.add(Not(unfoldedPropExpr(indices.last())))
+      // debug("${bmcSolver.assertions}")
 
       if (bmcSolver.check().isSat) {
         val trace = getTrace(bmcSolver.model)
@@ -228,6 +231,7 @@ constructor(
 
     return WithPushPop(indSolver).use {
       indSolver.add(Not(unfoldedPropExpr(indices.last())))
+      // debug("${bmcSolver?.assertions}")
 
       if (indSolver.check().isUnsat) {
         logger.write(Logger.Level.MAINSTEP, "Safety proven in k-induction step\n")

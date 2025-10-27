@@ -61,6 +61,7 @@ class ApplyLocationInvariantsPass(parseContext: ParseContext, val witness: Locat
             )
             
             for (incomingEdge in loc.incomingEdges) {
+                // if (incomingEdge.source == incomingEdge.target) continue
                 val redirectedEdge = incomingEdge.withTarget(newLoc)
                 edgesToRemove.add(incomingEdge)
                 edgesToAdd.add(redirectedEdge)
