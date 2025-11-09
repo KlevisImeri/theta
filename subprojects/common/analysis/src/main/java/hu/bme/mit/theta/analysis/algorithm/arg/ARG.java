@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 /** Represents an abstract reachability graph (ARG). See the related class ArgBuilder. */
 public final class ARG<S extends State, A extends Action> implements Proof {
 
-    private final Collection<ArgNode<S, A>> initNodes;
+u   private final Collection<ArgNode<S, A>> initNodes;
     public boolean initialized; // Set by ArgBuilder
     private int nextId = 0;
     private final PartialOrd<S> partialOrd;

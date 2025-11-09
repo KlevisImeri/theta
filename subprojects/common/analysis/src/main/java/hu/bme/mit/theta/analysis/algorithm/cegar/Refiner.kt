@@ -23,8 +23,13 @@ import hu.bme.mit.theta.analysis.algorithm.Proof;
  * Common interface for refiners. It takes a witness and a precision, checks if the counterexample
  * in the witness is feasible and if not, it refines the precision
  */
-public interface Refiner<P extends Prec, Pr extends Proof, C extends Cex> {
+interface Refiner<P : Prec, Pr : Proof, C : Cex> {
 
     /** Checks if the counterexample in the witness is feasible. If not, refines the precision */
-    RefinerResult<P, C> refine(Pr witness, P prec);
+    fun refine(witness: Pr, prec: P): RefinerResult<P, C>
+
+    /** Undoes the last refinement step. */
+    fun undoOnce(witness: Pr, prec: P): AbstractorResult {
+       TODO("Undo Once not Supported for this Refiner!")
+    }
 }

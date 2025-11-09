@@ -49,20 +49,14 @@ object GUI {
           rlj.core.InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Theta UI")
           rlj.core.SetTargetFPS(60)
 
-          while (!rlj.core.WindowShouldClose() && isRunning.get()) {      
+          while (!rlj.core.WindowShouldClose() && isRunning.get()) {
             handleCameraInput()
-            
             rlj.core.BeginDrawing()
-            rlj.core.ClearBackground(Color.RAYWHITE)
-            
-            rlj.core.BeginMode2D(camera.get())
-            
-            renderAction.get().invoke()
-            
-            rlj.core.EndMode2D()
-            
+              rlj.core.ClearBackground(Color.RAYWHITE)
+              rlj.core.BeginMode2D(camera.get())
+                renderAction.get().invoke() 
+              rlj.core.EndMode2D() 
             // drawUI()
-            
             rlj.core.EndDrawing()
           }
         } finally {

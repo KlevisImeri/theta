@@ -19,13 +19,15 @@ import kotlin.math.exp
 import kotlin.math.ln
 
 class ExpRLSPredictor1D(
-  private val forgettingFactor: Double,
-  private val initialWeight: Double = 0.0 
+  private val forgettingFactor: Double = 0.96,
+  private val initialWeight: Double = 1.0 //y=x
 ) {
     private val linearPredictor = RlsPredictor1D(forgettingFactor, initialWeight) 
 
     val weight: Double
         get() = linearPredictor.weight
+    val prevWeight: Double
+        get() = linearPredictor.prevWeight
 
     fun predict(feature: Double): Double {
         val logFeature = ln(feature)
@@ -37,5 +39,9 @@ class ExpRLSPredictor1D(
         val logFeature = ln(feature)
         val logActualValue = ln(actualValue)
         linearPredictor.update(logFeature, logActualValue)
+    }
+
+    fun undoOnce() {
+      linearPredictor.undoOnce()
     }
 }

@@ -37,4 +37,9 @@ interface Abstractor<P : Prec, Pr : Proof> {
 
     /** Explores the whole witness */
     fun unroll(witness: Pr, prec: P): AbstractorResult;
+
+    /** Undo the previous step */
+    fun undoOnce(witness: Pr, prec: P): AbstractorResult { 
+      TODO("Undo Once not Supported for this Abstractor!") 
+    }
 }

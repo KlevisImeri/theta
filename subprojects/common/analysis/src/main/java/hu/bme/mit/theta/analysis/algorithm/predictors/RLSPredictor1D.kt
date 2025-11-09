@@ -16,8 +16,8 @@
 package hu.bme.mit.theta.analysis.algorithm.predictors
 
 class RlsPredictor1D(
-  private val forgettingFactor: Double,
-  private val initialWeight: Double = 0.0 
+  private val forgettingFactor: Double = 96,
+  private val initialWeight: Double = 1.0 
 ) {
     /**
      * A guide to tuning the `forgettingFactor` (λ). This value controls the memory
@@ -31,16 +31,13 @@ class RlsPredictor1D(
      */
     var weight: Double = initialWeight
         private set
+    var prevWeight: Double = weigh
+        private set
     private var covariance: Double = 1000.0 // High initial uncertainty
+    private var prevCovariance: Double = covariance 
 
-    /**
-     * Predicts the next value based on the current feature.
-     */
     fun predict(feature: Double): Double = weight * feature
 
-    /**
-     * Updates the internal weight and covariance based on the actual measured value.
-     */
     fun update(feature: Double, actualValue: Double) {
         val error = actualValue - predict(feature)
         val denominator = forgettingFactor + feature * feature * covariance
@@ -48,7 +45,16 @@ class RlsPredictor1D(
         if (denominator == 0.0) return
 
         val gain = (covariance * feature) / denominator
+
+        prevWeight = weight
+        prevCovariance = covariance
+
         weight += gain * error
         covariance = (covariance - gain * feature * covariance) / forgettingFactor
+    }
+
+    fun undoOnce() {
+        weight = prevWeight 
+        covariance = prevCovariance
     }
 }
