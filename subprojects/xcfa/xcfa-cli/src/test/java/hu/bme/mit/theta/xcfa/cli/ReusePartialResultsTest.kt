@@ -46,121 +46,18 @@ class ReusePartialResultsTest {
     @JvmStatic
     fun partialResultExamples(): Stream<Arguments> {
       return Stream.of(
-        // Arguments.of("/c/partialResultTest/multivar_1-1.c", true),
-        // Arguments.of("/c/partialResultTest/safe-program-example-expl.c", true ),
-        // Arguments.of("/c/partialResultTest/safe-program-example.c", true),
-        // Arguments.of("/c/partialResultTest/unsafe-program-example.c", false),
-        //
-        // Arguments.of("/c/partialResultTest/large_const.c", true), // INFO: overkill for solver
-        // Arguments.of("/c/partialResultTest/AllInterval-015.c", true), // INFO: TIMEOUT
-        // Arguments.of("/c/partialResultTest/bresenham-ll_unwindbound10.c", "PredDefault->PredConjuncts"),
-        // Arguments.of("/c/partialResultTest/bresenham-ll_valuebound1.c", true), //INFO:: long
-        // partial res
-
-        //-------------------------------------Error(verification stuck)-------------------------------------
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound10.c", "PredBoolDefault->PredBoolConjuncts", true)
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "PredCartDefault->PredCartConjuncts", true)
-        // Arguments.of(
-        //   "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
-        //   "Cegar(PRED_CART,LAZY,WHOLE,2,true) -> Cegar(PRED_CART,LAZY,CONJUNCTS,2,true)",
-        //   "Cegar(PRED_CART,LAZY,WHOLE,2) -> Cegar(PRED_CART,LAZY,CONJUNCTS,2,true)",
-        //   true
-        // )
-        // Arguments.of(
-        //   "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
-        //   "Cegar(PRED_CART,FULL,WHOLE,false,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
-        //   "Cegar(PRED_CART,FULL,WHOLE,true,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
-        //   true
-        // )
-        // Arguments.of(
-        //   "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
-        //   "Cegar(PRED_CART,FULL,WHOLE,true,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
-        //   "Cegar(PRED_CART,FULL,WHOLE,false,2) -> Bounded()",
-        //   true
-        // )
-        // Arguments.of(
-        //   "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
-        //   "Cegar(PRED_CART,FULL,WHOLE,false,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
-        //   "Cegar(EXPL,LAZY,pRes=true) -> Bounded()",
-        //   true
-        // )
-        // ----
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound2.c", "PredBoolDefault->PredBoolConjuncts", true)
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound100.c", "PredBoolDefault->PredBoolConjuncts", true)
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_valuebound5.c", "PredBoolDefault->PredBoolConjuncts", true)
-        // Arguments.of(
-        //   "/c/partialResultTest/cohendiv-ll_valuebound5.c",
-        //   "Cegar(PRED_BOOL,LAZY,CONJUNCTS,2,true)",
-        //   "Cegar(PRED_BOOL,LAZY,WHOLE,2,tru) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,2)", 
-        //   true
-        // )
-        // Arguments.of(
-        //   "/c/partialResultTest/cohendiv-ll_valuebound5.c",
-        //   "Cegar(PRED_BOOL,LAZY,WHOLE,false,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,false,2)",
-        //   "Cegar(PRED_BOOL,LAZY,WHOLE,true,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,false,2)", 
-        //   true
-        // )
-
-        // Arguments.of("/c/partialResultTest/test_locks_14-2.c", "ExplDefault->ExplFull", false),
-        // Arguments.of("/c/partialResultTest/test_locks_15-1.c", "ExplDefault->ExplFull", false)
-        // Arguments.of(
-        //   "/c/partialResultTest/test_locks_15-1.c", 
-        //   "Cegar(EXPL,LAZY)", 
-        //   "Cegar(EXPL,FULL) -> Cegar(EXPL,LAZY)", 
-        //   false
-        // ),
-
-        // Arguments.of(
-        //   "/c/partialResultTest/test_locks_15-1.c", 
-        //   "Cegar(EXPL,FULL) -> Cegar(PRED_CART,LAZY,WHOLE,2)", 
-        //   "Cegar(EXPL,FULL,pRes=true) -> Cegar(PRED_CART,LAZY,WHOLE,2)", 
-        //   false
-        // ),
-
-        // ---
-        // Arguments.of("/c/partialResultTest/test_locks_14-2.c", "ExplDefault->PredCartDefault", false) //TODO: check 
-        // Arguments.of("/c/partialResultTest/test_locks_15-1.c", "ExplDefault->PredCartDefault", false)
-        // Arguments.of("/c/partialResultTest/cohendiv-ll_unwindbound1.c", "ExplDefault->PredCartDefault", true)
-        //----------------------------------------------------------------------------------------------------
-
-        //--------------------- TO TEST -------------
-        // Arguments.of(
-        //   "/c/partialResultTest/cohendiv-ll_unwindbound1.c", 
-        //   "Cegar(PRED_CART,FULL,WHOLE,false,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
-        //   "Cegar(PRED_CART,FULL,WHOLE,true,2) -> Cegar(PRED_CART,FULL,CONJUNCTS,false,2)",
-        //   true
-        // )
-        // Arguments.of(
-        //   "/c/partialResultTest/cohendiv-ll_valuebound5.c",
-        //   "Cegar(PRED_BOOL,LAZY,WHOLE,false,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,false,2)",
-        //   "Cegar(PRED_BOOL,LAZY,WHOLE,true,2) -> Cegar(PRED_BOOL,LAZY,CONJUNCTS,false,2)", 
-        //   true
-        // )
-        // Arguments.of(
-        //   "/c/partialResultTest/test_locks_15-1.c", 
-        //   "Cegar(EXPL,FULL) -> Cegar(PRED_CART,LAZY,WHOLE,false,2)", 
-        //   "Cegar(EXPL,FULL,pRes=true) -> Cegar(PRED_CART,LAZY,WHOLE,false,2)", 
-        //   false
-        // )
-        // Arguments.of(
-        //   "/c/partialResultTest/cohendiv-ll_valuebound5.c",
-        //   "PredCart(100, true) -> KInd()",
-        //   "Expl(pRes=true) -> PredCart()", 
-        //   true
-        // ),
-        // Arguments.of( 
-        //   "/c/partialResultTest/AllInterval-015.c",
-        //   "PredCart(20, true) -> KInd()",
-        //   "Expl(pRes=true) -> PredCart()", 
-        //   true
-        // )
         Arguments.of( 
           // "/c/partialResultTest/unsafe-program-example.c",
           // "/c/partialResultTest/functions_1-1.c",
           // "/c/partialResultTest/array_1-1.c",
           // "/c/partialResultTest/invert_string-3.c",
-          "/c/partialResultTest/test_locks_9.c",
           // "/c/partialResultTest/sum01-2.c",
+          // "/c/partialResultTest/test_locks_9.c",
+          // "/c/partialResultTest/sum01-2.c",
+          "/c/partialResultTest/nested_2.c",
+          // "/c/partialResultTest/nested_4.c",
+          // "/c/partialResultTest/simple.c",
+          // "/c/partialResultTest/nested_3.c",
           // "/c/partialResultTest/KIndFail.c",
           // "/c/partialResultTest/s3_srvr_1b.cil.c",
           // "/c/partialResultTest/test_locks_13.c",
@@ -174,6 +71,8 @@ class ReusePartialResultsTest {
           // "/c/partialResultTest/gr2006.c",
           "PredCart(pRes=true) -> KInd()",
           "KInd()",
+          // "KInd()",
+          "Expl(pRes=true) -> PredCart()",
           // "PredCart(pRes=true) -> PredCart()",
           // "PredCart(900, true) -> KInd()",
           // "PredCart(900, true, true) -> KInd()",
@@ -181,27 +80,6 @@ class ReusePartialResultsTest {
           // "Expl(100, true, true) -> PredCart()",
           false
         )
-
-        // Arguments.of( 
-        //   "/c/partialResultTest/AllInterval-015.c",
-        //   "PredCart(20)",
-        //   "Kind()", 
-        //   true
-        // )
-
-
-
-        //------------------------
-        // Arguments.of( 
-        //   "/c/partialResultTest/ExplPred.c",
-        //   "Expl(pRes=true) -> PredCart()",
-        //   "PredCart(20, true) -> KInd()",
-        //   true
-        // )
-          
-        //  INFO:: long partial res
-        // Arguments.of("/c/partialResultTest/egcd-ll_unwindbound2.c", true), 
-        // Arguments.of("/c/partialResultTest/klevis.c", true),
       )
     }
   }

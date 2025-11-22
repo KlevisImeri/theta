@@ -550,8 +550,8 @@ private fun postVerificationLogging(
         } else {
           locInvNew
         }
-        println(finalInvariants)
-        // println(finalInvariants.toString().lineSequence().take(10).joinToString("\n"))
+        // println(finalInvariants)
+        println(finalInvariants.toString().lineSequence().take(40).joinToString("\n"))
 
         finalInvariants.toJsonFile(partialResultTempFile, gson, logger)
         
