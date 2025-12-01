@@ -52,6 +52,7 @@ dependencies {
 
 tasks.withType<Test> {
   testLogging.showStandardStreams = true
+  maxHeapSize = "15g"
 }
 
 application {

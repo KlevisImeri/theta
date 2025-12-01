@@ -32,7 +32,7 @@ import hu.bme.mit.theta.common.logging.Logger
 import java.util.function.Function
 import hu.bme.mit.theta.analysis.utils.ArgVisualizer;
 import hu.bme.mit.theta.common.visualization.writer.GraphvizWriter;
-import hu.bme.mit.theta.ui.DEBUG
+import hu.bme.mit.theta.ui.DEBUG.debug
 
 class XcfaArgAbstractor<S : State, A : Action, P : Prec>(
   argBuilder: ArgBuilder<S, A, P>,

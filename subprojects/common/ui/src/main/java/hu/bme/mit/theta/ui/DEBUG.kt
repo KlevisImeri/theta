@@ -1,7 +1,7 @@
 package hu.bme.mit.theta.ui
 
 object DEBUG {
-  const val enabled = true; // INFO: build time constant
+  const val enabled = false; // INFO: build time constant
   
   private fun getLoc(): String {
     val stackTrace = Thread.currentThread().stackTrace
@@ -10,7 +10,8 @@ object DEBUG {
     val lineNumber = caller.lineNumber
     return "$fileName:$lineNumber"
   }
-
+  
+  @JvmStatic
   fun debug(str: String) {
     if(!enabled) return;
     println(TUI.debug("${getLoc()} $str"))

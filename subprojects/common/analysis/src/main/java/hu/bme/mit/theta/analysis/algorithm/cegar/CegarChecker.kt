@@ -162,13 +162,21 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
         var lastPrec = prec
         var lastLastPrec = lastPrec
         val explosionCheck = {
-          val now = Duration.between(startIterationTime, Clock.systemUTC().instant()).toMillis();
+          val now = Duration.between(startIterationTime, Clock.systemUTC().instant()).toMillis().toDouble();
+          // if(statsHolder.iteration > 4  // INFO: you have to at least learn the weights a bit 
+          //   //  2^8 = 256 complete states is quite small if you are using whole
+          //   && now > cegarParams.explosionMultiplier*predictedTimeMs) {
+          //   throw StateSpaceExplosionException();
+          // }
+
           // logger.write(Level.INFO, "Checking for state explosion!");
-          if(statsHolder.iteration > 4  // INFO: you have to at least learn the weights a bit 
-            //  2^8 = 256 complete states is quite small if you are using whole
-            && now > cegarParams.explosionMultiplier*predictedTimeMs) {
-            throw StateSpaceExplosionException();
+          exponentialPredictor.update(predictedTimeMs, now)
+          val continiousPrediction = exponentialPredictor.predict(now)
+          if (continiousPrediction > cegarParams.softTimeoutMs.toDouble()) {
+            exponentialPredictor.undoOnce()
+            throw StateSpaceExplosionException()
           }
+          exponentialPredictor.undoOnce()
         }
         
         if(GUI.enabled) { 
@@ -274,7 +282,7 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
                   latch.await();
                 }
                 
-                if(cegarParams.computePartialResult && statsHolder.iteration==1) throw NotSolvableException(); // WARN: REMOVE
+                // if(cegarParams.computePartialResult && statsHolder.iteration==1) { print("I ITERUPPTED THIS MY SELF A THE END OF THE CEGAR!"); throw AlgorithmTimeoutException("END OF LOOP");} // WARN: REMOVE
 
             } while (!abstractorResult.isSafe && refinerResult?.isUnsafe != true)
         } catch (e: RuntimeException) {

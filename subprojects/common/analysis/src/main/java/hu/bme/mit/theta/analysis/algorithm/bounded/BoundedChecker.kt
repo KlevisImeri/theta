@@ -95,7 +95,7 @@ constructor(
   private var iteration = 0
 
   init {
-    debug("$monolithicExpr")
+    // debug("$monolithicExpr")
     check(bmcSolver != itpSolver || bmcSolver == null) { "Use distinct solvers for BMC and IMC!" }
     check(bmcSolver != indSolver || bmcSolver == null) { "Use distinct solvers for BMC and KInd!" }
     check(itpSolver != indSolver || itpSolver == null) { "Use distinct solvers for IMC and KInd!" }

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import hu.bme.mit.theta.ui.DEBUG;
 
 /** Helper class for building the ARG with a given analysis and precision. */
 public final class ArgBuilder<S extends State, A extends Action, P extends Prec> {
@@ -89,7 +90,6 @@ public final class ArgBuilder<S extends State, A extends Action, P extends Prec>
     public Collection<ArgNode<S, A>> expand(final ArgNode<S, A> node, final P prec) {
         checkNotNull(node);
         checkNotNull(prec);
-        abortIfTimedOut("ArgBuilder expand");
 
         final Collection<ArgNode<S, A>> newSuccNodes = new ArrayList<>();
         final S state = node.getState();
@@ -99,7 +99,6 @@ public final class ArgBuilder<S extends State, A extends Action, P extends Prec>
                 lts.getEnabledActionsFor(state, exploredActions, prec); // WARN: Appranlty this can also take time
         final TransFunc<S, ? super A, ? super P> transFunc = analysis.getTransFunc();
         for (final A action : actions) {
-             abortIfTimedOut("ArgBuilder expand loop");
             final Collection<? extends S> succStates = transFunc.getSuccStates(state, action, prec);
             for (final S succState : succStates) {
                 if (excludeBottom && succState.isBottom()) {
