@@ -35,16 +35,20 @@ internal class CegarIteratoinTimeHeuristic(
     fun explosionCheck() {
         if (stats.iteration < cegarParams.rlPredictorWarmup) return
 
-        val currentTotalMs = stats.nowMs()
-        val lastRealIterTimeMs = stats.iterationTimes.last().toDouble()
-
-        expPred.update(predIterTimeMs, currentTotalMs)
-        val tempPredTime = expPred.predict(currentTotalMs)
-
-        if (tempPredTime > cegarParams.softTimeoutMs.toDouble()) {
-            expPred.undoOnce()
+        if (stats.nowMs() > predIterTimeMs*cegarParams.explosionMultiplier ) {
             throw StateSpaceExplosionException()
         }
-        expPred.undoOnce()
+
+        // val currentTotalMs = stats.nowMs()
+        // val lastRealIterTimeMs = stats.iterationTimes.last().toDouble()
+        //
+        // expPred.update(predIterTimeMs, currentTotalMs)
+        // val tempPredTime = expPred.predict(currentTotalMs)
+        //
+        // if (tempPredTime > cegarParams.softTimeoutMs.toDouble()) {
+        //     expPred.undoOnce()
+        //     throw StateSpaceExplosionException()
+        // }
+        // expPred.undoOnce()
     }
 }
