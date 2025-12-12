@@ -99,7 +99,7 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
             val afterTimeOut: () -> Unit = {},
             val iterationTimeHeuristic: Boolean = false,
             val forgettingFactor: Double = 0.96,
-            val explosionMultiplier: Int = 10,
+            val explosionMultiplier: Int = 3,
             val getVisualizer: (Proof,Prec) -> (() -> Unit) = {_,_ -> {}} 
         )
 
@@ -163,20 +163,20 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
         var lastLastPrec = lastPrec
         val explosionCheck = {
           val now = Duration.between(startIterationTime, Clock.systemUTC().instant()).toMillis().toDouble();
-          // if(statsHolder.iteration > 4  // INFO: you have to at least learn the weights a bit 
-          //   //  2^8 = 256 complete states is quite small if you are using whole
-          //   && now > cegarParams.explosionMultiplier*predictedTimeMs) {
-          //   throw StateSpaceExplosionException();
-          // }
+          if(statsHolder.iteration > 4  // INFO: you have to at least learn the weights a bit 
+            //  2^8 = 256 complete states is quite small if you are using whole
+            && now > cegarParams.explosionMultiplier*predictedTimeMs) {
+            throw StateSpaceExplosionException();
+          }
 
           // logger.write(Level.INFO, "Checking for state explosion!");
-          exponentialPredictor.update(predictedTimeMs, now)
-          val continiousPrediction = exponentialPredictor.predict(now)
-          if (continiousPrediction > cegarParams.softTimeoutMs.toDouble()) {
-            exponentialPredictor.undoOnce()
-            throw StateSpaceExplosionException()
-          }
-          exponentialPredictor.undoOnce()
+          // exponentialPredictor.update(predictedTimeMs, now)
+          // val continiousPrediction = exponentialPredictor.predict(now)
+          // if (continiousPrediction > cegarParams.softTimeoutMs.toDouble()) {
+          //   exponentialPredictor.undoOnce()
+          //   throw StateSpaceExplosionException()
+          // }
+          // exponentialPredictor.undoOnce()
         }
         
         if(GUI.enabled) { 
