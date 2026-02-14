@@ -10,7 +10,6 @@ internal class StateSpaceExplosionException : RuntimeException("State space expl
 internal class CegarIteratoinTimeHeuristic(
     val cegarParams: CegarParams,
     private val stats: CegarMetricsAccumulator,
-    private val logger: Logger,
     private val expPred: ExpRLSPredictor1D = ExpRLSPredictor1D(cegarParams.forgettingFactor)
 ) {
     private var predIterTimeMs: Double = expPred.predict(200.0)
@@ -20,8 +19,8 @@ internal class CegarIteratoinTimeHeuristic(
 
         expPred.update(predIterTimeMs, realIterTimeMs)
 
-        logger.write(Logger.Level.INFO, "Predicted iteration finish at ${predIterTimeMs.toLong().msToSecStr()}s.\n")
-        logger.write(Logger.Level.INFO, "Weight ${expPred.prevWeight} -> ${expPred.weight} \n")
+        Logger.info("Predicted iteration finish at ${predIterTimeMs.toLong().msToSecStr()}s.\n")
+        Logger.info("Weight ${expPred.prevWeight} -> ${expPred.weight} \n")
 
         predIterTimeMs = expPred.predict(realIterTimeMs)
     }

@@ -45,7 +45,6 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
   val xcfa: XCFA?,
   val config: XcfaConfig<F, B>,
   val parseContext: ParseContext?,
-  val logger: Logger,
 ) : SafetyChecker<EmptyProof, EmptyCex, XcfaPrec<*>> {
 
   private val placeholder = LocationInvariants()
@@ -81,7 +80,6 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
 
     val configJson =
       if (config.backendConfig.parseInProcess) {
-
         val config =
           config.copy(
             inputConfig = config.inputConfig.copy(partialResult = partialResultJson),
@@ -117,15 +115,11 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
             outputConfig =
               config.outputConfig.copy(
                 resultFolder = tempDir.toFile(),
-                // cOutputConfig = COutputConfig(disable = true),
-                // xcfaOutputConfig = XcfaOutputConfig(disable = true),
-                // chcOutputConfig = ChcOutputConfig(disable = true),
-                // witnessConfig = witnessConfig(disable = true)
+                cOutputConfig = config.outputConfig.cOutputConfig.copy(enabled = false),
+                xcfaOutputConfig = config.outputConfig.xcfaOutputConfig.copy(enabled = false),
+                chcOutputConfig = config.outputConfig.chcOutputConfig.copy(enabled = false),
+                argConfig = config.outputConfig.argConfig.copy(enabled = false),
                 partialResultOutputConfig = config.outputConfig.partialResultOutputConfig.copy(tempFileLocation = partialResultJson),
-                // argConfig =
-                //   config.outputConfig.argConfig.copy(
-                //     disable = false
-                //   ), // we need the arg to be produced
               ),
           )
         CachingFileSerializer.serialize("config.json", config) { getGson(xcfa).toJson(config) }
@@ -133,7 +127,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
 
     val heapSize =
       "-Xmx${if(config.backendConfig.memlimit == 0L) 1420L else config.backendConfig.memlimit/1024/1024 }m"
-    logger.write(Logger.Level.INFO, "Starting process with $heapSize of heap\n")
+    Logger.info("Starting process with $heapSize of heap\n")
 
     val pb =
       NuProcessBuilder(
@@ -159,17 +153,15 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
     val retCode = process.waitFor(config.backendConfig.timeoutMs, TimeUnit.MILLISECONDS)
     val booleanSafetyResult =
       if (retCode == Int.MIN_VALUE) {
-        if (processHandler.safetyResult == null) {
+          if (processHandler.safetyResult == null) {
           process.destroy(true)
-          logger.write(
-            Logger.Level.RESULT,
+          Logger.result(
             "The process run out of time so it got destroied!\n",
           )
           throw ErrorCodeException(ExitCodes.TIMEOUT.code)
         } else {
-          logger.write(
-            Logger.Level.RESULT,
-            "Config timed out but started writing result, trying to wait an additional 10% ...",
+          Logger.benchmark(
+            "Config timed out but started writing result, trying to wait an additional 10%..."
           )
           val retCode = process.waitFor(config.backendConfig.timeoutMs / 10, TimeUnit.MILLISECONDS)
           if (retCode != 0) {
@@ -235,7 +227,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
           xcfa!!
           // println("config.backendConfig.inProcess: ${config.backendConfig.inProcess}")
           var tempLoc = LocationInvariants()
-          LocationInvariants.fromFile(partialResultJson, getGson(xcfa), logger)?.let {
+          LocationInvariants.fromFile(partialResultJson, getGson(xcfa), Logger.instance)?.let {
             loadedInvariants ->
             tempLoc = loadedInvariants
           }
@@ -245,7 +237,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
         val newLines = stdoutRemainder.split("\n") // if ends with \n, last element will be ""
         newLines.subList(0, newLines.size - 1).forEach {
           stdout.add(it)
-          println("server: $it")
+          println("subprocess: $it")
         }
         stdoutRemainder = newLines[newLines.size - 1]
       }
@@ -262,7 +254,7 @@ class InProcessChecker<F : SpecFrontendConfig, B : SpecBackendConfig>(
         val newLines = stderrRemainder.split("\n") // if ends with \n, last element will be ""
         newLines.subList(0, newLines.size - 1).forEach {
           stderr.add(it)
-          err.println("server: $it")
+          err.println("subprocess: $it")
         }
         stderrRemainder = newLines[newLines.size - 1]
       }

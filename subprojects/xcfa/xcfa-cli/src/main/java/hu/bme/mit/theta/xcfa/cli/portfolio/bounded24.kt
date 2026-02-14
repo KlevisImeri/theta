@@ -240,7 +240,7 @@ fun boundedPortfolio24(
     return STM(configBmcZ3, edges)
   }
 
-  logger.write(Logger.Level.RESULT, "Using bounded portfolio\n")
+  Logger.result("Using bounded portfolio\n")
 
   val inProcess = HierarchicalNode("InProcess", getStm(true))
   val notInProcess = HierarchicalNode("NotInprocess", getStm(false))

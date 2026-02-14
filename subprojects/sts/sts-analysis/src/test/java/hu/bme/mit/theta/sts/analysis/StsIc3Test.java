@@ -31,37 +31,29 @@ package hu.bme.mit.theta.sts.analysis;
  *  limitations under the License.
  */
 
-import hu.bme.mit.theta.analysis.algorithm.bounded.MonolithicExpr;
 import hu.bme.mit.theta.analysis.algorithm.ic3.Ic3Checker;
 import hu.bme.mit.theta.common.Utils;
-import hu.bme.mit.theta.common.logging.ConsoleLogger;
 import hu.bme.mit.theta.common.logging.Logger;
-import hu.bme.mit.theta.core.model.Valuation;
 import hu.bme.mit.theta.solver.z3legacy.Z3LegacySolverFactory;
 import hu.bme.mit.theta.sts.STS;
 import hu.bme.mit.theta.sts.aiger.AigerParser;
 import hu.bme.mit.theta.sts.aiger.AigerToSts;
+import hu.bme.mit.theta.sts.analysis.pipeline.StsPipelineChecker;
 import hu.bme.mit.theta.sts.dsl.StsDslManager;
 import hu.bme.mit.theta.sts.dsl.StsSpec;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import java.util.List;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(value = Parameterized.class)
 public class StsIc3Test {
-
-    @Parameterized.Parameter(value = 0)
     public String filePath;
-
-    @Parameterized.Parameter(value = 1)
     public boolean isSafe;
 
-    @Parameterized.Parameters(name = "{index}: {0}, {1}")
     public static Collection<Object[]> data() {
         return Arrays.asList(
                 new Object[][] {
@@ -84,10 +76,11 @@ public class StsIc3Test {
                 });
     }
 
-    @Test
-    public void testIC3() throws IOException {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}, {1}")
+    public void testIC3(String filePath, boolean isSafe) throws IOException {
 
-        final Logger logger = new ConsoleLogger(Logger.Level.VERBOSE);
+        initStsIc3Test(filePath, isSafe);
 
         final STS sts;
         if (filePath.endsWith("aag")) {
@@ -99,22 +92,28 @@ public class StsIc3Test {
             }
             sts = Utils.singleElementOf(spec.getAllSts());
         }
-        final MonolithicExpr monolithicExpr = StsToMonolithicExprKt.toMonolithicExpr(sts);
-        var checker =
-                new Ic3Checker<>(
-                        monolithicExpr,
-                        true,
-                        Z3LegacySolverFactory.getInstance(),
-                        valuation -> StsToMonolithicExprKt.valToState(sts, valuation),
-                        (Valuation v1, Valuation v2) ->
-                                StsToMonolithicExprKt.valToAction(sts, v1, v2),
-                        true,
-                        true,
-                        true,
-                        true,
-                        true,
-                        true,
-                        logger);
-        Assert.assertEquals(isSafe, checker.check().isSafe());
+
+        final var checker =
+                new StsPipelineChecker<>(
+                        sts,
+                        monolithicExpr ->
+                                new Ic3Checker(
+                                        monolithicExpr,
+                                        Z3LegacySolverFactory.getInstance(),
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        Logger.INSTANCE),
+                        List.of(),
+                        List.of());
+        Assertions.assertEquals(isSafe, checker.check().isSafe());
+    }
+
+    public void initStsIc3Test(String filePath, boolean isSafe) {
+        this.filePath = filePath;
+        this.isSafe = isSafe;
     }
 }

@@ -15,38 +15,28 @@
  */
 package hu.bme.mit.theta.xsts.analysis;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import hu.bme.mit.theta.analysis.algorithm.SafetyResult;
 import hu.bme.mit.theta.analysis.algorithm.ic3.Ic3Checker;
-import hu.bme.mit.theta.common.logging.ConsoleLogger;
 import hu.bme.mit.theta.common.logging.Logger;
 import hu.bme.mit.theta.solver.z3legacy.Z3LegacySolverFactory;
 import hu.bme.mit.theta.xsts.XSTS;
-import hu.bme.mit.theta.xsts.analysis.hu.bme.mit.theta.xsts.analysis.XstsToMonolithicExprKt;
+import hu.bme.mit.theta.xsts.analysis.pipeline.XstsPipelineChecker;
 import hu.bme.mit.theta.xsts.dsl.XstsDslManager;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(value = Parameterized.class)
 public class XstsIc3CheckerTest {
-
-    @Parameterized.Parameter(value = 0)
     public String filePath;
-
-    @Parameterized.Parameter(value = 1)
     public String propPath;
-
-    @Parameterized.Parameter(value = 2)
     public boolean safe;
 
-    @Parameterized.Parameters(name = "{index}: {0}, {1}, {2}")
     public static Collection<Object[]> data() {
         return Arrays.asList(
                 new Object[][] {
@@ -250,9 +240,10 @@ public class XstsIc3CheckerTest {
                 });
     }
 
-    @Test
-    public void runTest() throws Exception {
-        final Logger logger = new ConsoleLogger(Logger.Level.SUBSTEP);
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}, {1}, {2}")
+    public void runTest(String filePath, String propPath, boolean safe) throws Exception {
+        initXstsIc3CheckerTest(filePath, propPath, safe);
 
         XSTS xsts;
         try (InputStream inputStream =
@@ -261,22 +252,20 @@ public class XstsIc3CheckerTest {
             xsts = XstsDslManager.createXsts(inputStream);
         }
 
-        final var monolithicExpr = XstsToMonolithicExprKt.toMonolithicExpr(xsts);
-        final var checker =
-                new Ic3Checker<>(
-                        monolithicExpr,
-                        true,
-                        Z3LegacySolverFactory.getInstance(),
-                        v -> monolithicExpr.getValToState().invoke(v),
-                        (v1, v2) -> monolithicExpr.getBiValToAction().invoke(v1, v2),
-                        true,
-                        true,
-                        true,
-                        true,
-                        true,
-                        true,
-                        logger);
-
+        var checker =
+                new XstsPipelineChecker<>(
+                        xsts,
+                        monolithicExpr ->
+                                new Ic3Checker(
+                                        monolithicExpr,
+                                        Z3LegacySolverFactory.getInstance(),
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        Logger.INSTANCE));
         final SafetyResult<?, ?> status = checker.check(null);
 
         if (safe) {
@@ -284,5 +273,11 @@ public class XstsIc3CheckerTest {
         } else {
             assertTrue(status.isUnsafe());
         }
+    }
+
+    public void initXstsIc3CheckerTest(String filePath, String propPath, boolean safe) {
+        this.filePath = filePath;
+        this.propPath = propPath;
+        this.safe = safe;
     }
 }

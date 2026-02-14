@@ -28,8 +28,6 @@ import hu.bme.mit.theta.analysis.utils.ProofVisualizer
 import hu.bme.mit.theta.common.Utils
 import hu.bme.mit.theta.common.exception.NotSolvableException
 import hu.bme.mit.theta.common.logging.Logger
-import hu.bme.mit.theta.common.logging.Logger.Level
-import hu.bme.mit.theta.common.logging.NullLogger
 import hu.bme.mit.theta.common.visualization.writer.JSONWriter
 import hu.bme.mit.theta.common.visualization.writer.WebDebuggerLogger
 import java.time.Clock
@@ -63,7 +61,6 @@ import kotlin.time.DurationUnit;
 class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
     private val abstractor: Abstractor<P, Pr>,
     private val refiner: Refiner<P, Pr, C>,
-    private val logger: Logger,
     private val proofVisualizer: ProofVisualizer<in Pr>,
     private val cegarParams: CegarParams
 ) : SafetyChecker<Pr, C, P> {
@@ -74,7 +71,6 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
     init {
       checkNotNull(abstractor)
       checkNotNull(refiner)
-      checkNotNull(logger)
       checkNotNull(proofVisualizer)
       checkNotNull(cegarParams)
       logConfigurationWarnings()
@@ -99,14 +95,12 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
         fun <P : Prec, Pr : Proof, C : Cex> create(
             abstractor: Abstractor<P, Pr>,
             refiner: Refiner<P, Pr, C>,
-            logger: Logger = NullLogger.getInstance(),
             proofVisualizer: ProofVisualizer<in Pr>,
             cegarParams: CegarParams = CegarParams()
         ): CegarChecker<P, Pr, C> {
             return CegarChecker(
               abstractor,
               refiner,
-              logger,
               proofVisualizer,
               cegarParams
             )
@@ -115,7 +109,7 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
   
 
     override fun check(initPrec: P): SafetyResult<Pr, C> {
-        logger.write(Level.INFO, "Configuration: %s%n", this)
+        Logger.info("Configuration: %s%n", this)
 
         var refinerResult: RefinerResult<P, C>? = null
         lateinit var abstractorResult: AbstractorResult
@@ -140,7 +134,7 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
               // atomic to be inside the sovlers 
               // and the soler ceck everytime is ti callend if solverInterrupted.
               if (solverInterrupted.get()) { 
-                  logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", cegarParams.softTimeoutMs)
+                  Logger.mainStep, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", cegarParams.softTimeoutMs)
                   cegarResult = unroll(proof, prec) 
               } 
             } catch(e: RuntimeException) { 
@@ -166,7 +160,7 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
                 try {
                   (refinerResult, newPrec) =  runRefiner(proof, nowPrec, lastPrec, stats)
                   if (solverInterrupted.get()) { // WARN: this shoudl be only a temporary fix for some reason refiner or abstrcot just returene safe i think
-                      logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", cegarParams.softTimeoutMs)
+                      Logger.mainStep, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", cegarParams.softTimeoutMs)
                       cegarResult = unroll(proof, prec) 
                   } 
                 } catch (e: RuntimeException) {
@@ -211,20 +205,20 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
             throw IllegalStateException("CEGAR loop terminated in an unexpected state.")
         }
 
-        logger.write(Level.RESULT, "%s%n", cegarResult)
-        logger.write(Level.INFO, "%s%n", stats)
+        Logger.result, "%s%n", cegarResult)
+        Logger.info, "%s%n", stats)
         return cegarResult
     }
 
       private fun unroll(prec: Prec, proof: Proof): SafetyResult { 
         try {
-            logger.write(Level.MAINSTEP, "| Unrolling...%n")
+            Logger.mainStep, "| Unrolling...%n")
             abstractor.unroll(proof, prec)
         } catch (e2: RuntimeException) {
-            logger.write(Level.MAINSTEP, "Could not unroll abstractor because ${e2.message} !%n")
+            Logger.mainStep, "Could not unroll abstractor because ${e2.message} !%n")
             throw e
         }
-        logger.write(Level.MAINSTEP, "| Abstractor unrolled successfully!%n")
+        Logger.mainStep, "| Abstractor unrolled successfully!%n")
         return SafetyResult.partial(proof, getStats())
       }
 
@@ -232,19 +226,19 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
       if (!cegarParams.computePartialResult) return;
       when {
           e is AlgorithmTimeoutException -> {
-              logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Main Thread Interrupted (%d ms)----------%n", cegarParams.softTimeoutMs)
+              Logger.mainStep, "%n----------Timeout Exceeded & Main Thread Interrupted (%d ms)----------%n", cegarParams.softTimeoutMs)
               unroll(prec)
           }
           e is NotSolvableException -> {
-              logger.write(Level.MAINSTEP, "%n----Infinite Loop Detected by CexMonitor----%n")
+              Logger.mainStep, "%n----Infinite Loop Detected by CexMonitor----%n")
               unroll(prec)
           }
           e is PreemptiveAbortion -> { 
-              logger.write(Level.MAINSTEP, "--------Iteration time heuristic predicts timeout--------%n")
+              Logger.mainStep, "--------Iteration time heuristic predicts timeout--------%n")
               unroll(lastPrec)
           }
           e is StateSpaceExplosionException -> {
-              logger.write(Level.MAINSTEP, "%n----Iteration time heuristic predicts state space explosion----%n")
+              Logger.mainStep, "%n----Iteration time heuristic predicts state space explosion----%n")
               throw e
               // TODO: cant unroll with the same precision becase its a state
               // space explostion and we can not finish cant unrooll with prev
@@ -252,11 +246,11 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
               // invaritns
           }
           solverInterrupted.get() -> {
-              logger.write(Level.MAINSTEP, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", cegarParams.softTimeoutMs)
+              Logger.mainStep, "%n----------Timeout Exceeded & Solver Interrupted (%d ms)----------%n", cegarParams.softTimeoutMs)
               // throw AlgorithmTimeoutException("Timeout Exceeded: Solver Interrupted after ${cegarParams.softTimeoutMs} ms")
           }
           else -> {
-              logger.write(Level.MAINSTEP, "%n--------------Some Solver Error-------------%n")
+              Logger.mainStep, "%n--------------Some Solver Error-------------%n")
               throw e
               // TODO: its probably a good idea that you try another solver to unroll
 
@@ -279,8 +273,8 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
         iterationTimeHeuristic: IteratoinTimeHeuristic,
         stats: S
     ): AbstractorResult { 
-        logger.write(Level.MAINSTEP, "Iteration %d%n", stats.iteration)
-        logger.write(Level.MAINSTEP, "| Checking abstraction...%n")
+        Logger.mainStep, "Iteration %d%n", stats.iteration)
+        Logger.mainStep, "| Checking abstraction...%n")
         val abstractorStartTotalTime = stats.nowMs()
 
         val result = if (cegarParams.iterationTimeHeuristic) {
@@ -290,8 +284,8 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
         }
 
         stats.abstractorTime += stats.nowMs() - abstractorStartTotalTime
-        logger.write(
-            Level.MAINSTEP, "| Checking abstraction done, result: %s%n", result
+        Logger.mainStep(
+            "| Checking abstraction done, result: %s%n", result
         )
 
         return result
@@ -312,15 +306,13 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
         lastPrec: P,
         stats: S 
   ): Pair<RefinerResult<P, C>, P> { 
-        logger.write(Level.MAINSTEP, "| Refining abstraction...%n")
+        Logger.mainStep("| Refining abstraction...%n")
         val refinerStartTotalTime = stats.nowMs()
 
         val refinerResult: RefinerResult<P, C> = refiner.refine(proof, prec) 
 
         stats.refinerTime += stats.nowMs() - refinerStartTotalTime 
-        logger.write(
-            Level.MAINSTEP, "Refining abstraction done, result: %s%n", refinerResult
-        )
+        Logger.mainStep("Refining abstraction done, result: %s%n", refinerResult
 
         val newPrec: P = if (refinerResult.isSpurious) {
             refinerResult.asSpurious().refinedPrec
@@ -329,9 +321,9 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
         }
 
         if (lastPrec == newPrec) {
-            logger.write(Level.MAINSTEP,"! Precision did NOT change in this iteration%n")
+            Logger.mainStep("! Precision did NOT change in this iteration%n")
         } else {
-            logger.write(Level.MAINSTEP,"! Precision DID change in this iteration%n")
+            Logger.mainStep,"! Precision DID change in this iteration%n")
         }
         
         return Pair(refinerResult, newPrec)
@@ -361,18 +353,18 @@ class CegarChecker<P : Prec, Pr : Proof, C : Cex> private constructor(
 
     private fun logConfigurationWarnings() {
         if (cegarParams.softTimeoutMs > 0 && cegarParams.hardTimeoutMs < cegarParams.softTimeoutMs) {
-            logger.write(Level.INFO, warn("Soft timeout is smaller than hard timeout, so it has no effect!\n"))
+            Logger.info, warn("Soft timeout is smaller than hard timeout, so it has no effect!\n"))
         }
          
         if (softTimeoutActive && cegarParams.afterTimeOut == null) {
-            logger.write(Level.INFO, warn(
+            Logger.info, warn(
                 "Soft timeout is set but afterTimeOut() is null. " +
                 "You probably want to execute something when timeout finishes!\n"
             ))
         }
         
         if (softTimeoutActive && !cegarParams.computePartialResult) {
-            logger.write(Level.INFO, warn(
+            Logger.info, warn(
                 "Soft timeout is enabled but computePartialResult is false. " +
                 "There's no reason to have soft timeout without computing partial results!\n"
             ))

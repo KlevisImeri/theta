@@ -21,8 +21,6 @@ import hu.bme.mit.theta.analysis.State
 import hu.bme.mit.theta.analysis.Trace
 import hu.bme.mit.theta.analysis.algorithm.arg.ARG
 import hu.bme.mit.theta.analysis.utils.ArgVisualizer
-import hu.bme.mit.theta.common.logging.Logger
-import hu.bme.mit.theta.common.logging.NullLogger
 import hu.bme.mit.theta.analysis.algorithm.cegar.CegarChecker.Companion.CegarParams
 
 object ArgCegarChecker {
@@ -32,13 +30,11 @@ object ArgCegarChecker {
     fun <S : State, A : Action, P : Prec> create(
         abstractor: ArgAbstractor<S, A, P>,
         refiner: ArgRefiner<S, A, P>,
-        logger: Logger = NullLogger.getInstance(),
         cegarParams: CegarParams = CegarParams()
     ): CegarChecker<P, ARG<S, A>, Trace<S, A>> {
         return CegarChecker.create(
             abstractor = abstractor,
             refiner = refiner,
-            logger = logger,
             proofVisualizer = ArgVisualizer.getDefault(),
             cegarParams = cegarParams
         )
@@ -74,12 +70,11 @@ object ArgCegarChecker {
 
     @Deprecated(
         message = "Use the version that takes a CegarParams object.",
-        replaceWith = ReplaceWith("create(abstractor, refiner, logger, cegarParams = CegarParams(computePartialResult = computePartialResult, softTimeoutMs = timeoutMs, afterTimeOut = { interruptSolvers.run() }))")
+        replaceWith = ReplaceWith("create(abstractor, refiner, cegarParams = CegarParams(computePartialResult = computePartialResult, softTimeoutMs = timeoutMs, afterTimeOut = { interruptSolvers.run() }))")
     )
     fun <S : State, A : Action, P : Prec> create(
         abstractor: ArgAbstractor<S, A, P>,
         refiner: ArgRefiner<S, A, P>,
-        logger: Logger,
         computePartialResult: Boolean,
         timeoutMs: Long,
         interruptSolvers: Runnable
@@ -89,6 +84,6 @@ object ArgCegarChecker {
             softTimeoutMs = timeoutMs,
             afterTimeOut = { interruptSolvers.run() }
         )
-        return create(abstractor, refiner, logger, config)
+        return create(abstractor, refiner, config)
     }
 }

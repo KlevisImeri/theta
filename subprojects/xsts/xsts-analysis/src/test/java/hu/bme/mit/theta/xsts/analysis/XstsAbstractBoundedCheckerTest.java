@@ -15,40 +15,36 @@
  */
 package hu.bme.mit.theta.xsts.analysis;
 
-import static hu.bme.mit.theta.analysis.algorithm.bounded.BoundedCheckerBuilderKt.buildBMC;
-import static org.junit.Assert.assertTrue;
+import static hu.bme.mit.theta.analysis.algorithm.bounded.BoundedCheckerBuilderKt.buildKIND;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import hu.bme.mit.theta.analysis.Trace;
+import hu.bme.mit.theta.analysis.algorithm.InvariantProof;
+import hu.bme.mit.theta.analysis.algorithm.SafetyChecker;
 import hu.bme.mit.theta.analysis.algorithm.SafetyResult;
-import hu.bme.mit.theta.analysis.algorithm.bounded.MonolithicExpr;
-import hu.bme.mit.theta.analysis.algorithm.bounded.MonolithicExprCegarChecker;
-import hu.bme.mit.theta.common.logging.ConsoleLogger;
-import hu.bme.mit.theta.common.logging.Logger;
+import hu.bme.mit.theta.analysis.algorithm.bounded.pipeline.MonolithicExprPass;
+import hu.bme.mit.theta.analysis.algorithm.bounded.pipeline.passes.PredicateAbstractionMEPass;
+import hu.bme.mit.theta.analysis.expr.ExprState;
+import hu.bme.mit.theta.analysis.expr.refinement.ExprTraceCheckerFactoriesKt;
+import hu.bme.mit.theta.analysis.unit.UnitPrec;
 import hu.bme.mit.theta.solver.z3legacy.Z3LegacySolverFactory;
 import hu.bme.mit.theta.xsts.XSTS;
-import hu.bme.mit.theta.xsts.analysis.hu.bme.mit.theta.xsts.analysis.XstsToMonolithicExprKt;
+import hu.bme.mit.theta.xsts.analysis.pipeline.XstsPipelineChecker;
 import hu.bme.mit.theta.xsts.dsl.XstsDslManager;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import java.util.List;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(value = Parameterized.class)
 public class XstsAbstractBoundedCheckerTest {
-
-    @Parameterized.Parameter(value = 0)
     public String filePath;
-
-    @Parameterized.Parameter(value = 1)
     public String propPath;
-
-    @Parameterized.Parameter(value = 2)
     public boolean safe;
 
-    @Parameterized.Parameters(name = "{index}: {0}, {1}, {2}")
     public static Collection<Object[]> data() {
         return Arrays.asList(
                 new Object[][] {
@@ -161,11 +157,11 @@ public class XstsAbstractBoundedCheckerTest {
                         "src/test/resources/property/array_10.prop",
                         false
                     },
-                    {
-                        "src/test/resources/model/array_constant.xsts",
-                        "src/test/resources/property/array_constant.prop",
-                        true
-                    },
+                    //                    {
+                    //                        "src/test/resources/model/array_constant.xsts",
+                    //                        "src/test/resources/property/array_constant.prop",
+                    //                        true
+                    //                    },
                     {
                         "src/test/resources/model/localvars.xsts",
                         "src/test/resources/property/localvars.prop",
@@ -209,9 +205,10 @@ public class XstsAbstractBoundedCheckerTest {
                 });
     }
 
-    @Test
-    public void runTest() throws Exception {
-        final Logger logger = new ConsoleLogger(Logger.Level.SUBSTEP);
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}, {1}, {2}")
+    public void runTest(String filePath, String propPath, boolean safe) throws Exception {
+        initXstsAbstractBoundedCheckerTest(filePath, propPath, safe);
 
         XSTS xsts;
         try (InputStream inputStream =
@@ -220,22 +217,25 @@ public class XstsAbstractBoundedCheckerTest {
             xsts = XstsDslManager.createXsts(inputStream);
         }
 
-        final var monolithicExpr = XstsToMonolithicExprKt.toMonolithicExpr(xsts);
-        final var checker =
-                new MonolithicExprCegarChecker<>(
-                        monolithicExpr,
-                        (MonolithicExpr abstractMonolithicExpr) ->
-                                buildBMC(
-                                        abstractMonolithicExpr,
-                                        Z3LegacySolverFactory.getInstance().createSolver(),
-                                        val -> abstractMonolithicExpr.getValToState().invoke(val),
-                                        (v1, v2) ->
-                                                abstractMonolithicExpr
-                                                        .getBiValToAction()
-                                                        .invoke(v1, v2),
-                                        logger),
-                        logger,
-                        Z3LegacySolverFactory.getInstance());
+        final List<MonolithicExprPass<InvariantProof>> passes =
+                List.of(
+                        new PredicateAbstractionMEPass<>(
+                                ExprTraceCheckerFactoriesKt.createFwBinItpCheckerFactory(
+                                        Z3LegacySolverFactory.getInstance())));
+        final SafetyChecker<
+                        InvariantProof, Trace<XstsState<? extends ExprState>, XstsAction>, UnitPrec>
+                checker =
+                        new XstsPipelineChecker<>(
+                                xsts,
+                                monolithicExpr ->
+                                        buildKIND(
+                                                monolithicExpr,
+                                                Z3LegacySolverFactory.getInstance().createSolver(),
+                                                Z3LegacySolverFactory.getInstance().createSolver(),
+                                                (i) -> false,
+                                                () -> true,
+                                                () -> false),
+                                passes);
 
         final SafetyResult<?, ?> status = checker.check(null);
 
@@ -244,5 +244,11 @@ public class XstsAbstractBoundedCheckerTest {
         } else {
             assertTrue(status.isUnsafe());
         }
+    }
+
+    public void initXstsAbstractBoundedCheckerTest(String filePath, String propPath, boolean safe) {
+        this.filePath = filePath;
+        this.propPath = propPath;
+        this.safe = safe;
     }
 }

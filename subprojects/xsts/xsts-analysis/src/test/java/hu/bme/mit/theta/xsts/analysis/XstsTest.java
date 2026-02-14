@@ -15,12 +15,9 @@
  */
 package hu.bme.mit.theta.xsts.analysis;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import hu.bme.mit.theta.analysis.algorithm.SafetyResult;
-import hu.bme.mit.theta.common.logging.ConsoleLogger;
-import hu.bme.mit.theta.common.logging.Logger;
-import hu.bme.mit.theta.common.logging.Logger.Level;
 import hu.bme.mit.theta.solver.SolverFactory;
 import hu.bme.mit.theta.solver.SolverManager;
 import hu.bme.mit.theta.solver.javasmt.JavaSMTSolverManager;
@@ -35,31 +32,20 @@ import java.io.SequenceInputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
-import org.junit.Assume;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(value = Parameterized.class)
 public class XstsTest {
 
     private static final String SOLVER_STRING = "Z3";
     private static final Path SMTLIB_HOME = SmtLibSolverManager.HOME;
-
-    @Parameterized.Parameter(value = 0)
     public String filePath;
-
-    @Parameterized.Parameter(value = 1)
     public String propPath;
-
-    @Parameterized.Parameter(value = 2)
     public boolean safe;
-
-    @Parameterized.Parameter(value = 3)
     public XstsConfigBuilder.Domain domain;
 
-    @Parameterized.Parameters(name = "{index}: {0}, {1}, {2}, {3}")
     public static Collection<Object[]> data() {
         return Arrays.asList(
                 new Object[][] {
@@ -570,13 +556,13 @@ public class XstsTest {
                 });
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void installSolver() {
         if (SOLVER_STRING.contains("Z3") || SOLVER_STRING.contains("JavaSMT")) {
             return;
         }
         try (final var solverManager =
-                SmtLibSolverManager.create(SMTLIB_HOME, new ConsoleLogger(Level.DETAIL))) {
+                SmtLibSolverManager.create(SMTLIB_HOME)) {
             String solverVersion = SmtLibSolverManager.getSolverVersion(SOLVER_STRING);
             String solverName = SmtLibSolverManager.getSolverName(SOLVER_STRING);
             if (solverManager.managesSolver(SOLVER_STRING)
@@ -592,20 +578,23 @@ public class XstsTest {
         }
     }
 
-    @Test
-    public void test() throws Exception {
-        final Logger logger = new ConsoleLogger(Level.SUBSTEP);
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}, {1}, {2}, {3}")
+    public void test(
+            String filePath, String propPath, boolean safe, XstsConfigBuilder.Domain domain)
+            throws Exception {
+        initXstsTest(filePath, propPath, safe, domain);
         SolverManager.registerSolverManager(
                 hu.bme.mit.theta.solver.z3legacy.Z3SolverManager.create());
         SolverManager.registerSolverManager(hu.bme.mit.theta.solver.z3.Z3SolverManager.create());
-        SolverManager.registerSolverManager(SmtLibSolverManager.create(SMTLIB_HOME, logger));
+        SolverManager.registerSolverManager(SmtLibSolverManager.create(SMTLIB_HOME));
         SolverManager.registerSolverManager(JavaSMTSolverManager.create());
 
         final SolverFactory solverFactory;
         try {
             solverFactory = SolverManager.resolveSolverFactory(SOLVER_STRING);
         } catch (Exception e) {
-            Assume.assumeNoException(e);
+            Assumptions.assumeFalse(true, e::toString);
             return;
         }
 
@@ -640,5 +629,13 @@ public class XstsTest {
         } finally {
             SolverManager.closeAll();
         }
+    }
+
+    public void initXstsTest(
+            String filePath, String propPath, boolean safe, XstsConfigBuilder.Domain domain) {
+        this.filePath = filePath;
+        this.propPath = propPath;
+        this.safe = safe;
+        this.domain = domain;
     }
 }

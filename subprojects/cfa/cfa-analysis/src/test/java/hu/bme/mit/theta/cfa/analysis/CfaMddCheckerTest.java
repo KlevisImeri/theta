@@ -15,22 +15,15 @@
  */
 package hu.bme.mit.theta.cfa.analysis;
 
-import static hu.bme.mit.theta.cfa.analysis.config.CfaConfigBuilder.Domain.*;
-import static hu.bme.mit.theta.cfa.analysis.config.CfaConfigBuilder.Refinement.*;
-
 import hu.bme.mit.theta.analysis.Trace;
+import hu.bme.mit.theta.analysis.algorithm.InvariantProof;
 import hu.bme.mit.theta.analysis.algorithm.SafetyResult;
 import hu.bme.mit.theta.analysis.algorithm.mdd.MddChecker;
-import hu.bme.mit.theta.analysis.algorithm.mdd.MddProof;
-import hu.bme.mit.theta.analysis.expr.ExprAction;
-import hu.bme.mit.theta.analysis.expr.ExprState;
+import hu.bme.mit.theta.analysis.expl.ExplState;
 import hu.bme.mit.theta.cfa.CFA;
 import hu.bme.mit.theta.cfa.dsl.CfaDslManager;
 import hu.bme.mit.theta.common.OsHelper;
-import hu.bme.mit.theta.common.logging.ConsoleLogger;
 import hu.bme.mit.theta.common.logging.Logger;
-import hu.bme.mit.theta.common.logging.NullLogger;
-import hu.bme.mit.theta.core.model.Valuation;
 import hu.bme.mit.theta.solver.SolverFactory;
 import hu.bme.mit.theta.solver.SolverManager;
 import hu.bme.mit.theta.solver.SolverPool;
@@ -39,22 +32,15 @@ import hu.bme.mit.theta.solver.z3legacy.Z3SolverManager;
 import java.io.FileInputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(value = Parameterized.class)
 public class CfaMddCheckerTest {
-
-    @Parameterized.Parameter(value = 0)
     public String filePath;
-
-    @Parameterized.Parameter(value = 1)
     public boolean isSafe;
 
-    @Parameterized.Parameters(name = "{index}: {0}, {1}")
     public static Collection<Object[]> data() {
         return Arrays.asList(
                 new Object[][] {
@@ -70,48 +56,46 @@ public class CfaMddCheckerTest {
                 });
     }
 
-    @Test
-    public void test() throws Exception {
-        final Logger logger = new ConsoleLogger(Logger.Level.SUBSTEP);
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}, {1}")
+    public void test(String filePath, boolean isSafe) throws Exception {
+        initCfaMddCheckerTest(filePath, isSafe);
 
         SolverManager.registerSolverManager(Z3SolverManager.create());
         if (OsHelper.getOs().equals(OsHelper.OperatingSystem.LINUX)) {
             SolverManager.registerSolverManager(
-                    SmtLibSolverManager.create(SmtLibSolverManager.HOME, NullLogger.getInstance()));
+                    SmtLibSolverManager.create(SmtLibSolverManager.HOME, Logger.INSTANCE));
         }
 
         final SolverFactory solverFactory;
         try {
             solverFactory = SolverManager.resolveSolverFactory("Z3");
         } catch (Exception e) {
-            Assume.assumeNoException(e);
+            Assumptions.assumeFalse(true, e::toString);
             return;
         }
 
         try {
             CFA cfa = CfaDslManager.createCfa(new FileInputStream(filePath));
-            var monolithicExpr = CfaToMonolithicExprKt.toMonolithicExpr(cfa);
 
-            final SafetyResult<MddProof, Trace<ExprState, ExprAction>> status;
+            final SafetyResult<InvariantProof, Trace<CfaState<ExplState>, CfaAction>> status;
             try (var solverPool = new SolverPool(solverFactory)) {
-                final MddChecker<ExprState, ExprAction> checker =
-                        MddChecker.create(
-                                monolithicExpr,
-                                monolithicExpr.getVars(),
-                                solverPool,
-                                logger,
-                                MddChecker.IterationStrategy.GSAT,
-                                valuation -> monolithicExpr.getValToState().invoke(valuation),
-                                (Valuation v1, Valuation v2) ->
-                                        monolithicExpr.getBiValToAction().invoke(v1, v2),
-                                true,
-                                10);
+                final var checker =
+                        new CfaPipelineChecker<>(
+                                cfa,
+                                monolithicExpr ->
+                                        new MddChecker(monolithicExpr, solverPool, Logger.INSTANCE));
                 status = checker.check(null);
             }
 
-            Assert.assertEquals(isSafe, status.isSafe());
+            Assertions.assertEquals(isSafe, status.isSafe());
         } finally {
             SolverManager.closeAll();
         }
+    }
+
+    public void initCfaMddCheckerTest(String filePath, boolean isSafe) {
+        this.filePath = filePath;
+        this.isSafe = isSafe;
     }
 }

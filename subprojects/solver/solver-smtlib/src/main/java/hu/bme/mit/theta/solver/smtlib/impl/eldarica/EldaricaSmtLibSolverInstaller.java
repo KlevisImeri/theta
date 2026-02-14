@@ -37,13 +37,16 @@ public class EldaricaSmtLibSolverInstaller extends SmtLibSolverInstaller.Default
     private final List<SemVer.VersionDecoder> versions;
 
     private final YicesSmtLibSolverInstaller yicesInstaller =
-            new YicesSmtLibSolverInstaller(logger);
+            new YicesSmtLibSolverInstaller();
     private static final String YICES_VERSION = "1.0.40";
 
-    public EldaricaSmtLibSolverInstaller(final Logger logger) {
-        super(logger);
+    public EldaricaSmtLibSolverInstaller() {
 
         versions = new ArrayList<>();
+        versions.add(
+                SemVer.VersionDecoder.create(SemVer.of("2.2"))
+                        .addString(LINUX, X64, "zip")
+                        .build());
         versions.add(
                 SemVer.VersionDecoder.create(SemVer.of("2.1"))
                         .addString(LINUX, X64, "zip")
@@ -83,7 +86,7 @@ public class EldaricaSmtLibSolverInstaller extends SmtLibSolverInstaller.Default
                                 "https://github.com/uuverifiers/eldarica/releases/download/v%s/eldarica-bin-%s.%s",
                                 version, version, archStr));
 
-        logger.write(Logger.Level.MAINSTEP, "Starting download (%s)...\n", downloadUrl.toString());
+        Logger.INSTANCE.mainStep("Starting download (%s)...\n", downloadUrl.toString());
         try (final var inputStream = downloadUrl.toURL().openStream()) {
             Compress.extract(inputStream, installDir, Compress.CompressionType.ZIP);
             installDir.resolve(getSolverBinaryName()).toFile().setExecutable(true, true);
@@ -91,7 +94,7 @@ public class EldaricaSmtLibSolverInstaller extends SmtLibSolverInstaller.Default
             throw new SmtLibSolverInstallerException(e);
         }
 
-        logger.write(Logger.Level.MAINSTEP, "Download finished\n");
+        Logger.INSTANCE.mainStep("Download finished\n");
     }
 
     @Override
@@ -116,12 +119,13 @@ public class EldaricaSmtLibSolverInstaller extends SmtLibSolverInstaller.Default
         final var solverFilePath =
                 solverPath != null ? solverPath : installDir.resolve(getSolverBinaryName());
         final var yicesPath = installDir.resolve("yices").resolve("bin");
-        return EldaricaSmtLibSolverFactory.create(solverFilePath, solverArgs, yicesPath);
+        return EldaricaSmtLibSolverFactory.create(
+                solverFilePath, solverArgs, yicesPath, version.equals("2.1"));
     }
 
     @Override
     public List<String> getSupportedVersions() {
-        return Arrays.asList("2.1");
+        return Arrays.asList("2.1", "2.2");
     }
 
     private String getSolverBinaryName() {

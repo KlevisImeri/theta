@@ -20,7 +20,7 @@ import static hu.bme.mit.theta.core.type.abstracttype.AbstractExprs.Leq;
 import static hu.bme.mit.theta.core.type.booltype.BoolExprs.*;
 import static hu.bme.mit.theta.core.type.booltype.BoolExprs.Not;
 import static hu.bme.mit.theta.core.type.inttype.IntExprs.Int;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import hu.bme.mit.delta.java.mdd.*;
 import hu.bme.mit.delta.mdd.MddVariableDescriptor;
@@ -36,7 +36,7 @@ import hu.bme.mit.theta.core.type.inttype.IntType;
 import hu.bme.mit.theta.solver.SolverPool;
 import hu.bme.mit.theta.solver.z3legacy.Z3LegacySolverFactory;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MddExpressionTest {
 
@@ -87,7 +87,9 @@ public class MddExpressionTest {
         recursiveCursor.moveNext();
         recursiveCursor.moveNext();
 
-        final Set<Valuation> valuations = MddValuationCollector.collect(rootNode);
+        final var rootHandle =
+                varOrder.getDefaultSetSignature().getTopVariableHandle().getHandleFor(rootNode);
+        final Set<Valuation> valuations = MddValuationCollector.collect(rootHandle);
 
         assertEquals(valuations.size(), 5);
     }
@@ -127,7 +129,9 @@ public class MddExpressionTest {
 
         for (var c = node4.cursor(); c.moveNext(); ) {}
 
-        final Set<Valuation> valuations = MddValuationCollector.collect(rootNode);
+        final var rootHandle =
+                varOrder.getDefaultSetSignature().getTopVariableHandle().getHandleFor(rootNode);
+        final Set<Valuation> valuations = MddValuationCollector.collect(rootHandle);
 
         // TODO This might be 2 if default values are enabled
         assertEquals(valuations.size(), 3);
@@ -172,7 +176,9 @@ public class MddExpressionTest {
             childCursor.moveNext();
         }
 
-        final Set<Valuation> valuations = MddValuationCollector.collect(rootNode);
+        final var rootHandle =
+                varOrder.getDefaultSetSignature().getTopVariableHandle().getHandleFor(rootNode);
+        final Set<Valuation> valuations = MddValuationCollector.collect(rootHandle);
 
         assertEquals(valuations.size(), 5);
     }
@@ -224,7 +230,9 @@ public class MddExpressionTest {
         recursiveCursor.moveNext();
         recursiveCursor.moveNext();
 
-        final Set<Valuation> valuations = MddValuationCollector.collect(rootNode);
+        final var rootHandle =
+                varOrder.getDefaultSetSignature().getTopVariableHandle().getHandleFor(rootNode);
+        final Set<Valuation> valuations = MddValuationCollector.collect(rootHandle);
 
         assertEquals(valuations.size(), 5);
     }
@@ -260,7 +268,9 @@ public class MddExpressionTest {
         recursiveCursor.moveNext();
         recursiveCursor.moveNext();
 
-        final Set<Valuation> valuations = MddValuationCollector.collect(rootNode);
+        final var rootHandle =
+                varOrder.getDefaultSetSignature().getTopVariableHandle().getHandleFor(rootNode);
+        final Set<Valuation> valuations = MddValuationCollector.collect(rootHandle);
 
         assertEquals(valuations.size(), 1);
     }
@@ -314,7 +324,9 @@ public class MddExpressionTest {
         recursiveCursor.moveNext();
         recursiveCursor.moveNext();
 
-        final Set<Valuation> valuations = MddValuationCollector.collect(rootNode);
+        final var rootHandle =
+                varOrder.getDefaultSetSignature().getTopVariableHandle().getHandleFor(rootNode);
+        final Set<Valuation> valuations = MddValuationCollector.collect(rootHandle);
 
         assertEquals(27, valuations.size());
     }

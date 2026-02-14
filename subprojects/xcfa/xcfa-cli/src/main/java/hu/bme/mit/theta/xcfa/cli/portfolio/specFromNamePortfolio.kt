@@ -19,7 +19,6 @@ import hu.bme.mit.theta.analysis.algorithm.mdd.MddChecker
 import hu.bme.mit.theta.analysis.expr.refinement.PruneStrategy
 import hu.bme.mit.theta.analysis.expr.refinement.PruneStrategy.*
 import hu.bme.mit.theta.common.logging.Logger
-import hu.bme.mit.theta.common.logging.Logger.Level.RESULT
 import hu.bme.mit.theta.frontend.ParseContext
 import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig.ArithmeticType.efficient
 import hu.bme.mit.theta.frontend.transformation.grammar.preprocess.ArithmeticTrait

@@ -18,7 +18,6 @@ package hu.bme.mit.theta.xcfa.cli.portfolio
 import hu.bme.mit.theta.analysis.expr.refinement.PruneStrategy.FULL
 import hu.bme.mit.theta.analysis.expr.refinement.PruneStrategy.LAZY
 import hu.bme.mit.theta.common.logging.Logger
-import hu.bme.mit.theta.common.logging.Logger.Level.RESULT
 import hu.bme.mit.theta.frontend.ParseContext
 import hu.bme.mit.theta.frontend.transformation.ArchitectureConfig.ArithmeticType.efficient
 import hu.bme.mit.theta.frontend.transformation.grammar.preprocess.ArithmeticTrait
@@ -1157,7 +1156,7 @@ fun complexPortfolio25(
       else -> LIN_INT
     }
 
-  logger.write(RESULT, "Using portfolio $mainTrait\n")
+  Logger.result("Using portfolio $mainTrait\n")
 
   var inProcessStm = getStm(mainTrait, true)
   var notInProcessStm = getStm(mainTrait, false)

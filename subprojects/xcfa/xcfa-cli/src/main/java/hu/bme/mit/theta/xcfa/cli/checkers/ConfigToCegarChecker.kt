@@ -31,6 +31,7 @@ import hu.bme.mit.theta.analysis.expr.ExprAction
 import hu.bme.mit.theta.analysis.expr.ExprState
 import hu.bme.mit.theta.analysis.expr.refinement.*
 import hu.bme.mit.theta.analysis.pred.PredState
+import hu.bme.mit.theta.analysis.prod2.Prod2State
 import hu.bme.mit.theta.analysis.ptr.PtrState
 import hu.bme.mit.theta.analysis.runtimemonitor.CexMonitor
 import hu.bme.mit.theta.analysis.runtimemonitor.MonitorCheckpoint
@@ -38,15 +39,15 @@ import hu.bme.mit.theta.analysis.waitlist.PriorityWaitlist
 import hu.bme.mit.theta.common.logging.Logger
 import hu.bme.mit.theta.core.decl.VarDecl
 import hu.bme.mit.theta.core.utils.ExprUtils
-import hu.bme.mit.theta.core.utils.changeVars
+import hu.bme.mit.theta.frontend.ParseContext
 import hu.bme.mit.theta.graphsolver.patterns.constraints.MCM
 import hu.bme.mit.theta.solver.SolverFactory
+import hu.bme.mit.theta.xcfa.ErrorDetection
 import hu.bme.mit.theta.xcfa.analysis.*
 import hu.bme.mit.theta.xcfa.analysis.por.XcfaDporLts
+import hu.bme.mit.theta.xcfa.analysis.proof.LocationInvariants
 import hu.bme.mit.theta.xcfa.cli.params.*
-import hu.bme.mit.theta.xcfa.cli.utils.LocationInvariants
 import hu.bme.mit.theta.xcfa.cli.utils.getSolver
-import hu.bme.mit.theta.xcfa.dereferences
 import hu.bme.mit.theta.xcfa.model.XCFA
 import hu.bme.mit.theta.core.type.booltype.*;
 import hu.bme.mit.theta.core.type.booltype.BoolExprs.And;
@@ -66,17 +67,14 @@ import hu.bme.mit.theta.xcfa.model.toDot
 fun getCegarChecker(
   xcfa: XCFA,
   mcm: MCM,
+  parseContext: ParseContext,
   config: XcfaConfig<*, *>,
   logger: Logger,
-): SafetyChecker<LocationInvariants, Trace<XcfaState<PtrState<*>>, XcfaAction>, XcfaPrec<*>> {        // println(updatedXcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
-  // println(xcfa.toDot(MetadataLabelCustomizer).toString().replace("main::", ""))
+): SafetyChecker<LocationInvariants, Trace<XcfaState<PtrState<*>>, XcfaAction>, XcfaPrec<*>> {
+  if (config.inputConfig.property.verifiedProperty == ErrorDetection.TERMINATION)
+    error("Termination cannot be checked with CEGAR, use LIVENESS_CEGAR as a backend.")
+
   val cegarConfig = config.backendConfig.specConfig as CegarConfig
-  if (
-    config.inputConfig.property == ErrorDetection.DATA_RACE &&
-      xcfa.procedures.any { it.edges.any { it.label.dereferences.isNotEmpty() } }
-  ) {
-    throw RuntimeException("DATA_RACE cannot be checked when pointers exist in the file.")
-  }
   val abstractionSolverFactory: SolverFactory =
     getSolver(
       cegarConfig.abstractorConfig.abstractionSolver,
@@ -90,9 +88,9 @@ fun getCegarChecker(
 
   val ignoredVarRegistry = mutableMapOf<VarDecl<*>, MutableSet<ExprState>>()
 
-  val lts = cegarConfig.coi.getLts(xcfa, ignoredVarRegistry, cegarConfig.porLevel)
+  val (coi, lts) = cegarConfig.coi.getLts(xcfa, parseContext, cegarConfig.por, ignoredVarRegistry)
   val waitlist =
-    if (cegarConfig.porLevel.isDynamic) {
+    if (cegarConfig.por.isDynamic) {
       (cegarConfig.coi.porLts as XcfaDporLts).waitlist
     } else {
       PriorityWaitlist.create<ArgNode<out XcfaState<PtrState<ExprState>>, XcfaAction>>(
@@ -107,6 +105,7 @@ fun getCegarChecker(
   val corePartialOrd: PartialOrd<XcfaState<PtrState<ExprState>>> =
     if (xcfa.isInlined) getPartialOrder(globalStatePartialOrd)
     else getStackPartialOrder(globalStatePartialOrd)
+  val errorDetector = getXcfaErrorDetector(config.inputConfig.property.verifiedProperty)
   val abstractor: ArgAbstractor<ExprState, ExprAction, Prec> =
     cegarConfig.abstractorConfig.domain.abstractor(
       xcfa,
@@ -114,29 +113,32 @@ fun getCegarChecker(
       cegarConfig.abstractorConfig.maxEnum,
       waitlist,
       cegarConfig.refinerConfig.refinement.stopCriterion,
-      logger,
       lts,
-      config.inputConfig.property,
-      if (cegarConfig.porLevel.isDynamic) {
+      errorDetector,
+      if (cegarConfig.por.isDynamic) {
         XcfaDporLts.getPartialOrder(corePartialOrd)
       } else {
         corePartialOrd
       },
       cegarConfig.abstractorConfig.havocMemory,
+      coi,
     ) as ArgAbstractor<ExprState, ExprAction, Prec>
 
-  val (ref_, refinementSolverInstance) =
-    cegarConfig.refinerConfig.refinement.refiner(refinementSolverFactory, cegarConfig.cexMonitor)
-  val ref = ref_ as ExprTraceChecker<Refutation>
+  val ref: ExprTraceChecker<Refutation> =
+    errorDetector.exprTraceCheckerWrapper(
+      cegarConfig.refinerConfig.refinement.refiner(refinementSolverFactory, cegarConfig.cexMonitor)
+        as ExprTraceChecker<Refutation>
+    )
   val precRefiner: PrecRefiner<ExprState, ExprAction, Prec, Refutation> =
     cegarConfig.abstractorConfig.domain.itpPrecRefiner(
-      cegarConfig.refinerConfig.exprSplitter.exprSplitter
+      cegarConfig.refinerConfig.exprSplitter.exprSplitter,
+      xcfa,
     ) as PrecRefiner<ExprState, ExprAction, Prec, Refutation>
   val atomicNodePruner: NodePruner<ExprState, ExprAction> =
     cegarConfig.abstractorConfig.domain.nodePruner as NodePruner<ExprState, ExprAction>
   val refiner: ArgRefiner<ExprState, ExprAction, Prec> =
     if (cegarConfig.refinerConfig.refinement == Refinement.MULTI_SEQ)
-      if (cegarConfig.porLevel == POR.AASPOR)
+      if (cegarConfig.por == POR.AASPOR)
         MultiExprTraceRefiner.create(
           ref,
           precRefiner,
@@ -151,7 +153,7 @@ fun getCegarChecker(
           cegarConfig.refinerConfig.pruneStrategy,
           logger,
         )
-    else if (cegarConfig.porLevel == POR.AASPOR)
+    else if (cegarConfig.por == POR.AASPOR)
       XcfaSingleExprTraceRefiner.create(
         ref,
         precRefiner,
@@ -167,31 +169,19 @@ fun getCegarChecker(
         logger,
       )
 
-  fun getVisualizer(proof: Proof, prec: Prec): (() -> Unit) {
-    if (proof is ARG<*, *> && prec is XcfaPrec<*>) {
-      val arg = proof
-      val precPred = (prec.p as PtrPrec<*>).innerPrec as PredPrec //TODO: for more cases
-      val argVisualizer = ArgPredCartStateSpace2DVisualizer(proof, precPred);
-      return { argVisualizer.draw() }
-    } 
-    return {}
-  }
-
   val baseCegarParams = CegarParams(
       computePartialResult = !config.backendConfig.disablePartialResult,
       softTimeoutMs = config.backendConfig.softTimeoutMs,
       hardTimeoutMs = config.backendConfig.timeoutMs,
       afterTimeOut = {
         abstractionSolverInstance.interrupt();
-        refinementSolverInstance.interrupt();
         // abstractionSolverInstance.reset();
       },
       iterationTimeHeuristic = cegarConfig.iterationTimeHeuristic,
-      getVisualizer = ::getVisualizer
   )
 
-  val cegarChecker: CegarChecker<Prec, ARG<ExprState, ExprAction>, Trace<ExprState, ExprAction>> =
-    if (cegarConfig.porLevel == POR.AASPOR)
+  val cegarChecker =
+    if (cegarConfig.por == POR.AASPOR)
       ArgCegarChecker.create(
         abstractor,
         AasporRefiner.create(refiner, cegarConfig.refinerConfig.pruneStrategy, ignoredVarRegistry),
@@ -254,6 +244,18 @@ fun getCegarChecker(
                       }
                       is PredState -> {
                         PredState.of(s.preds.map { ExprUtils.changeDecls(it, declMap) })
+                      }
+                      is Prod2State<*, *> -> {
+                        if (s.state1.isBottom) ExplState.bottom()
+                        else
+                          Prod2State.of(
+                            ExplState.of((s.state1 as ExplState).`val`.changeVars(declMap)),
+                            PredState.of(
+                              (s.state2 as PredState).preds.map {
+                                ExprUtils.changeDecls(it, declMap)
+                              }
+                            ),
+                          )
                       }
                       else -> {
                         error("Unknown state: ${s}")

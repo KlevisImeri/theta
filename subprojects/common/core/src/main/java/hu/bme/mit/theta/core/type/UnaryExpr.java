@@ -59,7 +59,7 @@ public abstract class UnaryExpr<OpType extends Type, ExprType extends Type>
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         int result = hashCode;
         if (result == 0) {
             result = getHashSeed();

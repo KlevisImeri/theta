@@ -160,7 +160,7 @@ final class StmtToExprTransformer {
                 indexings.add(result.indexing);
                 jointIndexing = jointIndexing.join(result.indexing);
             }
-            final Set<VarDecl<?>> vars = ExprUtils.getVars(choices);
+            final Set<VarDecl<?>> vars = StmtUtils.getVars(nonDetStmt);
             final List<Expr<BoolType>> branchExprs = new ArrayList<>();
             for (int i = 0; i < choices.size(); i++) {
                 final List<Expr<BoolType>> exprs = new ArrayList<>();
@@ -207,7 +207,7 @@ final class StmtToExprTransformer {
 
             final Expr<BoolType> thenExpr = And(thenResult.getExprs());
             final Expr<BoolType> elzeExpr = And(elzeResult.getExprs());
-            final Set<VarDecl<?>> vars = ExprUtils.getVars(ImmutableList.of(thenExpr, elzeExpr));
+            final Set<VarDecl<?>> vars = StmtUtils.getVars(ifStmt);
 
             VarIndexing jointIndexing = thenIndexing.join(elzeIndexing);
             final List<Expr<BoolType>> thenAdditions = new ArrayList<>();
@@ -215,10 +215,15 @@ final class StmtToExprTransformer {
             for (VarDecl<?> decl : vars) {
                 final int thenIndex = thenIndexing.get(decl);
                 final int elzeIndex = elzeIndexing.get(decl);
+                final BiFunction<Expr<?>, Expr<?>, Expr<BoolType>> assign =
+                        decl.getType() instanceof FpType
+                                ? (Expr<?> e1, Expr<?> e2) ->
+                                        FpExprs.FpAssign((Expr<FpType>) e1, (Expr<FpType>) e2)
+                                : (Expr<?> e1, Expr<?> e2) -> Eq(e1, e2);
                 if (thenIndex < elzeIndex) {
                     if (thenIndex > 0) {
                         thenAdditions.add(
-                                Eq(
+                                assign.apply(
                                         Prime(decl.getRef(), thenIndex),
                                         Prime(decl.getRef(), elzeIndex)));
                     } else {
@@ -227,7 +232,7 @@ final class StmtToExprTransformer {
                 } else if (elzeIndex < thenIndex) {
                     if (elzeIndex > 0) {
                         elzeAdditions.add(
-                                Eq(
+                                assign.apply(
                                         Prime(decl.getRef(), elzeIndex),
                                         Prime(decl.getRef(), thenIndex)));
                     } else {

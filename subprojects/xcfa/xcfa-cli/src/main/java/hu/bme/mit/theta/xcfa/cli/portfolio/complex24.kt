@@ -1078,7 +1078,7 @@ fun complexPortfolio24(
       else -> ArithmeticTrait.LIN_INT
     }
 
-  logger.write(Logger.Level.RESULT, "Using portfolio $mainTrait\n")
+  Logger.result("Using portfolio $mainTrait\n")
 
   val inProcess = HierarchicalNode("InProcess", getStm(mainTrait, true))
   val notInProcess = HierarchicalNode("NotInprocess", getStm(mainTrait, false))

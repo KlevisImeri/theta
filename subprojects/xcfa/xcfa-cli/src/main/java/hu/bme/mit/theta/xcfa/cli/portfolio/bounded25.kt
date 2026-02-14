@@ -386,7 +386,7 @@ fun boundedPortfolio25(
     else STM(bmcConfig, edges) // mdd should not be run not-in-proc
   }
 
-  logger.write(Logger.Level.RESULT, "Using bounded portfolio\n")
+  Logger.result("Using bounded portfolio\n")
 
   val inProcess = HierarchicalNode("InProcess", getStm(true))
   val notInProcess = HierarchicalNode("NotInprocess", getStm(false))

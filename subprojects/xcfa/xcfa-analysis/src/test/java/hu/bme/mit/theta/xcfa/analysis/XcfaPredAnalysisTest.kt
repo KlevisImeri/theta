@@ -21,7 +21,10 @@ import hu.bme.mit.theta.analysis.algorithm.cegar.ArgAbstractor
 import hu.bme.mit.theta.analysis.algorithm.cegar.ArgCegarChecker
 import hu.bme.mit.theta.analysis.algorithm.cegar.ArgRefiner
 import hu.bme.mit.theta.analysis.algorithm.cegar.abstractor.StopCriterions
-import hu.bme.mit.theta.analysis.expr.refinement.*
+import hu.bme.mit.theta.analysis.expr.refinement.AasporRefiner
+import hu.bme.mit.theta.analysis.expr.refinement.ExprTraceBwBinItpChecker
+import hu.bme.mit.theta.analysis.expr.refinement.ItpRefutation
+import hu.bme.mit.theta.analysis.expr.refinement.PruneStrategy
 import hu.bme.mit.theta.analysis.pred.*
 import hu.bme.mit.theta.analysis.ptr.ItpRefToPtrPrec
 import hu.bme.mit.theta.analysis.ptr.PtrPrec
@@ -29,16 +32,12 @@ import hu.bme.mit.theta.analysis.ptr.PtrState
 import hu.bme.mit.theta.analysis.ptr.getPtrPartialOrd
 import hu.bme.mit.theta.analysis.waitlist.PriorityWaitlist
 import hu.bme.mit.theta.c2xcfa.getXcfaFromC
-import hu.bme.mit.theta.common.logging.ConsoleLogger
-import hu.bme.mit.theta.common.logging.Logger
-import hu.bme.mit.theta.common.logging.NullLogger
 import hu.bme.mit.theta.core.type.booltype.BoolExprs
 import hu.bme.mit.theta.frontend.ParseContext
 import hu.bme.mit.theta.solver.z3legacy.Z3LegacySolverFactory
-import hu.bme.mit.theta.xcfa.analysis.coi.ConeOfInfluence
-import hu.bme.mit.theta.xcfa.analysis.coi.XcfaCoiMultiThread
+import hu.bme.mit.theta.xcfa.ErrorDetection
+import hu.bme.mit.theta.xcfa.XcfaProperty
 import hu.bme.mit.theta.xcfa.analysis.por.*
-import java.util.*
 import kotlin.random.Random
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
@@ -49,6 +48,8 @@ class XcfaPredAnalysisTest {
   companion object {
 
     private val seed = 1001
+
+    private val property = XcfaProperty(ErrorDetection.ERROR_LOCATION)
 
     @JvmStatic
     fun data(): Collection<Array<Any>> {
@@ -65,8 +66,8 @@ class XcfaPredAnalysisTest {
   fun testNoporPred(filepath: String, verdict: (SafetyResult<*, *>) -> Boolean) {
     println("Testing NOPOR on $filepath...")
     val stream = javaClass.getResourceAsStream(filepath)
-    val xcfa = getXcfaFromC(stream!!, ParseContext(), false, false, NullLogger.getInstance()).first
-    ConeOfInfluence = XcfaCoiMultiThread(xcfa)
+    val xcfa =
+      getXcfaFromC(stream!!, ParseContext(), false, property, NullLogger.getInstance()).first
 
     val solver = Z3LegacySolverFactory.getInstance().createSolver()
     val analysis =
@@ -80,6 +81,7 @@ class XcfaPredAnalysisTest {
 
     val lts = getXcfaLts()
 
+    val errorDetector = getXcfaErrorDetector(property.verifiedProperty)
     val abstractor =
       getXcfaAbstractor(
         analysis,
@@ -87,9 +89,8 @@ class XcfaPredAnalysisTest {
           ArgNodeComparators.combine(ArgNodeComparators.targetFirst(), ArgNodeComparators.bfs())
         ),
         StopCriterions.firstCex<XcfaState<PtrState<PredState>>, XcfaAction>(),
-        ConsoleLogger(Logger.Level.DETAIL),
         lts,
-        ErrorDetection.ERROR_LOCATION,
+        errorDetector,
       )
         as ArgAbstractor<XcfaState<PtrState<PredState>>, XcfaAction, XcfaPrec<PtrPrec<PredPrec>>>
 
@@ -122,8 +123,8 @@ class XcfaPredAnalysisTest {
   fun testSporPred(filepath: String, verdict: (SafetyResult<*, *>) -> Boolean) {
     println("Testing SPOR on $filepath...")
     val stream = javaClass.getResourceAsStream(filepath)
-    val xcfa = getXcfaFromC(stream!!, ParseContext(), false, false, NullLogger.getInstance()).first
-    ConeOfInfluence = XcfaCoiMultiThread(xcfa)
+    val xcfa =
+      getXcfaFromC(stream!!, ParseContext(), false, property, NullLogger.getInstance()).first
 
     val solver = Z3LegacySolverFactory.getInstance().createSolver()
     val analysis =
@@ -137,6 +138,7 @@ class XcfaPredAnalysisTest {
 
     val lts = XcfaSporLts(xcfa)
 
+    val errorDetector = getXcfaErrorDetector(property.verifiedProperty)
     val abstractor =
       getXcfaAbstractor(
         analysis,
@@ -144,9 +146,8 @@ class XcfaPredAnalysisTest {
           ArgNodeComparators.combine(ArgNodeComparators.targetFirst(), ArgNodeComparators.bfs())
         ),
         StopCriterions.firstCex<XcfaState<PtrState<PredState>>, XcfaAction>(),
-        ConsoleLogger(Logger.Level.DETAIL),
         lts,
-        ErrorDetection.ERROR_LOCATION,
+        errorDetector,
       )
         as ArgAbstractor<XcfaState<PtrState<PredState>>, XcfaAction, XcfaPrec<PtrPrec<PredPrec>>>
 
@@ -180,8 +181,8 @@ class XcfaPredAnalysisTest {
     XcfaDporLts.random = Random(seed)
     println("Testing DPOR on $filepath...")
     val stream = javaClass.getResourceAsStream(filepath)
-    val xcfa = getXcfaFromC(stream!!, ParseContext(), false, false, NullLogger.getInstance()).first
-    ConeOfInfluence = XcfaCoiMultiThread(xcfa)
+    val xcfa =
+      getXcfaFromC(stream!!, ParseContext(), false, property, NullLogger.getInstance()).first
 
     val solver = Z3LegacySolverFactory.getInstance().createSolver()
     val analysis =
@@ -195,14 +196,14 @@ class XcfaPredAnalysisTest {
 
     val lts = XcfaDporLts(xcfa)
 
+    val errorDetector = getXcfaErrorDetector(property.verifiedProperty)
     val abstractor =
       getXcfaAbstractor(
         analysis,
         lts.waitlist,
         StopCriterions.firstCex<XcfaState<PtrState<PredState>>, XcfaAction>(),
-        ConsoleLogger(Logger.Level.DETAIL),
         lts,
-        ErrorDetection.ERROR_LOCATION,
+        errorDetector,
       )
         as ArgAbstractor<XcfaState<PtrState<PredState>>, XcfaAction, XcfaPrec<PtrPrec<PredPrec>>>
 
@@ -220,7 +221,6 @@ class XcfaPredAnalysisTest {
         ),
         precRefiner,
         PruneStrategy.FULL,
-        ConsoleLogger(Logger.Level.DETAIL),
       ) as ArgRefiner<XcfaState<PtrState<PredState>>, XcfaAction, XcfaPrec<PtrPrec<PredPrec>>>
 
     val cegarChecker = ArgCegarChecker.create(abstractor, refiner)
@@ -235,8 +235,8 @@ class XcfaPredAnalysisTest {
   fun testAasporPred(filepath: String, verdict: (SafetyResult<*, *>) -> Boolean) {
     println("Testing AASPOR on $filepath...")
     val stream = javaClass.getResourceAsStream(filepath)
-    val xcfa = getXcfaFromC(stream!!, ParseContext(), false, false, NullLogger.getInstance()).first
-    ConeOfInfluence = XcfaCoiMultiThread(xcfa)
+    val xcfa =
+      getXcfaFromC(stream!!, ParseContext(), false, property, NullLogger.getInstance()).first
 
     val solver = Z3LegacySolverFactory.getInstance().createSolver()
     val analysis =
@@ -250,16 +250,16 @@ class XcfaPredAnalysisTest {
 
     val lts = XcfaAasporLts(xcfa, mutableMapOf())
 
+    val errorDetector = getXcfaErrorDetector(property.verifiedProperty)
     val abstractor =
-      getXcfaAbstractor
+      getXcfaAbstractor(
         analysis,
         PriorityWaitlist.create(
           ArgNodeComparators.combine(ArgNodeComparators.targetFirst(), ArgNodeComparators.bfs())
         ),
         StopCriterions.firstCex<XcfaState<PtrState<PredState>>, XcfaAction>(),
-        ConsoleLogger(Logger.Level.DETAIL),
         lts,
-        ErrorDetection.ERROR_LOCATION,
+        errorDetector,
       )
         as ArgAbstractor<XcfaState<PtrState<PredState>>, XcfaAction, XcfaPrec<PtrPrec<PredPrec>>>
 
@@ -297,8 +297,8 @@ class XcfaPredAnalysisTest {
     XcfaDporLts.random = Random(seed)
     println("Testing AADPOR on $filepath...")
     val stream = javaClass.getResourceAsStream(filepath)
-    val xcfa = getXcfaFromC(stream!!, ParseContext(), false, false, NullLogger.getInstance()).first
-    ConeOfInfluence = XcfaCoiMultiThread(xcfa)
+    val xcfa =
+      getXcfaFromC(stream!!, ParseContext(), false, property, NullLogger.getInstance()).first
 
     val solver = Z3LegacySolverFactory.getInstance().createSolver()
     val analysis =
@@ -312,14 +312,14 @@ class XcfaPredAnalysisTest {
 
     val lts = XcfaAadporLts(xcfa)
 
+    val errorDetector = getXcfaErrorDetector(property.verifiedProperty)
     val abstractor =
       getXcfaAbstractor(
         analysis,
         lts.waitlist,
         StopCriterions.firstCex<XcfaState<PtrState<PredState>>, XcfaAction>(),
-        ConsoleLogger(Logger.Level.DETAIL),
         lts,
-        ErrorDetection.ERROR_LOCATION,
+        errorDetector,
       )
         as ArgAbstractor<XcfaState<PtrState<PredState>>, XcfaAction, XcfaPrec<PtrPrec<PredPrec>>>
 

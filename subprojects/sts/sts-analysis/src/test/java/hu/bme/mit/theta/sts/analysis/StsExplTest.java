@@ -20,7 +20,7 @@ import static hu.bme.mit.theta.core.decl.Decls.Var;
 import static hu.bme.mit.theta.core.type.anytype.Exprs.Prime;
 import static hu.bme.mit.theta.core.type.booltype.BoolExprs.*;
 import static hu.bme.mit.theta.core.type.inttype.IntExprs.*;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import hu.bme.mit.theta.analysis.Analysis;
 import hu.bme.mit.theta.analysis.LTS;
@@ -43,9 +43,7 @@ import hu.bme.mit.theta.analysis.expr.ExprState;
 import hu.bme.mit.theta.analysis.expr.ExprStatePredicate;
 import hu.bme.mit.theta.analysis.expr.refinement.*;
 import hu.bme.mit.theta.analysis.waitlist.PriorityWaitlist;
-import hu.bme.mit.theta.common.logging.ConsoleLogger;
 import hu.bme.mit.theta.common.logging.Logger;
-import hu.bme.mit.theta.common.logging.Logger.Level;
 import hu.bme.mit.theta.core.decl.VarDecl;
 import hu.bme.mit.theta.core.type.Expr;
 import hu.bme.mit.theta.core.type.inttype.IntType;
@@ -56,14 +54,14 @@ import hu.bme.mit.theta.sts.STS;
 import hu.bme.mit.theta.sts.STS.Builder;
 import java.util.Collections;
 import java.util.function.Predicate;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class StsExplTest {
 
     @Test
     public void test() {
 
-        final Logger logger = new ConsoleLogger(Level.VERBOSE);
+        final Logger logger = Logger.INSTANCE;
 
         final VarDecl<IntType> vx = Var("x", Int());
         final Expr<IntType> x = vx.getRef();

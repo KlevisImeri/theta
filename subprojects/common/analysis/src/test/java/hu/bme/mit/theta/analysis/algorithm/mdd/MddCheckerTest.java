@@ -20,56 +20,40 @@ import static hu.bme.mit.theta.core.type.anytype.Exprs.Prime;
 import static hu.bme.mit.theta.core.type.booltype.BoolExprs.And;
 import static hu.bme.mit.theta.core.type.booltype.BoolExprs.Not;
 import static hu.bme.mit.theta.core.type.inttype.IntExprs.Int;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import hu.bme.mit.theta.analysis.Trace;
 import hu.bme.mit.theta.analysis.algorithm.SafetyResult;
 import hu.bme.mit.theta.analysis.algorithm.bounded.MonolithicExpr;
+import hu.bme.mit.theta.analysis.expl.ExplState;
 import hu.bme.mit.theta.analysis.expr.ExprAction;
-import hu.bme.mit.theta.analysis.expr.ExprState;
 import hu.bme.mit.theta.common.logging.ConsoleLogger;
 import hu.bme.mit.theta.common.logging.Logger;
 import hu.bme.mit.theta.core.decl.Decls;
 import hu.bme.mit.theta.core.decl.VarDecl;
-import hu.bme.mit.theta.core.model.Valuation;
 import hu.bme.mit.theta.core.type.Expr;
 import hu.bme.mit.theta.core.type.booltype.BoolType;
 import hu.bme.mit.theta.core.type.inttype.IntExprs;
 import hu.bme.mit.theta.core.type.inttype.IntType;
-import hu.bme.mit.theta.core.utils.ExprUtils;
 import hu.bme.mit.theta.solver.SolverPool;
 import hu.bme.mit.theta.solver.z3legacy.Z3LegacySolverFactory;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(value = Parameterized.class)
 public class MddCheckerTest {
 
     private static final VarDecl<IntType> X = Decls.Var("x", IntType.getInstance());
     private static final VarDecl<IntType> Y = Decls.Var("y", IntType.getInstance());
     private static final VarDecl<IntType> Z = Decls.Var("z", IntType.getInstance());
-
-    @Parameterized.Parameter(value = 0)
     public Expr<BoolType> initExpr;
-
-    @Parameterized.Parameter(value = 1)
     public Expr<BoolType> tranExpr;
-
-    @Parameterized.Parameter(value = 2)
     public Expr<BoolType> propExpr;
-
-    @Parameterized.Parameter(value = 3)
     public boolean safe;
-
-    @Parameterized.Parameter(value = 4)
     public Long stateSpaceSize;
 
-    @Parameterized.Parameters(name = "{index}: {0}, {1}, {2}, {3}, {4}")
     public static Collection<Object[]> data() {
         return Arrays.asList(
                 new Object[][] {
@@ -153,18 +137,42 @@ public class MddCheckerTest {
                 });
     }
 
-    @Test
-    public void testBfs() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}, {1}, {2}, {3}, {4}")
+    public void testBfs(
+            Expr<BoolType> initExpr,
+            Expr<BoolType> tranExpr,
+            Expr<BoolType> propExpr,
+            boolean safe,
+            Long stateSpaceSize)
+            throws Exception {
+        initMddCheckerTest(initExpr, tranExpr, propExpr, safe, stateSpaceSize);
         testWithIterationStrategy(MddChecker.IterationStrategy.BFS);
     }
 
-    @Test
-    public void testSat() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}, {1}, {2}, {3}, {4}")
+    public void testSat(
+            Expr<BoolType> initExpr,
+            Expr<BoolType> tranExpr,
+            Expr<BoolType> propExpr,
+            boolean safe,
+            Long stateSpaceSize)
+            throws Exception {
+        initMddCheckerTest(initExpr, tranExpr, propExpr, safe, stateSpaceSize);
         testWithIterationStrategy(MddChecker.IterationStrategy.SAT);
     }
 
-    @Test
-    public void testGsat() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}, {1}, {2}, {3}, {4}")
+    public void testGsat(
+            Expr<BoolType> initExpr,
+            Expr<BoolType> tranExpr,
+            Expr<BoolType> propExpr,
+            boolean safe,
+            Long stateSpaceSize)
+            throws Exception {
+        initMddCheckerTest(initExpr, tranExpr, propExpr, safe, stateSpaceSize);
         testWithIterationStrategy(MddChecker.IterationStrategy.GSAT);
     }
 
@@ -173,21 +181,11 @@ public class MddCheckerTest {
 
         final Logger logger = new ConsoleLogger(Logger.Level.SUBSTEP);
 
-        final SafetyResult<MddProof, Trace<ExprState, ExprAction>> status;
+        final SafetyResult<MddProof, Trace<ExplState, ExprAction>> status;
         try (var solverPool = new SolverPool(Z3LegacySolverFactory.getInstance())) {
             final var monolithicExpr = new MonolithicExpr(initExpr, tranExpr, propExpr);
-            final MddChecker<ExprState, ExprAction> checker =
-                    MddChecker.create(
-                            monolithicExpr,
-                            List.copyOf(ExprUtils.getVars(List.of(initExpr, tranExpr, propExpr))),
-                            solverPool,
-                            logger,
-                            iterationStrategy,
-                            valuation -> monolithicExpr.getValToState().invoke(valuation),
-                            (Valuation v1, Valuation v2) ->
-                                    monolithicExpr.getBiValToAction().invoke(v1, v2),
-                            true,
-                            10);
+            final MddChecker checker =
+                    new MddChecker(monolithicExpr, solverPool, logger, iterationStrategy);
             status = checker.check(null);
         }
 
@@ -199,5 +197,18 @@ public class MddCheckerTest {
             assertTrue(stateSpaceSize >= status.getProof().size());
             assertTrue(status.asUnsafe().getCex().length() >= 0);
         }
+    }
+
+    public void initMddCheckerTest(
+            Expr<BoolType> initExpr,
+            Expr<BoolType> tranExpr,
+            Expr<BoolType> propExpr,
+            boolean safe,
+            Long stateSpaceSize) {
+        this.initExpr = initExpr;
+        this.tranExpr = tranExpr;
+        this.propExpr = propExpr;
+        this.safe = safe;
+        this.stateSpaceSize = stateSpaceSize;
     }
 }

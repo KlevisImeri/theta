@@ -1,7 +1,6 @@
 package hu.bme.mit.theta.analysis.algorithm.cegar
 
 import hu.bme.mit.theta.common.logging.Logger
-import hu.bme.mit.theta.common.logging.Logger.Level
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 
@@ -22,12 +21,11 @@ internal data class CegarStatisticsAccumulator(
     return startMark.elapsedNow().inWholeMilliseconds
   }
 
-  fun newIterationTime(logger: Logger) { 
+  fun newIterationTime() { 
     val currentTotalMs = nowMs()
     iterationTimes.add(currentTotalMs);
 
-    logger.write(
-        Level.MAINSTEP, 
+    Logger.mainStep(
         "Iteration finished at ${iterationTimes.last().msToSecStr()}s! %n"
     )
   }

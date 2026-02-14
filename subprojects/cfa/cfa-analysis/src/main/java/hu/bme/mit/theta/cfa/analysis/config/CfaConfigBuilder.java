@@ -52,7 +52,6 @@ import hu.bme.mit.theta.cfa.analysis.prec.GlobalCfaPrecRefiner;
 import hu.bme.mit.theta.cfa.analysis.prec.LocalCfaPrec;
 import hu.bme.mit.theta.cfa.analysis.prec.LocalCfaPrecRefiner;
 import hu.bme.mit.theta.common.logging.Logger;
-import hu.bme.mit.theta.common.logging.NullLogger;
 import hu.bme.mit.theta.solver.Solver;
 import hu.bme.mit.theta.solver.SolverFactory;
 import java.util.Set;
@@ -65,7 +64,7 @@ public class CfaConfigBuilder {
     private final SolverFactory refinementSolverFactory;
     private final Domain domain;
     private final Refinement refinement;
-    private Logger logger = NullLogger.getInstance();
+    private Logger logger = Logger.INSTANCE;
     private Search search = Search.BFS;
     private PredSplit predSplit = PredSplit.WHOLE;
     private PrecGranularity precGranularity = PrecGranularity.GLOBAL;
@@ -144,13 +143,6 @@ public class CfaConfigBuilder {
             return (new PredStrategy(cfa)).buildConfig(errLoc);
         }
         throw new UnsupportedOperationException(domain + " domain is not supported.");
-    }
-
-    public enum Algorithm {
-        CEGAR,
-        BMC,
-        KINDUCTION,
-        IMC
     }
 
     public enum Domain {

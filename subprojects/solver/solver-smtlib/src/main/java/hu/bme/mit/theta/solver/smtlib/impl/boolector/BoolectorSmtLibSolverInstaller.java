@@ -28,10 +28,10 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
+@Deprecated
 public class BoolectorSmtLibSolverInstaller extends SmtLibSolverInstaller.Default {
 
-    public BoolectorSmtLibSolverInstaller(final Logger logger) {
-        super(logger);
+    public BoolectorSmtLibSolverInstaller() {
     }
 
     @Override
@@ -48,7 +48,7 @@ public class BoolectorSmtLibSolverInstaller extends SmtLibSolverInstaller.Defaul
                                 "https://github.com/Boolector/boolector/archive/refs/tags/%s.tar.gz",
                                 version));
 
-        logger.write(Logger.Level.MAINSTEP, "Starting download (%s)...\n", downloadUrl.toString());
+        Logger.INSTANCE.mainStep("Starting download (%s)...\n", downloadUrl.toString());
 
         try (final var inputStream = downloadUrl.toURL().openStream()) {
             Compress.extract(inputStream, installDir, Compress.CompressionType.TARGZ);
@@ -56,9 +56,9 @@ public class BoolectorSmtLibSolverInstaller extends SmtLibSolverInstaller.Defaul
             throw new SmtLibSolverInstallerException(e);
         }
 
-        logger.write(Logger.Level.MAINSTEP, "Download finished\n");
+        Logger.INSTANCE.mainStep("Download finished\n");
 
-        logger.write(Logger.Level.MAINSTEP, "Starting compilation\n");
+        Logger.INSTANCE.mainStep("Starting compilation\n");
 
         installDir
                 .resolve("contrib")
@@ -84,7 +84,7 @@ public class BoolectorSmtLibSolverInstaller extends SmtLibSolverInstaller.Defaul
                 .toFile()
                 .setExecutable(true, true);
 
-        logger.write(Logger.Level.MAINSTEP, "Finished compilation\n");
+        Logger.INSTANCE.mainStep("Finished compilation\n");
     }
 
     @Override
@@ -132,7 +132,7 @@ public class BoolectorSmtLibSolverInstaller extends SmtLibSolverInstaller.Defaul
     private void executeCommand(final Path workingPath, final String command)
             throws SmtLibSolverInstallerException {
         try {
-            logger.write(Logger.Level.SUBSTEP, "Execute command: %s\n", command);
+            Logger.INSTANCE.subStep("Execute command: %s\n", command);
             final var process =
                     new ProcessBuilder()
                             .command("bash", "-c", command)

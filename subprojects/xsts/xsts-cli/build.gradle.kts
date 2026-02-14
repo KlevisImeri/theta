@@ -16,9 +16,11 @@
 plugins {
     id("kotlin-common")
     id("cli-tool")
+    id("archive-packaging")
 }
 
 dependencies {
+    implementation(files(rootDir.resolve(Deps.delta)))
     implementation(project(":theta-petrinet-model"))
     implementation(project(":theta-petrinet-analysis"))
     implementation(project(":theta-petrinet-xsts"))
@@ -39,4 +41,11 @@ dependencies {
 
 application {
     mainClass.set("hu.bme.mit.theta.xsts.cli.XstsCliMainKt")
+}
+archivePackaging {
+    variant {
+        toolName = "Theta-xsts"
+        inputFlags = "CEGAR"
+        readmeTemplate = file("src/main/resources/archive-packaging/README.md")
+    }
 }

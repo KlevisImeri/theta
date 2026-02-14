@@ -25,10 +25,10 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 
+@Deprecated
 public class BitwuzlaSmtLibSolverInstaller extends SmtLibSolverInstaller.Default {
 
-    public BitwuzlaSmtLibSolverInstaller(final Logger logger) {
-        super(logger);
+    public BitwuzlaSmtLibSolverInstaller() {
     }
 
     @Override
@@ -44,7 +44,7 @@ public class BitwuzlaSmtLibSolverInstaller extends SmtLibSolverInstaller.Default
                         String.format(
                                 "https://github.com/bitwuzla/bitwuzla/archive/%s.zip", version));
 
-        logger.write(Logger.Level.MAINSTEP, "Starting download (%s)...\n", downloadUrl.toString());
+        Logger.INSTANCE.mainStep("Starting download (%s)...\n", downloadUrl.toString());
 
         try (final var inputStream = downloadUrl.toURL().openStream()) {
             Compress.extract(inputStream, installDir, Compress.CompressionType.ZIP);
@@ -52,9 +52,9 @@ public class BitwuzlaSmtLibSolverInstaller extends SmtLibSolverInstaller.Default
             throw new SmtLibSolverInstallerException(e);
         }
 
-        logger.write(Logger.Level.MAINSTEP, "Download finished\n");
+        Logger.INSTANCE.mainStep("Download finished\n");
 
-        logger.write(Logger.Level.MAINSTEP, "Starting compilation\n");
+        Logger.INSTANCE.mainStep("Starting compilation\n");
 
         installDir
                 .resolve("contrib")
@@ -83,7 +83,7 @@ public class BitwuzlaSmtLibSolverInstaller extends SmtLibSolverInstaller.Default
                 .toFile()
                 .setExecutable(true, true);
 
-        logger.write(Logger.Level.MAINSTEP, "Finished compilation\n");
+        Logger.INSTANCE.mainStep("Finished compilation\n");
     }
 
     @Override
@@ -118,7 +118,7 @@ public class BitwuzlaSmtLibSolverInstaller extends SmtLibSolverInstaller.Default
     private void executeCommand(final Path workingPath, final String command)
             throws SmtLibSolverInstallerException {
         try {
-            logger.write(Logger.Level.SUBSTEP, "Execute command: %s\n", command);
+            Logger.INSTANCE.subStep("Execute command: %s\n", command);
             final var process =
                     new ProcessBuilder()
                             .command("bash", "-c", command)

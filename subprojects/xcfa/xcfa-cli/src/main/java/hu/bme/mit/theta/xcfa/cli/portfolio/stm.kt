@@ -17,6 +17,7 @@ package hu.bme.mit.theta.xcfa.cli.portfolio
 
 import hu.bme.mit.theta.analysis.algorithm.SafetyResult
 import hu.bme.mit.theta.common.exception.NotSolvableException
+import hu.bme.mit.theta.common.logging.Logger
 import hu.bme.mit.theta.xcfa.cli.params.Backend
 import hu.bme.mit.theta.xcfa.cli.params.BoundedConfig
 import hu.bme.mit.theta.xcfa.cli.params.XcfaConfig
@@ -151,7 +152,7 @@ ${edges.map { it.visualize() }.reduce { a, b -> "$a\n$b" }}
 """
       .trimMargin()
 
-  fun execute(partialResult: LocationInvariants? = null): Pair<Any, SafetyResult<*, *>> {
+  fun execute(partialResult: LocationInvariants? = null): Pair<Any, Any> {
     var currentNode: Node = initNode
     var currentPartialResult: LocationInvariants? = partialResult
     while (true) {
@@ -174,13 +175,13 @@ ${edges.map { it.visualize() }.reduce { a, b -> "$a\n$b" }}
           }
         } else return Pair(x, res)
       } catch (e: Throwable) {
-        println("Caught exception: $e")
+        Logger.benchmark("Caught exception: $e")
         val edge: Edge? = currentNode.outEdges.find { it.trigger(e) }
         if (edge != null) {
-          println("Handling exception as ${edge.trigger}")
+          Logger.benchmark("Handling exception as ${edge.trigger}")
           currentNode = edge.target
         } else {
-          println(
+          Logger.benchmark(
             "Could not handle trigger $e (Available triggers: ${
                         currentNode.outEdges.map { it.trigger }.toList()
                     })"
@@ -194,6 +195,6 @@ ${edges.map { it.visualize() }.reduce { a, b -> "$a\n$b" }}
 
 // fun XcfaConfig<*, CegarConfig>.visualize(inProcess: Boolean): String =
 //    """solvers: $abstractionSolver, $refinementSolver
-//    |domain: $domain, search: $search, initprec: $initPrec, por: $porLevel
+//    |domain: $domain, search: $search, initprec: $initPrec, por: $por
 //    |refinement: $refinement, pruneStrategy: $pruneStrategy
 //    |timeout: $timeoutMs ms, inProcess: $inProcess""".trimMargin()

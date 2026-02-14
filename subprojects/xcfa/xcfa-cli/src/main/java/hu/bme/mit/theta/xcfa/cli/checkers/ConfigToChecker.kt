@@ -16,6 +16,7 @@
 package hu.bme.mit.theta.xcfa.cli.checkers
 
 import hu.bme.mit.theta.analysis.Trace
+import hu.bme.mit.theta.analysis.algorithm.Checker
 import hu.bme.mit.theta.analysis.algorithm.SafetyChecker
 import hu.bme.mit.theta.analysis.algorithm.SafetyResult
 import hu.bme.mit.theta.analysis.algorithm.arg.ARG
@@ -30,32 +31,30 @@ import hu.bme.mit.theta.xcfa.cli.params.Backend
 import hu.bme.mit.theta.xcfa.cli.params.XcfaConfig
 import hu.bme.mit.theta.xcfa.model.XCFA
 
-fun getChecker(
+fun getSafetyChecker(
   xcfa: XCFA?,
   mcm: MCM?,
   config: XcfaConfig<*, *>,
   parseContext: ParseContext?,
-  logger: Logger,
-  uniqueLogger: Logger,
 ): SafetyChecker<*, *, *> =
   if (config.backendConfig.inProcess) {
-    InProcessChecker(xcfa, config, parseContext, logger)
+    InProcessChecker(xcfa, config, parseContext)
   } else {
     xcfa!!
     mcm!!
     parseContext!!
     when (config.backendConfig.backend) {
-      Backend.CEGAR -> getCegarChecker(xcfa, mcm, config, logger)
+      Backend.CEGAR -> getCegarChecker(xcfa, mcm, parseContext, config)
       Backend.BMC,
       Backend.KIND,
       Backend.IMC,
       Backend.KINDIMC,
-      Backend.BOUNDED -> getBoundedChecker(xcfa, mcm, parseContext, config, logger)
-      Backend.OC -> getOcChecker(xcfa, mcm, config, logger)
+      Backend.BOUNDED -> getBoundedChecker(xcfa, parseContext, config)
+      Backend.OC -> getOcChecker(xcfa, mcm, config)
       Backend.LAZY -> TODO()
       Backend.PORTFOLIO ->
-        getPortfolioChecker(xcfa, mcm, config, parseContext, logger, uniqueLogger)
-      Backend.MDD -> getMddChecker(xcfa, mcm, parseContext, config, logger)
+        getPortfolioChecker(xcfa, mcm, config, parseContext)
+      Backend.MDD -> getMddChecker(xcfa, parseContext, config)
       Backend.NONE ->
         SafetyChecker<
           ARG<XcfaState<PtrState<*>>, XcfaAction>,
@@ -64,9 +63,38 @@ fun getChecker(
         > { _ ->
           SafetyResult.unknown()
         }
-      Backend.CHC -> getHornChecker(xcfa, mcm, config, logger)
-      Backend.IC3 -> getIc3Checker(xcfa, mcm, parseContext, config, logger)
-      Backend.LASSO_VALIDATION ->
-        getLassoValidationChecker(xcfa, mcm, parseContext, config, logger, uniqueLogger)
+      Backend.CHC -> getHornChecker(xcfa, mcm, config, parseContext)
+      Backend.IC3 -> getIc3Checker(xcfa, parseContext, config)
+      Backend.LIVENESS_CEGAR -> getAsgCegarChecker(xcfa, parseContext, mcm, config)
+      Backend.TRACEGEN ->
+        throw RuntimeException(
+          "Trace generation is NOT safety analysis, can not return safety checker for trace generation"
+        )
+    }
+  }
+
+fun getChecker(
+  xcfa: XCFA?,
+  mcm: MCM?,
+  config: XcfaConfig<*, *>,
+  parseContext: ParseContext?,
+): Checker<*, XcfaPrec<*>> =
+  if (config.backendConfig.inProcess) {
+    InProcessChecker(xcfa, config, parseContext)
+  } else {
+    when (config.backendConfig.backend) {
+      Backend.TRACEGEN -> getTracegenChecker(xcfa!!, parseContext!!, mcm, config)
+      Backend.NONE ->
+        SafetyChecker<
+          ARG<XcfaState<PtrState<*>>, XcfaAction>,
+          Trace<XcfaState<PtrState<*>>, XcfaAction>,
+          XcfaPrec<*>,
+        > { _ ->
+          SafetyResult.unknown()
+        }
+      else ->
+        throw RuntimeException(
+          "Use getSafetyChecker method for safety analysis instead of getChecker"
+        )
     }
   }
