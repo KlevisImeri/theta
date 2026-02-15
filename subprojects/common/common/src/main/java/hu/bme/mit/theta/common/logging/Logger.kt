@@ -1,4 +1,4 @@
-/*
+/*logger.
  *  Copyright 2025 Budapest University of Technology and Economics
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,8 +71,9 @@ object Logger {
 
     private fun getLocation(): String {
         val stackTrace = Thread.currentThread().stackTrace
-        val caller = stackTrace[4]
-        val fileName = caller.fileName
+        val index = minOf(4, stackTrace.size - 1)
+        val caller = stackTrace[index]
+        val fileName = caller.fileName ?: "Unknown"
         val lineNumber = caller.lineNumber
         return "$fileName:$lineNumber"
     }
@@ -87,9 +88,7 @@ object Logger {
         val formatted = formatMessage(level, location, message)
         output.write(formatted)
         output.write("\n")
-        if (output is PrintWriter) {
-            (output as PrintWriter).flush()
-        }
+        output.flush()
     }
 
     fun debug(format: String, vararg args: Any?) {
@@ -176,9 +175,7 @@ object Logger {
     }
 
     fun close() {
-        if (output is PrintWriter) {
-            (output as PrintWriter).close()
-        }
+        output.close();
         initialized = false
     }
 }

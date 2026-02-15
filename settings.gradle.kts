@@ -66,6 +66,8 @@ include(
     "solver/solver-smtlib",
     "solver/solver-smtlib-cli",
     "solver/graph-solver",
+
+    "portfolio/portfolio",
 )
 
 for (project in rootProject.children) {

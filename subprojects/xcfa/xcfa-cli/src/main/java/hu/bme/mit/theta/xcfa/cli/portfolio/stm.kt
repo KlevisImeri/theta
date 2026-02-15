@@ -28,14 +28,14 @@ abstract class Node(val name: String) {
   val outEdges: MutableSet<Edge> = LinkedHashSet()
   var parent: STM? = null
 
-  abstract fun execute(partialResult: LocationInvariants? = null): Pair<Any, SafetyResult<*, *>>
+  abstract fun execute(partialResult: LocationInvariants? = null): Pair<Any, Any>
 
   abstract fun visualize(): String
 }
 
 class HierarchicalNode(name: String, val innerSTM: STM) : Node(name) {
 
-  override fun execute(partialResult: LocationInvariants?): Pair<Any, SafetyResult<*, *>> =
+  override fun execute(partialResult: LocationInvariants?): Pair<Any, Any> =
     innerSTM.execute(partialResult)
 
   override fun visualize(): String =
@@ -71,7 +71,8 @@ class ConfigNode(
 ) : Node(name) {
 
   override fun execute(partialResult: LocationInvariants?): Pair<Any, SafetyResult<*, *>> {
-    println("Current configuration: $config")
+    Logger.result("Current configuration: $name")
+    Logger.benchmark("Current configuration: $config")
     return Pair(Pair(name, config), check(config, partialResult))
   }
 
