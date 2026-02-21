@@ -16,21 +16,11 @@
 plugins {
     id("java-common")
     id("kotlin-common")
-    id("application")
-}
-
-group = "hu.bme.mit.theta"
-version = "0.1-SNAPSHOT"
-
-application {
-    mainClass.set("hu.bme.mit.theta.portfolio.MainPortfolioKt")
-    applicationName = "thetaport"
 }
 
 dependencies {
     implementation(Deps.Kotlin.stdlib)
     implementation("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}")
-    implementation(Deps.jcommander)
     implementation(project(":theta-common"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 }
