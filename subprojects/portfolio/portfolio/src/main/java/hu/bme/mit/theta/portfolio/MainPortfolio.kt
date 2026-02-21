@@ -88,7 +88,7 @@ fun main(args: Array<String>) {
         exitProcess(0)
     }
 
-    val logTypes = config.logLevels.split(",").map { it.trim() }.toTypedArray()
+    val logTypes = config.logLevels
     Logger.init(logTypes)
 
     Logger.mainStep("Starting portfolio execution")
