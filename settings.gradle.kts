@@ -49,6 +49,7 @@ include(
     "xcfa/xcfa2chc",
     "xcfa/xcfa-analysis",
     "xcfa/xcfa-cli",
+    "xcfa/xcfa-port",
 
     "xta/xta",
     "xta/xta-analysis",
